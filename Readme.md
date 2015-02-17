@@ -17,7 +17,7 @@ For create customer families
 Add it in your main thelia composer.json file
 
 ```
-composer require thelia/customerfamily-module:~1.0
+composer require thelia/customer-family-module:~1.0
 ```
 
 ## Usage
@@ -31,8 +31,8 @@ This loop returns client families
 ### Input arguments
 
 |Argument |Description |Version |
-|---      |--- |       |--- |
-|**if** | family id | 1.0
+|---      |---         |--- |
+|**id** | family id | 1.0
 |**exclude_id** | exclude family id | 1.0
 
 ### Output values
