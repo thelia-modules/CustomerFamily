@@ -9,7 +9,7 @@ For create customer families
 
 ### Manually
 
-* Copy the module into ```<thelia_root>/local/modules/RecentlyViewed``` directory and be sure that the name of the module is CustomerFamily.
+* Copy the module into ```<thelia_root>/local/modules/CustomerFamily``` directory and be sure that the name of the module is CustomerFamily.
 * Activate it in your thelia administration panel
 
 ### Composer
