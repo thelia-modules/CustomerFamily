@@ -1,0 +1,80 @@
+{loop name="customer_customer_family" type="customer_customer_family" customer_id=$ID}
+    {assign var="_customer_family_id_" value=$CUSTOMER_FAMILY_ID}
+    {assign var="_siret_" value=$SIRET}
+    {assign var="_vat_" value=$VAT}
+{/loop}
+<div class="row">
+    <div class="col-md-12 general-block-decorator">
+        <div class="row">
+            <div class="col-md-12 title title-without-tabs">{intl l="Family of this customer" d="customerfamily"}</div>
+            <div class="col-md-12">
+                <div class="col-md-12">
+                    {form name="customer.customer.family.form"}
+                    <form class="form-horizontal" action="{url path="/admin/module/CustomerFamily/customer/update"}" method="post">
+
+                    {form_hidden_fields form=$form}
+
+                    {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+
+                    {form_field form=$form field='customer_id'}
+                        <input type="hidden" name="{$name}" value="{$ID}" />
+                    {/form_field}
+
+                    {form_field form=$form field='customer_family_id'}
+                    <div class="form-group {if $error}has-error{/if}">
+                        <label for="{$label_attr.for}" class="control-label group-type-status">{$label} *</label>
+                        <div class="control-input">
+                            <select name="{$name}" id="{$label_attr.for}" class="form-control">
+                                {loop name="customer_family" type="customer_family"}
+                                <option data-code="{$CODE}" value="{$CUSTOMER_FAMILY_ID}" {if {$value|default:$_customer_family_id_} == $CUSTOMER_FAMILY_ID}selected{/if}>{$TITLE_CUSTOMER_FAMILY}</option>
+                                {/loop}
+                            </select>
+                        </div>
+                    </div>
+                    {/form_field}
+
+                    {form_field form=$form field="siret"}
+                    <div class="form-group group-email {if $error}has-error{/if}">
+                        <label class="control-label" for="{$label_attr.for}">{$label} <span class="required">*</span></label>
+
+                        <div class="control-input">
+                            <input type="text" name="{$name}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder siret"}" value="{$value|default:$_siret_}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
+                            {if $error }
+                            <span class="help-block">{$message}</span>
+                            {assign var="error_focus" value="true"}
+                            {/if}
+                        </div>
+                    </div><!--/.form-group-->
+                    {/form_field}
+
+                    {form_field form=$form field="vat"}
+                    <div class="form-group group-email {if $error}has-error{/if}">
+                        <label class="control-label" for="{$label_attr.for}">{$label} <span class="required">*</span></label>
+
+                        <div class="control-input">
+                            <input type="text" name="{$name}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder vat"}" value="{$value|default:$_vat_}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
+                            {if $error }
+                            <span class="help-block">{$message}</span>
+                            {assign var="error_focus" value="true"}
+                            {/if}
+                        </div>
+                    </div><!--/.form-group-->
+                    {/form_field}
+
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label class="control-label"></label>
+                            <button class="btn btn-default btn-primary form-control" type="submit">
+                                <span class="glyphicon glyphicon-check"></span>
+                                {intl l="Update"}
+                            </button>
+                        </div>
+                    </div>
+
+                    </form>
+                    {/form}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,163 @@
+<div class="general-block-decorator" id="CustomerFamily">
+    <div class="title">
+        {intl l="Customer Family" d="customerfamily"}
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            {if $hide_flags != true}
+            <ul class="nav nav-pills">
+                {loop name="lang_list" type="lang"}
+                <li {if $ID == $edit_language_id}class="active"{/if}>
+                    {if $current_tab}
+                        {$lang_url = {url path="/admin/module/CustomerFamily" edit_language_id=$ID current_tab=$current_tab}}
+                    {else}
+                        {$lang_url = {url path="/admin/module/CustomerFamily" edit_language_id=$ID}}
+                    {/if}
+                    <a class="language-change-button" data-language-id="{$ID}" href="{$lang_url nofilter}" title="{intl l='Edit information in %lng' lng={$TITLE}}">
+                        <img src="{image file="assets/img/flags/$CODE.png"}" alt="{$TITLE}" />
+                    </a>
+                </li>
+                {/loop}
+            </ul>
+            {/if}
+        </div>
+
+        {form name="customer.family.delete.form"}
+        {if $form_error}
+            <div class="alert alert-danger">{$form_error_message}</div
+        {/if}
+        {/form}
+
+        <div class="col-md-12">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            {intl l="ID"}
+                        </th>
+                        <th>
+                            {intl l="Code"}
+                        </th>
+                        <th>
+                            {intl l="Title"}
+                        </th>
+                        <th>
+                            {intl l="Action"}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {ifloop rel="customer_family"}
+                        {loop type="customer_family" name="customer_family" lang=$edit_language_id  force_return="on"}
+                        <tr>
+                            <td>
+                                {$CUSTOMER_FAMILY_ID}
+                            </td>
+                            <td>
+                                {$CODE}
+                            </td>
+                            <td>
+                                {$TITLE_CUSTOMER_FAMILY}
+                            </td>
+                            <td>
+                                <a class="btn btn-info pull-left js-action-update" data-id="{$CUSTOMER_FAMILY_ID}" data-code="{$CODE}" data-title="{$TITLE_CUSTOMER_FAMILY}" style="margin-right: 5px;">{intl l="Edit" d="customerfamily"}</a>
+                                <a class="btn btn-danger pull-left js-action-delete" data-id="{$CUSTOMER_FAMILY_ID}" style="margin-right: 5px;">{intl l="Delete"}</a>
+                            </td>
+                        </tr>
+                        {/loop}
+                    {/ifloop}
+                    {elseloop rel="customer_family"}
+                        <tr>
+                            <td colspan="4" class="text-center">
+                                {intl l="No family" d="CustomerFamily"}
+                            </td>
+                        </tr>
+                    {/elseloop}
+                </tbody>
+                <tfoot class="text-center">
+                    <tr>
+                        <td colspan="4">
+                            {form name="customer.family.create.form"}
+                            <form action="{url path="/admin/module/CustomerFamily/create"}" method="POST" class="form-inline">
+                            {if $form_error}
+                                <div class="alert alert-danger">{$form_error_message}</div
+                            {/if}
+                                {form_hidden_fields form=$form}
+                                {form_field form=$form field="locale"}
+                                    <input type="hidden" name="{$name}" value="{$edit_language_locale}" />
+                                {/form_field}
+                                {form_field form=$form field="code"}
+                                <div class="form-group{if $error} has-error{/if}">
+                                    <input class="form-control" type="text" required placeholder="{$label}" name="{$name}" value="{$value}" />
+                                </div>
+                                {/form_field}
+                                {form_field form=$form field="title"}
+                                    <div class="form-group{if $error} has-error{/if}">
+                                        <input class="form-control" type="text" required placeholder="{$label}" name="{$name}" value="{$value}" />
+                                    </div>
+                                {/form_field}
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary js-action-create">{intl l="Add"}</button>
+                                </div>
+                            </form>
+                            {/form}
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+
+        </div>
+    </div>
+
+    {form name="customer.family.delete.form"}
+        <div class="modal js-modal-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <form action="" method="POST">
+                    {form_hidden_fields form=$form}
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            {intl l="Do you really want to delete this customer family ?" d="customerfamily"}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">{intl l="No"}</button>
+                            <button type="submit" type="button" class="btn btn-danger js-action-delete-confirm">{intl l="Yes"}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    {/form}
+
+    {form name="customer.family.update.form"}
+        <div class="modal js-modal-update" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <form action="" method="POST">
+                    {form_hidden_fields form=$form}
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            {form_field form=$form field="locale"}
+                                <input type="hidden" name="{$name}" value="{$edit_language_locale}" />
+                            {/form_field}
+                            {form_field form=$form field="code"}
+                                <div class="form-group{if $error} has-error{/if}">
+                                    <label>{$label}</label>
+                                    <input class="form-control js-field-code" type="text" required placeholder="{$label}" name="{$name}" value="{$value}" />
+                                </div>
+                            {/form_field}
+                            {form_field form=$form field="title"}
+                                <div class="form-group{if $error} has-error{/if}">
+                                    <label>{$label}</label>
+                                    <input class="form-control js-field-title" type="text" required placeholder="{$label}" name="{$name}" value="{$value}" />
+                                </div>
+                            {/form_field}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">{intl l="Cancel"}</button>
+                            <button type="submit" type="button" class="btn btn-primary js-action-delete-confirm">{intl l="Update"}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    {/form}
+</div>

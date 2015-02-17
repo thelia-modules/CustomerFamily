@@ -1,0 +1,31 @@
+<script type="text/javascript">
+    (function($, $module){
+
+        //delete
+        var $modalDelete = $module.find('.js-modal-delete')
+
+        $module.on('click', '.js-action-delete', function(event){
+            var id = $(this).data('id');
+            $modalDelete.find('form').attr('action', '{url path="/admin/module/CustomerFamily/delete"}/'+id);
+            $modalDelete.modal('show');
+            event.preventDefault();
+        });
+        //end delete
+
+        //update
+        var $modalUpdate = $module.find('.js-modal-update')
+
+        $module.on('click', '.js-action-update', function(event){
+            var id = $(this).data('id');
+
+            $modalUpdate.find('.js-field-code').val($(this).data('code'));
+            $modalUpdate.find('.js-field-title').val($(this).data('title'));
+
+            $modalUpdate.find('form').attr('action', '{url path="/admin/module/CustomerFamily/update"}/'+id);
+            $modalUpdate.modal('show');
+            event.preventDefault();
+        });
+        //end update
+
+    })(jQuery, jQuery('#CustomerFamily'));
+</script>

@@ -1,0 +1,12 @@
+{
+    "name": "thelia/customer-family-module",
+    "type": "thelia-module",
+    "license": "LGPL V3",
+    "description": "For creating customer families",
+    "require": {
+        "thelia/installer": "1.0"
+    },
+    "extra": {
+        "installer-name": "CustomerFamily"
+    }
+}
