@@ -15,8 +15,8 @@
         <form name="customer.family.delete.form" class="CustomerFamily\Form\CustomerFamilyDeleteForm" />
 
         <form name="customer.customer.family.form" class="CustomerFamily\Form\CustomerCustomerFamilyForm" />
-        <form name="thelia.front.customer.create" class="CustomerFamily\Form\CustomerFamilyCustomerCreateForm" />
-        <form name="thelia.front.customer.profile.update" class="CustomerFamily\Form\CustomerFamilyCustomerProfileUpdateForm" />
+        <!--<form name="thelia.front.customer.create" class="CustomerFamily\Form\CustomerFamilyCustomerCreateForm" />-->
+        <!--<form name="thelia.front.customer.profile.update" class="CustomerFamily\Form\CustomerFamilyCustomerProfileUpdateForm" />-->
     </forms>
 
     <commands>
@@ -32,7 +32,21 @@
             <argument type="service" id="mailer"/>
             <tag name="kernel.event_subscriber"/>
         </service>
+
+		<!-- Listening to create customer form actions -->
+		<service id="customer.family.form.action" class="CustomerFamily\EventListeners\CustomerFamilyFormListener" scope="request">
+			<argument type="service" id="request" />
+			<tag name="kernel.event_subscriber"/>
+		</service>
     </services>
+
+	<hooks>
+		<!-- Additional fields for the register form -->
+		<hook id="customer.family.register.form" class="CustomerFamily\Hook\CustomerFamilyRegisterFormHook" scope="request">
+			<tag name="hook.event_listener" event="register.form-bottom" type="front" method="onRegisterFormBottom"/>
+			<tag name="hook.event_listener" event="register.after-javascript-include" type="front" method="onRegisterAfterJSInclude"/>
+		</hook>
+	</hooks>
 
     <!--
     <exports>

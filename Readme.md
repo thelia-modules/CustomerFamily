@@ -3,7 +3,7 @@
 For create customer families
 
 ## Compatibility
-* Thelia >= 2.0
+* Thelia >= 2.1.0
 
 ## Installation
 
@@ -19,6 +19,28 @@ Add it in your main thelia composer.json file
 ```
 composer require thelia/customer-family-module:~1.0
 ```
+
+### Adding code in Thelia
+
+The module uses Thelia's default register.html template. It currently does not work with the template. Hopefully there is a workaround to fix this problem. You have to add a `form` argument in the hook called "register.form-bottom" :
+
+```
+{hook name="register.form-bottom" form=$form }
+```
+
+There is also a bug while submitting the customer registration. To fix it, go to the Front\Controller\CustomerController PHP class, in the `createAction();` method. Replace this line :
+
+```
+$customerCreation = new CustomerCreateForm($this->getRequest());
+```
+
+by this line :
+
+```
+$customerCreation = $this->createForm('thelia.front.customer.create');
+```
+
+These issues will be fixed in a future version of Thelia.
 
 ## Usage
 

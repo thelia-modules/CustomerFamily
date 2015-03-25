@@ -34,6 +34,8 @@ use Thelia\Mailer\MailerFactory;
  */
 class CustomerFamilyListener implements EventSubscriberInterface
 {
+     const THELIA_CUSTOMER_CREATE_FORM_NAME = 'thelia_customer_create';
+
     /** @var \Thelia\Core\HttpFoundation\Request */
     protected $request;
 
@@ -147,14 +149,21 @@ class CustomerFamilyListener implements EventSubscriberInterface
      */
     public function afterCreateCustomer(CustomerEvent $event)
     {
-        $form = $this->request->request->get("customer_family_customer_create_form");
+        $form = $this->request->request->get(self::THELIA_CUSTOMER_CREATE_FORM_NAME);
 
-        if (array_key_exists("customer_family_id", $form)) {
+        if (array_key_exists('customer_family_code', $form)) {
+            $customerFamily = CustomerFamily::getCustomerFamilyByCode($form['customer_family_code']);
+            $id = $customerFamily->getId();
+
+            // Ignore SIRET and VAT if the customer is not professional
+            $siret = $customerFamily->getCode() == CustomerFamily::CUSTOMER_FAMILY_PROFESSIONAL ? $form['siret'] : '';
+            $vat = $customerFamily->getCode() == CustomerFamily::CUSTOMER_FAMILY_PROFESSIONAL ? $form['vat'] : '';
+
             $updateEvent = new CustomerCustomerFamilyEvent($event->getCustomer()->getId());
             $updateEvent
-                ->setCustomerFamilyId($form["customer_family_id"])
-                ->setSiret($form["siret"])
-                ->setVat($form["vat"])
+                ->setCustomerFamilyId($id)
+                ->setSiret($siret)
+                ->setVat($vat)
             ;
 
             $event->getDispatcher()->dispatch(CustomerFamilyEvents::CUSTOMER_CUSTOMER_FAMILY_UPDATE, $updateEvent);
@@ -187,7 +196,11 @@ class CustomerFamilyListener implements EventSubscriberInterface
      */
     public function customerCustomerFamilyUpdate(CustomerCustomerFamilyEvent $event)
     {
-        $customerCustomerFamily = CustomerCustomerFamilyQuery::create()->findPk($event->getCustomerId());
+        $customerCustomerFamily = CustomerCustomerFamilyQuery::create()
+            ->filterByCustomerId($event->getCustomerId())
+            ->filterByCustomerFamilyId($event->getCustomerFamilyId())
+            ->findOne();
+        //$customerCustomerFamily = CustomerCustomerFamilyQuery::create()->findPk($event->getCustomerId());
 
         if ($customerCustomerFamily === null) {
             $customerCustomerFamily = new CustomerCustomerFamily();
@@ -213,7 +226,7 @@ class CustomerFamilyListener implements EventSubscriberInterface
             return $form;
         }
 
-        if (null != $form = $this->request->request->get("customer_family_customer_create_form")) {
+        if (null != $form = $this->request->request->get(self::THELIA_CUSTOMER_CREATE_FORM_NAME)) {
             return $form;
         }
 
