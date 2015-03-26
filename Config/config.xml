@@ -46,6 +46,11 @@
 			<tag name="hook.event_listener" event="register.form-bottom" type="front" method="onRegisterFormBottom"/>
 			<tag name="hook.event_listener" event="register.after-javascript-include" type="front" method="onRegisterAfterJSInclude"/>
 		</hook>
+
+		<!-- Showing customer family informations -->
+		<hook id="customer.family.account.display" class="CustomerFamily\Hook\CustomerFamilyAccountDisplayHook" scope="request">
+			<tag name="hook.event_listener" event="account.additional" type="front" method="onAccountAdditional"/>
+		</hook>
 	</hooks>
 
     <!--

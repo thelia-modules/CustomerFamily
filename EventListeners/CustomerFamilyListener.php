@@ -152,6 +152,7 @@ class CustomerFamilyListener implements EventSubscriberInterface
         $form = $this->request->request->get(self::THELIA_CUSTOMER_CREATE_FORM_NAME);
 
         if (array_key_exists('customer_family_code', $form)) {
+            // TODO : improve because it might add a new CustomerFamily
             $customerFamily = CustomerFamily::getCustomerFamilyByCode($form['customer_family_code']);
             $id = $customerFamily->getId();
 
@@ -200,7 +201,6 @@ class CustomerFamilyListener implements EventSubscriberInterface
             ->filterByCustomerId($event->getCustomerId())
             ->filterByCustomerFamilyId($event->getCustomerFamilyId())
             ->findOne();
-        //$customerCustomerFamily = CustomerCustomerFamilyQuery::create()->findPk($event->getCustomerId());
 
         if ($customerCustomerFamily === null) {
             $customerCustomerFamily = new CustomerCustomerFamily();
