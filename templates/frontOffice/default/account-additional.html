@@ -1,4 +1,4 @@
-{default_translation_domain domain='customerfamily'}
+{default_translation_domain domain=$messageDomain}
 {loop type="customer_customer_family" name="customer_customer_family" customer_id={$customerId} }
 <div id="customer-customer-family-{$CUSTOMER_ID}-{$CUSTOMER_FAMILY_ID}">
 	{loop type="customer_family" name="customer_family" id={$CUSTOMER_FAMILY_ID} }

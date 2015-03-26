@@ -28,6 +28,10 @@ return array(
     "This field can't be empty" => "Ce champs ne peut pas être vide",
     'The customer family is not valid' => "La famille de clients n'est pas valide",
 
+    //P
+    'Placeholder SIRET' => 'Numéro de SIRET',
+    'Placeholder V.A.T.' => 'TVA intracommunautaire',
+
     //V
     "Vat" => "TVA intracommunautaire",
 

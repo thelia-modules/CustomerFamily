@@ -27,7 +27,7 @@ class CustomerFamilyAccountDisplayHook extends BaseHook
             return;
         }
 
-        $customerId = intval($customer->getId());
+        $customerId = $customer->getId();
 
         if ($customerId <= 0) {
             // Wrong customer => return.
@@ -38,12 +38,12 @@ class CustomerFamilyAccountDisplayHook extends BaseHook
 
         $event->add(array(
             'id'      => $customerId,
-            'messageDomain' => CustomerFamily::MESSAGE_DOMAIN,
             'title'   => $title,
             'content' => $this->render(
                 'account-additional.html',
                 array(
                     'customerId' => $customerId,
+                    'messageDomain' => CustomerFamily::MESSAGE_DOMAIN,
                     'particular' => CustomerFamily::CUSTOMER_FAMILY_PARTICULAR,
                     'title'      => $title,
                 )

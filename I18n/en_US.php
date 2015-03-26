@@ -14,4 +14,8 @@ return array(
 
     //V
     "Vat" => "VAT",
+
+    //P
+    'Placeholder SIRET' => 'Siret numbe',
+    'Placeholder V.A.T.' => 'VAT',
 );

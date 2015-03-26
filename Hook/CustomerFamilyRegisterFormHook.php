@@ -12,6 +12,7 @@
 
 namespace CustomerFamily\Hook;
 
+use CustomerFamily\CustomerFamily;
 use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\Hook\BaseHook;
 use Thelia\Form\CustomerCreateForm;
@@ -24,7 +25,13 @@ class CustomerFamilyRegisterFormHook extends BaseHook
      */
     public function onRegisterFormBottom(HookRenderEvent $event)
     {
-        $event->add($this->render('register.html', array('form' => $event->getArgument('form'))));
+        $event->add($this->render(
+            'register.html',
+            array(
+                'form' => $event->getArgument('form'),
+                'messageDomain' => CustomerFamily::MESSAGE_DOMAIN,
+            )
+        ));
     }
 
     /**
