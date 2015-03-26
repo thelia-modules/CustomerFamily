@@ -27,11 +27,18 @@ class CustomerFamilyAccountDisplayHook extends BaseHook
             return;
         }
 
-        $customerId = $customer->getId();
-        $title = $this->trans('My customer family');
+        $customerId = intval($customer->getId());
+
+        if ($customerId <= 0) {
+            // Wrong customer => return.
+            return;
+        }
+
+        $title = $this->trans('My customer family', [], CustomerFamily::MESSAGE_DOMAIN);
 
         $event->add(array(
             'id'      => $customerId,
+            'messageDomain' => CustomerFamily::MESSAGE_DOMAIN,
             'title'   => $title,
             'content' => $this->render(
                 'account-additional.html',
@@ -40,7 +47,7 @@ class CustomerFamilyAccountDisplayHook extends BaseHook
                     'particular' => CustomerFamily::CUSTOMER_FAMILY_PARTICULAR,
                     'title'      => $title,
                 )
-            )
+            ),
         ));
     }
 }

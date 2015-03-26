@@ -12,7 +12,6 @@
 
 namespace CustomerFamily\EventListeners;
 
-
 use CustomerFamily\CustomerFamily;
 use CustomerFamily\Model\CustomerFamilyQuery;
 use Symfony\Component\HttpFoundation\Request;
