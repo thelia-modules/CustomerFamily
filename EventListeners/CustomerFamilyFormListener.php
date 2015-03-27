@@ -95,7 +95,6 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
             $customerFamilyChoices[$customerFamily->getCode()] = self::trans($customerFamily->getTitle());
         }
 
-
         // Building additional fields
         $event->getForm()->getFormBuilder()
             ->add(

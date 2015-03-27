@@ -7,9 +7,9 @@
 			<label class="control-label" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
 			<div class="control-input">
 				<select name="{$name}" id="customer_family_code_select" class="form-control"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
-					<option value="" data-code="none" selected="selected">-- {intl l="Select customer family"} --</option>
+					<option value="" data-code="none"{if "$value" == '' } selected="selected"{/if}>-- {intl l="Select customer family"} --</option>
 					{loop type="customer_family" name="customer_family"}
-					<option value="{$CODE}" data-code="{$CODE}">{$TITLE_CUSTOMER_FAMILY}</option>
+					<option value="{$CODE}" data-code="{$CODE}" {if "$value" == "$CODE" } selected="selected"{/if}>{$TITLE_CUSTOMER_FAMILY}</option>
 					{/loop}
 				</select>
 				{if $error }
