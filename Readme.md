@@ -3,7 +3,9 @@
 For create customer families
 
 ## Compatibility
-* Thelia >= 2.1.0
+* Thelia >= 2.2.0
+* For use on Thelia 2.1.x, use tag [1.1](https://github.com/thelia-modules/CustomerFamily/tree/1.1)
+* For use on Thelia 2.0.x, use tag [1.0](https://github.com/thelia-modules/CustomerFamily/tree/1.0)
 
 ## Installation
 
@@ -19,46 +21,6 @@ Add it in your main thelia composer.json file
 ```
 composer require thelia/customer-family-module:~1.0
 ```
-
-### Adding code in Thelia
-
-The module needs some modifications il Thelia's code to work properly. These issues should be fixed in a future version of Thelia.
-
-#### Registering customers
-
-CustomerFamily uses Thelia's default register.html template and it does not work with the current version of this one. Hopefully there is a workaround to fix this problem. You have to add a `form` argument in the hook called "register.form-bottom" :
-
-```
-{hook name="register.form-bottom" form=$form }
-```
-
-There is also a bug while submitting the customer registration. To fix it, go to the Front\Controller\CustomerController PHP class, in the `createAction();` method. Replace this line :
-
-```
-$customerCreation = new CustomerCreateForm($this->getRequest());
-```
-
-by this line :
-
-```
-$customerCreation = $this->createForm('thelia.front.customer.create');
-```
-
-#### Updating accounts
-
-There are almost the same problems while updating accounts.
-
-First there is a missing `form` parameter in the default account-update.html template's account-update.form-bottom hook :
-
-```
-{hook name="account-update.form-bottom" form=$form }
-```
-
-There are also some form instantiations bugs which makes the submit ignore CustomerFamily's additional fields. To fix it, you have to use the `BaseController::createForm();` method instead of form contructors. Consequently you have to do those two modifications :
-
-* In `CustomerController::viewAcion();`, replace "`$customerProfileUpdateForm = new CustomerProfileUpdateForm($this->getRequest(), 'form', $data);`" by "`$customerProfileUpdateForm = $this->createForm('thelia.front.customer.profile.update', 'form', $data);`".
-
-* In `CustomerController::updateAcion();`, replace "`$customerProfileUpdateForm = new CustomerProfileUpdateForm($this->getRequest());`" by "`$customerProfileUpdateForm = $this->createForm('thelia.front.customer.profile.update');`".
 
 ## Usage
 
@@ -83,7 +45,7 @@ This loop returns client families
 |**CODE** | customer family code | 1.0
 |**TITLE_CUSTOMER_FAMILY** | customer family title | 1.0
 
-### Exemple
+### Example
 ```
 {loop type="customer_family" name="customer_family_loop" current_product=$product_id limit="4"}
     {$CODE} ({$TITLE_CUSTOMER_FAMILY})
@@ -92,7 +54,7 @@ This loop returns client families
 
 ## Loop customer_customer_family
 
-This loop returns customer famility for specific cutomer
+This loop returns customer family for specific customer
 
 ### Input arguments
 
@@ -110,7 +72,7 @@ This loop returns customer famility for specific cutomer
 |**SIRET** | siret number | 1.0
 |**VAT** | vat number id | 1.0
 
-### Exemple
+### Example
 ```
 {loop type="customer_customer_family" name="customer_customer_family_loop" customer_id="4"}
     {SIRET}
