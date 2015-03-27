@@ -79,7 +79,8 @@ class CustomerFamily extends BaseModule
                     ->filterByLocale($locale)
                 ->endUse()
                 ->filterByCode($code)
-                ->findOne()) {
+                ->findOne()
+        ) {
             //Be sure that you don't create it twice
             /** @var CustomerFamilyModel $customerF */
             if (null != $customerF = CustomerFamilyQuery::create()->findOneByCode($code)) {
