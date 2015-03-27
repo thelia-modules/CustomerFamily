@@ -19,13 +19,22 @@ return array(
 
     //S
     "Siret number" => "Numéro de SIRET",
+    'Select customer family' => 'Sélectionnez une famille de clients',
 
     //N
     "No family" => "Aucune famille",
 
     //T
     "This field can't be empty" => "Ce champs ne peut pas être vide",
+    'The customer family is not valid' => "La famille de clients n'est pas valide",
+
+    //P
+    'Placeholder SIRET' => 'Numéro de SIRET',
+    'Placeholder V.A.T.' => 'TVA intracommunautaire',
 
     //V
     "Vat" => "TVA intracommunautaire",
+
+    //M
+    'My customer family' => 'Ma famille de clients',
 );

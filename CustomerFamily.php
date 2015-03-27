@@ -74,14 +74,31 @@ class CustomerFamily extends BaseModule
         }
 
         /** @var CustomerFamilyModel $customerFamily */
-        if (null == $customerFamily = CustomerFamilyQuery::create()->findOneByCode($code)) {
-            $customerFamily = new CustomerFamilyModel();
-            $customerFamily
-                ->setCode($code)
-                ->setLocale($locale)
-                ->setTitle($title)
-                ->save()
-            ;
+        if (null == $customerFamily = CustomerFamilyQuery::create()
+                ->useCustomerFamilyI18nQuery()
+                    ->filterByLocale($locale)
+                ->endUse()
+                ->filterByCode($code)
+                ->findOne()
+        ) {
+            //Be sure that you don't create it twice
+            /** @var CustomerFamilyModel $customerF */
+            if (null != $customerF = CustomerFamilyQuery::create()->findOneByCode($code)) {
+                $customerF
+                    ->setLocale($locale)
+                    ->setTitle($title)
+                    ->save()
+                ;
+            } else {
+                $customerFamily = new CustomerFamilyModel();
+                $customerFamily
+                    ->setCode($code)
+                    ->setLocale($locale)
+                    ->setTitle($title)
+                    ->save()
+                ;
+            }
+
         }
 
         return $customerFamily;

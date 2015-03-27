@@ -1,0 +1,50 @@
+{default_translation_domain domain=$messageDomain}
+<fieldset id="register-customer-family" class="panel">
+	<div class="panel-heading">{intl l='Customer family'}</div>
+	<div class="panel-body">
+		{form_field form=$form field='customer_family_code'}
+		<div class="form-group {if $error} has-error{/if}">
+			<label class="control-label" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
+			<div class="control-input">
+				<select name="{$name}" id="customer_family_code_select" class="form-control"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
+					<option value="" data-code="none"{if {$value} eq '' } selected="selected"{/if}>-- {intl l="Select customer family"} --</option>
+					{loop type="customer_family" name="customer_family"}
+					<option value="{$CODE}" data-code="{$CODE}"{if {$value} eq {$CODE} } selected="selected"{/if}>{$TITLE_CUSTOMER_FAMILY}</option>
+					{/loop}
+				</select>
+				{if $error }
+				<span class="help-block">{$message}</span>
+					{assign var="error_focus" value="true"}
+				{/if}
+			</div>
+		</div><!--/.form-group-->
+		{/form_field}
+		{* Additional fields for CustomerCustomerFamily update. Should not be displayed if the customer is a particular one. *}
+		<div id="customer-family-extra-fields">
+			{form_field form=$form field='siret' }
+			<div class="form-group{if $error} has-error{/if}">
+				<label class="control-label" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
+				<div class="control-input">
+					<input type="text" name="{$name}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l='Placeholder SIRET'}" value="{$value}" {if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
+					{if $error }
+					<span class="help-block">{$message}</span>
+						{assign var="error_focus" value="true"}
+					{/if}
+				</div>
+			</div><!--/.form-group-->
+			{/form_field}
+			{form_field form=$form field='vat' }
+			<div class="form-group{if $error} has-error{/if}">
+				<label class="control-label" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
+				<div class="control-input">
+					<input type="text" name="{$name}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l='Placeholder V.A.T.'}" value="{$value}" {if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
+					{if $error }
+					<span class="help-block">{$message}</span>
+						{assign var="error_focus" value="true"}
+					{/if}
+				</div>
+			</div><!--/.form-group-->
+			{/form_field}
+		</div>
+	</div>
+</fieldset>

@@ -15,7 +15,8 @@ CREATE TABLE `customer_family`
     `code` VARCHAR(45) NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `customer_family_U_1` (`code`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
