@@ -26,7 +26,6 @@ use Thelia\Core\Translation\Translator;
 
 class CustomerFamilyFormListener extends BaseAction implements EventSubscriberInterface
 {
-
     /** 'thelia_customer_create' is the name of the form used to create Customers (Thelia\Form\CustomerCreateForm). */
     const THELIA_CUSTOMER_CREATE_FORM_NAME = 'thelia_customer_create';
 
@@ -125,7 +124,7 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
                 array(
                     'constraints' => array(
                         new Constraints\Callback(array("methods" => array(
-                            array($this, "checkParticularInformations")
+                            array($this, "checkParticularInformationsForRegister")
                         )))
                     ),
                     'required' => false,
@@ -143,7 +142,7 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
                 array(
                     'constraints' => array(
                         new Constraints\Callback(array("methods" => array(
-                            array($this, "checkParticularInformations")
+                            array($this, "checkParticularInformationsForRegister")
                         )))
                     ),
                     'required' => false,
@@ -219,7 +218,7 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
                 array(
                     'constraints' => array(
                         new Constraints\Callback(array("methods" => array(
-                            array($this, "checkParticularInformations")
+                            array($this, "checkParticularInformationsForUpdate")
                         )))
                     ),
                     'required' => false,
@@ -238,7 +237,7 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
                 array(
                     'constraints' => array(
                         new Constraints\Callback(array("methods" => array(
-                            array($this, "checkParticularInformations")
+                            array($this, "checkParticularInformationsForUpdate")
                         )))
                     ),
                     'required' => false,
@@ -273,9 +272,31 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
      * @param string                    $value
      * @param ExecutionContextInterface $context
      */
-    public function checkParticularInformations($value, ExecutionContextInterface $context)
+    public function checkParticularInformationsForRegister($value, ExecutionContextInterface $context)
     {
-        $form = $this->request->request->get(self::THELIA_CUSTOMER_CREATE_FORM_NAME);
+        $this->doCheckParticularInformations($value, $context, self::THELIA_CUSTOMER_CREATE_FORM_NAME);
+    }
+
+    /**
+     * Validate a field only if vat and siret are not empty if the customer family is professional
+     *
+     * @param string                    $value
+     * @param ExecutionContextInterface $context
+     */
+    public function checkParticularInformationsForUpdate($value, ExecutionContextInterface $context)
+    {
+        $this->doCheckParticularInformations($value, $context, self::THELIA_ACCOUNT_UPDATE_FORM_NAME);
+    }
+
+    /**
+     * Validate a field only if vat and siret are not empty if the customer family is professional
+     *
+     * @param string                    $value
+     * @param ExecutionContextInterface $context
+     */
+    public function doCheckParticularInformations($value, ExecutionContextInterface &$context, $formName)
+    {
+        $form = $this->request->request->get($formName);
 
         if (is_null($form) or !array_key_exists(self::CUSTOMER_FAMILY_CODE_FIELD_NAME, $form)) {
             return;
