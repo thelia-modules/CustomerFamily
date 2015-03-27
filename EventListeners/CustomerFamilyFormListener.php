@@ -13,23 +13,28 @@
 namespace CustomerFamily\EventListeners;
 
 use CustomerFamily\CustomerFamily;
+use CustomerFamily\Model\CustomerCustomerFamilyQuery;
 use CustomerFamily\Model\CustomerFamilyQuery;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Action\BaseAction;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\TheliaFormEvent;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Translation\Translator;
 
 class CustomerFamilyFormListener extends BaseAction implements EventSubscriberInterface
 {
 
-    /**
-     * 'thelia_customer_create' is the name of the form used to create Customers (Thelia\Form\CustomerCreateForm).
-     */
+    /** 'thelia_customer_create' is the name of the form used to create Customers (Thelia\Form\CustomerCreateForm). */
     const THELIA_CUSTOMER_CREATE_FORM_NAME = 'thelia_customer_create';
+
+    /**
+     * 'thelia_customer_profile_update' is the name of the form used to update accounts
+     * (Thelia\Form\CustomerProfileUpdateForm).
+     */
+    const THELIA_ACCOUNT_UPDATE_FORM_NAME = 'thelia_customer_profile_update';
 
     const CUSTOMER_FAMILY_CODE_FIELD_NAME = 'customer_family_code';
 
@@ -71,7 +76,8 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::FORM_AFTER_BUILD.'.'.self::THELIA_CUSTOMER_CREATE_FORM_NAME => array('addCustomerFamilyFields', 128),
+            TheliaEvents::FORM_AFTER_BUILD.'.'.self::THELIA_CUSTOMER_CREATE_FORM_NAME => array('addCustomerFamilyFieldsForRegister', 128),
+            TheliaEvents::FORM_AFTER_BUILD.'.'.self::THELIA_ACCOUNT_UPDATE_FORM_NAME  => array('addCustomerFamilyFieldsForUpdate',   128),
         );
     }
 
@@ -80,7 +86,7 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
      * It add two fields : one for the SIRET number and one for VAT.
      * @param TheliaFormEvent $event
      */
-    public function addCustomerFamilyFields(TheliaFormEvent $event)
+    public function addCustomerFamilyFieldsForRegister(TheliaFormEvent $event)
     {
         // Retrieving CustomerFamily choices
         $customerFamilyChoices = array();
@@ -147,6 +153,102 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
                         'for' => 'vat'
                     ),
                     'mapped' => false,
+                )
+            )
+        ;
+    }
+
+    /**
+     * Callback used to add some fields to the Thelia's CustomerCreateForm.
+     * It add two fields : one for the SIRET number and one for VAT.
+     * @param TheliaFormEvent $event
+     */
+    public function addCustomerFamilyFieldsForUpdate(TheliaFormEvent $event)
+    {
+        // Adding new fields
+        $customer = $this->request->getSession()->getCustomerUser();
+
+        if (is_null($customer)) {
+            // No customer => no account update => stop here
+            return;
+        }
+
+        $customerCustomerFamily = CustomerCustomerFamilyQuery::create()->findOneByCustomerId($customer->getId());
+
+        $cfData = array(
+            self::CUSTOMER_FAMILY_CODE_FIELD_NAME  => (is_null($customerCustomerFamily) or is_null($customerCustomerFamily->getCustomerFamily())) ? '' : $customerCustomerFamily->getCustomerFamily()->getCode(),
+            self::CUSTOMER_FAMILY_SIRET_FIELD_NAME => is_null($customerCustomerFamily) ? false : $customerCustomerFamily->getSiret(),
+            self::CUSTOMER_FAMILY_VAT_FIELD_NAME   => is_null($customerCustomerFamily) ? false : $customerCustomerFamily->getVat(),
+        );
+
+        // Retrieving CustomerFamily choices
+        $customerFamilyChoices = array();
+
+        /** @var \CustomerFamily\Model\CustomerFamily $customerFamilyChoice */
+        foreach (CustomerFamilyQuery::create()->find() as $customerFamilyChoice) {
+            $customerFamilyChoices[$customerFamilyChoice->getCode()] = self::trans($customerFamilyChoice->getTitle());
+        }
+
+
+        // Building additional fields
+        $event->getForm()->getFormBuilder()
+            ->add(
+                self::CUSTOMER_FAMILY_CODE_FIELD_NAME,
+                'choice',
+                array(
+                    'constraints' => array(
+                        new Constraints\Callback(array('methods' => array(
+                            array($this, 'checkCustomerFamily')
+                        ))),
+                        new Constraints\NotBlank(),
+                    ),
+                    'choices' => $customerFamilyChoices,
+                    'empty_data' => false,
+                    'required' => false,
+                    'label' => self::trans('Customer family'),
+                    'label_attr' => array(
+                        'for' => 'customer_family_id',
+                    ),
+                    'mapped' => false,
+                    'data' => $cfData[self::CUSTOMER_FAMILY_CODE_FIELD_NAME],
+                )
+            )
+            ->add(
+                self::CUSTOMER_FAMILY_SIRET_FIELD_NAME,
+                'text',
+                array(
+                    'constraints' => array(
+                        new Constraints\Callback(array("methods" => array(
+                            array($this, "checkParticularInformations")
+                        )))
+                    ),
+                    'required' => false,
+                    'empty_data' => false,
+                    'label' => self::trans('Siret number'),
+                    'label_attr' => array(
+                        'for' => 'siret'
+                    ),
+                    'mapped' => false,
+                    'data' => $cfData[self::CUSTOMER_FAMILY_SIRET_FIELD_NAME],
+                )
+            )
+            ->add(
+                self::CUSTOMER_FAMILY_VAT_FIELD_NAME,
+                'text',
+                array(
+                    'constraints' => array(
+                        new Constraints\Callback(array("methods" => array(
+                            array($this, "checkParticularInformations")
+                        )))
+                    ),
+                    'required' => false,
+                    'empty_data' => false,
+                    'label' => self::trans('Vat'),
+                    'label_attr' => array(
+                        'for' => 'vat'
+                    ),
+                    'mapped' => false,
+                    'data' => $cfData[self::CUSTOMER_FAMILY_VAT_FIELD_NAME],
                 )
             )
         ;

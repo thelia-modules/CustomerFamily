@@ -22,7 +22,11 @@ composer require thelia/customer-family-module:~1.0
 
 ### Adding code in Thelia
 
-The module uses Thelia's default register.html template. It currently does not work with the template. Hopefully there is a workaround to fix this problem. You have to add a `form` argument in the hook called "register.form-bottom" :
+The module needs some modifications il Thelia's code to work properly. These issues should be fixed in a future version of Thelia.
+
+#### Registering customers
+
+CustomerFamily uses Thelia's default register.html template and it does not work with the current version of this one. Hopefully there is a workaround to fix this problem. You have to add a `form` argument in the hook called "register.form-bottom" :
 
 ```
 {hook name="register.form-bottom" form=$form }
@@ -40,7 +44,21 @@ by this line :
 $customerCreation = $this->createForm('thelia.front.customer.create');
 ```
 
-These issues will be fixed in a future version of Thelia.
+#### Updating accounts
+
+There are almost the same problems while updating accounts.
+
+First there is a missing `form` parameter in the default account-update.html template's account-update.form-bottom hook :
+
+```
+{hook name="account-update.form-bottom" form=$form }
+```
+
+There are also some form instantiations bugs which makes the submit ignore CustomerFamily's additional fields. To fix it, you have to use the `BaseController::createForm();` method instead of form contructors. Consequently you have to do those two modifications :
+
+* In `CustomerController::viewAcion();`, replace "`$customerProfileUpdateForm = new CustomerProfileUpdateForm($this->getRequest(), 'form', $data);`" by "`$customerProfileUpdateForm = $this->createForm('thelia.front.customer.profile.update', 'form', $data);`".
+
+* In `CustomerController::updateAcion();`, replace "`$customerProfileUpdateForm = new CustomerProfileUpdateForm($this->getRequest());`" by "`$customerProfileUpdateForm = $this->createForm('thelia.front.customer.profile.update');`".
 
 ## Usage
 
