@@ -25,9 +25,6 @@
 		<foreign-key foreignTable="customer_family" onDelete="CASCADE">
 			<reference local="customer_family_id" foreign="id" />
 		</foreign-key>
-		<index name="idx_customer_customer_family_customer_id">
-			<index-column name="customer_id" />
-		</index>
 		<index name="idx_customer_customer_family_customer_family_id">
 			<index-column name="customer_family_id" />
 		</index>

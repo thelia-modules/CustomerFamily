@@ -122,12 +122,7 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
                 self::CUSTOMER_FAMILY_SIRET_FIELD_NAME,
                 'text',
                 array(
-                    'constraints' => array(
-                        new Constraints\Callback(array("methods" => array(
-                            array($this, "checkParticularInformationsForRegister")
-                        )))
-                    ),
-                    'required' => false,
+                    'required' => true,
                     'empty_data' => false,
                     'label' => self::trans('Siret number'),
                     'label_attr' => array(
@@ -140,12 +135,7 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
                 self::CUSTOMER_FAMILY_VAT_FIELD_NAME,
                 'text',
                 array(
-                    'constraints' => array(
-                        new Constraints\Callback(array("methods" => array(
-                            array($this, "checkParticularInformationsForRegister")
-                        )))
-                    ),
-                    'required' => false,
+                    'required' => true,
                     'empty_data' => false,
                     'label' => self::trans('Vat'),
                     'label_attr' => array(
@@ -216,12 +206,7 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
                 self::CUSTOMER_FAMILY_SIRET_FIELD_NAME,
                 'text',
                 array(
-                    'constraints' => array(
-                        new Constraints\Callback(array("methods" => array(
-                            array($this, "checkParticularInformationsForUpdate")
-                        )))
-                    ),
-                    'required' => false,
+                    'required' => true,
                     'empty_data' => false,
                     'label' => self::trans('Siret number'),
                     'label_attr' => array(
@@ -235,12 +220,7 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
                 self::CUSTOMER_FAMILY_VAT_FIELD_NAME,
                 'text',
                 array(
-                    'constraints' => array(
-                        new Constraints\Callback(array("methods" => array(
-                            array($this, "checkParticularInformationsForUpdate")
-                        )))
-                    ),
-                    'required' => false,
+                    'required' => true,
                     'empty_data' => false,
                     'label' => self::trans('Vat'),
                     'label_attr' => array(
@@ -263,65 +243,6 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
     {
         if (CustomerFamilyQuery::create()->filterByCode($value)->count() == 0) {
             $context->addViolation(self::trans('The customer family is not valid'));
-        }
-    }
-
-    /**
-     * Validate a field only if vat and siret are not empty if the customer family is professional
-     *
-     * @param string                    $value
-     * @param ExecutionContextInterface $context
-     */
-    public function checkParticularInformationsForRegister($value, ExecutionContextInterface $context)
-    {
-        $this->doCheckParticularInformations($value, $context, self::THELIA_CUSTOMER_CREATE_FORM_NAME);
-    }
-
-    /**
-     * Validate a field only if vat and siret are not empty if the customer family is professional
-     *
-     * @param string                    $value
-     * @param ExecutionContextInterface $context
-     */
-    public function checkParticularInformationsForUpdate($value, ExecutionContextInterface $context)
-    {
-        $this->doCheckParticularInformations($value, $context, self::THELIA_ACCOUNT_UPDATE_FORM_NAME);
-    }
-
-    /**
-     * Validate a field only if vat and siret are not empty if the customer family is professional
-     *
-     * @param string                    $value
-     * @param ExecutionContextInterface $context
-     */
-    public function doCheckParticularInformations($value, ExecutionContextInterface &$context, $formName)
-    {
-        $form = $this->request->request->get($formName);
-
-        if (is_null($form) or !array_key_exists(self::CUSTOMER_FAMILY_CODE_FIELD_NAME, $form)) {
-            return;
-        }
-
-        switch ($form[self::CUSTOMER_FAMILY_CODE_FIELD_NAME]) {
-            case CustomerFamily::CUSTOMER_FAMILY_PARTICULAR:
-                // Don't care about additional fields => continue
-                break;
-
-            case CustomerFamily::CUSTOMER_FAMILY_PROFESSIONAL:
-                // Additional fields should not be empty
-                $blankFields = array(
-                    isset($form[self::CUSTOMER_FAMILY_SIRET_FIELD_NAME]) ? (strlen($form[self::CUSTOMER_FAMILY_SIRET_FIELD_NAME]) === 0) : true,
-                    isset($form[self::CUSTOMER_FAMILY_VAT_FIELD_NAME]) ? (strlen($form[self::CUSTOMER_FAMILY_VAT_FIELD_NAME]) === 0) : true
-                );
-
-                if (in_array(true, $blankFields)) {
-                    // A field is blank => violation
-                    $context->addViolation(self::trans("This field can't be empty"));
-                }
-                break;
-
-            default:
-                break;
         }
     }
 
