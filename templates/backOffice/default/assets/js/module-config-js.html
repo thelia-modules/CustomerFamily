@@ -1,0 +1,57 @@
+{javascripts file="assets/js/bootstrap-switch/bootstrap-switch.js"}
+    <script src="{$asset_url}"></script>
+{/javascripts}
+
+<script type="text/javascript">
+    (function($, $module){
+
+        //delete
+        var $modalDelete = $module.find('.js-modal-delete');
+
+        $module.on('click', '.js-action-delete', function(event){
+            var id = $(this).data('id');
+            $modalDelete.find('form').attr('action', '{url path="/admin/module/CustomerFamily/delete"}/'+id);
+            $modalDelete.modal('show');
+            event.preventDefault();
+        });
+        //end delete
+
+        //update
+        var $modalUpdate = $module.find('.js-modal-update');
+
+        $module.on('click', '.js-action-update', function(event){
+            var id = $(this).data('id');
+
+            $modalUpdate.find('.js-field-code').val($(this).data('code'));
+            $modalUpdate.find('.js-field-title').val($(this).data('title'));
+
+            $modalUpdate.find('form').attr('action', '{url path="/admin/module/CustomerFamily/update"}/'+id);
+            $modalUpdate.modal('show');
+            event.preventDefault();
+        });
+        //end update
+
+        $module.find(".switch-small").bootstrapSwitch();
+
+        // Price calculation activation
+        $module.find(".price-calculation-activation").on("switch-change", function(e, data){
+            var form = $("#activate-price-calculation");
+            $('body').append('<div class="modal-backdrop fade in" id="loading-event"><div class="loading"></div></div>');
+            $.ajax({
+                url: form.attr('action'),
+                type: form.attr('method'),
+                data: form.serialize()
+            })
+            .done(function(){
+                $("#loading-event").remove();
+            })
+            .fail(function(jqXHR, textStatus, errorThrown){
+                $("#loading-event").remove();
+                $('#price-calculation-failed-body').html(jqXHR.responseJSON.error);
+                $("#price-calculation-failed").modal("show");
+            });
+        });
+
+    })(jQuery, jQuery('#CustomerFamily'));
+
+</script>

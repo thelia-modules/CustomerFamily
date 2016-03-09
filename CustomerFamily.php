@@ -36,6 +36,8 @@ class CustomerFamily extends BaseModule
     /** @cont string */
     const CUSTOMER_FAMILY_PROFESSIONAL = "professional";
 
+    const PRICE_CALC_ACTIVE = 'customer_family_price_activated';
+
     /**
      * @param ConnectionInterface $con
      */

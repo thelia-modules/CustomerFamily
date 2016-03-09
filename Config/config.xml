@@ -7,6 +7,7 @@
 	<loops>
 		<loop name="customer_family" class="CustomerFamily\Loop\CustomerFamilyLoop" />
 		<loop name="customer_customer_family" class="CustomerFamily\Loop\CustomerCustomerFamilyLoop" />
+		<loop name="customer_family_price" class="CustomerFamily\Loop\CustomerFamilyPriceLoop" />
 	</loops>
 
 	<forms>
@@ -15,13 +16,10 @@
 		<form name="customer.family.delete.form" class="CustomerFamily\Form\CustomerFamilyDeleteForm" />
 
 		<form name="customer.customer.family.form" class="CustomerFamily\Form\CustomerCustomerFamilyForm" />
-	</forms>
 
-	<commands>
-		<!--
-		<command class="MyModule\Command\MySuperCommand" />
-		-->
-	</commands>
+		<form name="customer_family_price_update" class="CustomerFamily\Form\CustomerFamilyPriceForm" />
+		<form name="customer_family_price_activate" class="CustomerFamily\Form\CustomerFamilyPriceActivateForm" />
+	</forms>
 
 	<services>
 		<service id="customer.family.action" class="CustomerFamily\EventListeners\CustomerFamilyListener" scope="request">
@@ -39,6 +37,17 @@
 	</services>
 
 	<hooks>
+		<!-- Admin configuration templates -->
+		<hook id="customer.family.config">
+			<tag name="hook.event_listener" event="module.configuration" type="back" templates="render:module_configuration.html" />
+			<tag name="hook.event_listener" event="module.config-js" type="back" templates="render:assets/js/module-config-js.html" />
+		</hook>
+
+		<!-- Admin customer edit -->
+		<hook id="customer.family.customer.edit">
+			<tag name="hook.event_listener" event="customer.edit" type="back" templates="render:customer-edit.html" />
+		</hook>
+
 		<!-- Additional fields for the register form -->
 		<hook id="customer.family.register.form" class="CustomerFamily\Hook\CustomerFamilyRegisterFormHook" scope="request">
 			<tag name="hook.event_listener" event="register.form-bottom" type="front" method="onRegisterFormBottom"/>
@@ -57,15 +66,4 @@
 		</hook>
 	</hooks>
 
-	<!--
-	<exports>
-
-	</exports>
-	-->
-
-	<!--
-	<imports>
-
-	</imports>
-	-->
 </config>

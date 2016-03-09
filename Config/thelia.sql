@@ -32,7 +32,6 @@ CREATE TABLE `customer_customer_family`
     `siret` VARCHAR(50),
     `vat` VARCHAR(50),
     PRIMARY KEY (`customer_id`),
-    INDEX `idx_customer_customer_family_customer_id` (`customer_id`),
     INDEX `idx_customer_customer_family_customer_family_id` (`customer_family_id`),
     CONSTRAINT `customer_customer_family_FK_1`
         FOREIGN KEY (`customer_id`)
@@ -41,6 +40,71 @@ CREATE TABLE `customer_customer_family`
     CONSTRAINT `customer_customer_family_FK_2`
         FOREIGN KEY (`customer_family_id`)
         REFERENCES `customer_family` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- customer_family_price
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `customer_family_price`;
+
+CREATE TABLE `customer_family_price`
+(
+    `customer_family_id` INTEGER NOT NULL,
+    `use_equation` TINYINT DEFAULT 0 NOT NULL,
+    `amount_added_before` DECIMAL(16,6) DEFAULT 0,
+    `amount_added_after` DECIMAL(16,6) DEFAULT 0,
+    `multiplication_coefficient` DECIMAL(16,6) DEFAULT 1,
+    `is_taxed` TINYINT DEFAULT 1 NOT NULL,
+    PRIMARY KEY (`customer_family_id`),
+    CONSTRAINT `fk_customer_family_id`
+        FOREIGN KEY (`customer_family_id`)
+        REFERENCES `customer_family` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- product_purchase_price
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `product_purchase_price`;
+
+CREATE TABLE `product_purchase_price`
+(
+    `product_sale_elements_id` INTEGER NOT NULL,
+    `currency_id` INTEGER NOT NULL,
+    `purchase_price` DECIMAL(16,6) DEFAULT 0,
+    PRIMARY KEY (`product_sale_elements_id`,`currency_id`),
+    INDEX `FI_currency_id` (`currency_id`),
+    CONSTRAINT `fk_product_sale_elements_id`
+        FOREIGN KEY (`product_sale_elements_id`)
+        REFERENCES `product_sale_elements` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_currency_id`
+        FOREIGN KEY (`currency_id`)
+        REFERENCES `currency` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- order_product_purchase_price
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `order_product_purchase_price`;
+
+CREATE TABLE `order_product_purchase_price`
+(
+    `order_product_id` INTEGER NOT NULL,
+    `purchase_price` DECIMAL(16,6) DEFAULT 0,
+    PRIMARY KEY (`order_product_id`),
+    CONSTRAINT `fk_order_product_id`
+        FOREIGN KEY (`order_product_id`)
+        REFERENCES `order_product` (`id`)
+        ON UPDATE RESTRICT
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
 

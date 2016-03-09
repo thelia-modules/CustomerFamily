@@ -30,5 +30,37 @@
 		</index>
 	</table>
 
+	<table name="customer_family_price">
+		<column name="customer_family_id" primaryKey="true" required="true" type="INTEGER" />
+		<foreign-key foreignTable="customer_family" name="fk_customer_family_id" onDelete="CASCADE" onUpdate="RESTRICT">
+			<reference foreign="id" local="customer_family_id" />
+		</foreign-key>
+		<column name="use_equation" type="TINYINT" required="true" defaultValue="0"/>
+		<column name="amount_added_before" type="DECIMAL" size="16" scale="6" defaultValue="0" />
+		<column name="amount_added_after" type="DECIMAL" size="16" scale="6" defaultValue="0" />
+		<column name="multiplication_coefficient" type="DECIMAL" size="16" scale="6" defaultValue="1" />
+		<column name="is_taxed" type="TINYINT" required="true" defaultValue="1"/>
+	</table>
+
+	<table name="product_purchase_price">
+		<column name="product_sale_elements_id" primaryKey="true" required="true" type="INTEGER" />
+		<foreign-key foreignTable="product_sale_elements" name="fk_product_sale_elements_id" onDelete="CASCADE" onUpdate="RESTRICT">
+			<reference foreign="id" local="product_sale_elements_id" />
+		</foreign-key>
+		<column name="currency_id" primaryKey="true" required="true" type="INTEGER" />
+		<foreign-key foreignTable="currency" name="fk_currency_id" onDelete="CASCADE" onUpdate="RESTRICT">
+			<reference foreign="id" local="currency_id" />
+		</foreign-key>
+		<column name="purchase_price" type="DECIMAL" size="16" scale="6" defaultValue="0"/>
+	</table>
+
+	<table name="order_product_purchase_price">
+		<column name="order_product_id" primaryKey="true" required="true" type="INTEGER" />
+		<foreign-key foreignTable="order_product" name="fk_order_product_id" onDelete="CASCADE" onUpdate="RESTRICT">
+			<reference foreign="id" local="order_product_id" />
+		</foreign-key>
+		<column name="purchase_price" type="DECIMAL" size="16" scale="6" defaultValue="0"/>
+	</table>
+
 	<external-schema filename="local/config/schema.xml" referenceOnly="true" />
 </database>

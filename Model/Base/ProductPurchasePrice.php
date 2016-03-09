@@ -4,10 +4,12 @@ namespace CustomerFamily\Model\Base;
 
 use \Exception;
 use \PDO;
-use CustomerFamily\Model\CustomerFamily as ChildCustomerFamily;
-use CustomerFamily\Model\CustomerFamilyI18nQuery as ChildCustomerFamilyI18nQuery;
-use CustomerFamily\Model\CustomerFamilyQuery as ChildCustomerFamilyQuery;
-use CustomerFamily\Model\Map\CustomerFamilyI18nTableMap;
+use CustomerFamily\Model\ProductPurchasePriceQuery as ChildProductPurchasePriceQuery;
+use CustomerFamily\Model\Map\ProductPurchasePriceTableMap;
+use CustomerFamily\Model\Thelia\Model\Currency as ChildCurrency;
+use CustomerFamily\Model\Thelia\Model\ProductSaleElements as ChildProductSaleElements;
+use CustomerFamily\Model\Thelia\Model\CurrencyQuery;
+use CustomerFamily\Model\Thelia\Model\ProductSaleElementsQuery;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -19,12 +21,12 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 
-abstract class CustomerFamilyI18n implements ActiveRecordInterface
+abstract class ProductPurchasePrice implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\CustomerFamily\\Model\\Map\\CustomerFamilyI18nTableMap';
+    const TABLE_MAP = '\\CustomerFamily\\Model\\Map\\ProductPurchasePriceTableMap';
 
 
     /**
@@ -54,28 +56,33 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
     protected $virtualColumns = array();
 
     /**
-     * The value for the id field.
+     * The value for the product_sale_elements_id field.
      * @var        int
      */
-    protected $id;
+    protected $product_sale_elements_id;
 
     /**
-     * The value for the locale field.
-     * Note: this column has a database default value of: 'en_US'
+     * The value for the currency_id field.
+     * @var        int
+     */
+    protected $currency_id;
+
+    /**
+     * The value for the purchase_price field.
+     * Note: this column has a database default value of: '0'
      * @var        string
      */
-    protected $locale;
+    protected $purchase_price;
 
     /**
-     * The value for the title field.
-     * @var        string
+     * @var        ProductSaleElements
      */
-    protected $title;
+    protected $aProductSaleElements;
 
     /**
-     * @var        CustomerFamily
+     * @var        Currency
      */
-    protected $aCustomerFamily;
+    protected $aCurrency;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -93,11 +100,11 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
      */
     public function applyDefaultValues()
     {
-        $this->locale = 'en_US';
+        $this->purchase_price = '0';
     }
 
     /**
-     * Initializes internal state of CustomerFamily\Model\Base\CustomerFamilyI18n object.
+     * Initializes internal state of CustomerFamily\Model\Base\ProductPurchasePrice object.
      * @see applyDefaults()
      */
     public function __construct()
@@ -194,9 +201,9 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>CustomerFamilyI18n</code> instance.  If
-     * <code>obj</code> is an instance of <code>CustomerFamilyI18n</code>, delegates to
-     * <code>equals(CustomerFamilyI18n)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>ProductPurchasePrice</code> instance.  If
+     * <code>obj</code> is an instance of <code>ProductPurchasePrice</code>, delegates to
+     * <code>equals(ProductPurchasePrice)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param  mixed   $obj The object to compare to.
      * @return boolean Whether equal to the object specified.
@@ -279,7 +286,7 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return CustomerFamilyI18n The current object, for fluid interface
+     * @return ProductPurchasePrice The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -311,7 +318,7 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
      * @param string $data The source data to import from
      *
-     * @return CustomerFamilyI18n The current object, for fluid interface
+     * @return ProductPurchasePrice The current object, for fluid interface
      */
     public function importFrom($parser, $data)
     {
@@ -357,104 +364,108 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
     }
 
     /**
-     * Get the [id] column value.
+     * Get the [product_sale_elements_id] column value.
      *
      * @return   int
      */
-    public function getId()
+    public function getProductSaleElementsId()
     {
 
-        return $this->id;
+        return $this->product_sale_elements_id;
     }
 
     /**
-     * Get the [locale] column value.
+     * Get the [currency_id] column value.
+     *
+     * @return   int
+     */
+    public function getCurrencyId()
+    {
+
+        return $this->currency_id;
+    }
+
+    /**
+     * Get the [purchase_price] column value.
      *
      * @return   string
      */
-    public function getLocale()
+    public function getPurchasePrice()
     {
 
-        return $this->locale;
+        return $this->purchase_price;
     }
 
     /**
-     * Get the [title] column value.
-     *
-     * @return   string
-     */
-    public function getTitle()
-    {
-
-        return $this->title;
-    }
-
-    /**
-     * Set the value of [id] column.
+     * Set the value of [product_sale_elements_id] column.
      *
      * @param      int $v new value
-     * @return   \CustomerFamily\Model\CustomerFamilyI18n The current object (for fluent API support)
+     * @return   \CustomerFamily\Model\ProductPurchasePrice The current object (for fluent API support)
      */
-    public function setId($v)
+    public function setProductSaleElementsId($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->id !== $v) {
-            $this->id = $v;
-            $this->modifiedColumns[CustomerFamilyI18nTableMap::ID] = true;
+        if ($this->product_sale_elements_id !== $v) {
+            $this->product_sale_elements_id = $v;
+            $this->modifiedColumns[ProductPurchasePriceTableMap::PRODUCT_SALE_ELEMENTS_ID] = true;
         }
 
-        if ($this->aCustomerFamily !== null && $this->aCustomerFamily->getId() !== $v) {
-            $this->aCustomerFamily = null;
+        if ($this->aProductSaleElements !== null && $this->aProductSaleElements->getId() !== $v) {
+            $this->aProductSaleElements = null;
         }
 
 
         return $this;
-    } // setId()
+    } // setProductSaleElementsId()
 
     /**
-     * Set the value of [locale] column.
+     * Set the value of [currency_id] column.
+     *
+     * @param      int $v new value
+     * @return   \CustomerFamily\Model\ProductPurchasePrice The current object (for fluent API support)
+     */
+    public function setCurrencyId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->currency_id !== $v) {
+            $this->currency_id = $v;
+            $this->modifiedColumns[ProductPurchasePriceTableMap::CURRENCY_ID] = true;
+        }
+
+        if ($this->aCurrency !== null && $this->aCurrency->getId() !== $v) {
+            $this->aCurrency = null;
+        }
+
+
+        return $this;
+    } // setCurrencyId()
+
+    /**
+     * Set the value of [purchase_price] column.
      *
      * @param      string $v new value
-     * @return   \CustomerFamily\Model\CustomerFamilyI18n The current object (for fluent API support)
+     * @return   \CustomerFamily\Model\ProductPurchasePrice The current object (for fluent API support)
      */
-    public function setLocale($v)
+    public function setPurchasePrice($v)
     {
         if ($v !== null) {
             $v = (string) $v;
         }
 
-        if ($this->locale !== $v) {
-            $this->locale = $v;
-            $this->modifiedColumns[CustomerFamilyI18nTableMap::LOCALE] = true;
+        if ($this->purchase_price !== $v) {
+            $this->purchase_price = $v;
+            $this->modifiedColumns[ProductPurchasePriceTableMap::PURCHASE_PRICE] = true;
         }
 
 
         return $this;
-    } // setLocale()
-
-    /**
-     * Set the value of [title] column.
-     *
-     * @param      string $v new value
-     * @return   \CustomerFamily\Model\CustomerFamilyI18n The current object (for fluent API support)
-     */
-    public function setTitle($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->title !== $v) {
-            $this->title = $v;
-            $this->modifiedColumns[CustomerFamilyI18nTableMap::TITLE] = true;
-        }
-
-
-        return $this;
-    } // setTitle()
+    } // setPurchasePrice()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -466,7 +477,7 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
-            if ($this->locale !== 'en_US') {
+            if ($this->purchase_price !== '0') {
                 return false;
             }
 
@@ -497,14 +508,14 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
         try {
 
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : CustomerFamilyI18nTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ProductPurchasePriceTableMap::translateFieldName('ProductSaleElementsId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->product_sale_elements_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : CustomerFamilyI18nTableMap::translateFieldName('Locale', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->locale = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ProductPurchasePriceTableMap::translateFieldName('CurrencyId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->currency_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : CustomerFamilyI18nTableMap::translateFieldName('Title', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->title = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ProductPurchasePriceTableMap::translateFieldName('PurchasePrice', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->purchase_price = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -513,10 +524,10 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 3; // 3 = CustomerFamilyI18nTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 3; // 3 = ProductPurchasePriceTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException("Error populating \CustomerFamily\Model\CustomerFamilyI18n object", 0, $e);
+            throw new PropelException("Error populating \CustomerFamily\Model\ProductPurchasePrice object", 0, $e);
         }
     }
 
@@ -535,8 +546,11 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
-        if ($this->aCustomerFamily !== null && $this->id !== $this->aCustomerFamily->getId()) {
-            $this->aCustomerFamily = null;
+        if ($this->aProductSaleElements !== null && $this->product_sale_elements_id !== $this->aProductSaleElements->getId()) {
+            $this->aProductSaleElements = null;
+        }
+        if ($this->aCurrency !== null && $this->currency_id !== $this->aCurrency->getId()) {
+            $this->aCurrency = null;
         }
     } // ensureConsistency
 
@@ -561,13 +575,13 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(CustomerFamilyI18nTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(ProductPurchasePriceTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildCustomerFamilyI18nQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildProductPurchasePriceQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -577,7 +591,8 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aCustomerFamily = null;
+            $this->aProductSaleElements = null;
+            $this->aCurrency = null;
         } // if (deep)
     }
 
@@ -587,8 +602,8 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see CustomerFamilyI18n::setDeleted()
-     * @see CustomerFamilyI18n::isDeleted()
+     * @see ProductPurchasePrice::setDeleted()
+     * @see ProductPurchasePrice::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -597,12 +612,12 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(CustomerFamilyI18nTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProductPurchasePriceTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
         try {
-            $deleteQuery = ChildCustomerFamilyI18nQuery::create()
+            $deleteQuery = ChildProductPurchasePriceQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -639,7 +654,7 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(CustomerFamilyI18nTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProductPurchasePriceTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
@@ -659,7 +674,7 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                CustomerFamilyI18nTableMap::addInstanceToPool($this);
+                ProductPurchasePriceTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -694,11 +709,18 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aCustomerFamily !== null) {
-                if ($this->aCustomerFamily->isModified() || $this->aCustomerFamily->isNew()) {
-                    $affectedRows += $this->aCustomerFamily->save($con);
+            if ($this->aProductSaleElements !== null) {
+                if ($this->aProductSaleElements->isModified() || $this->aProductSaleElements->isNew()) {
+                    $affectedRows += $this->aProductSaleElements->save($con);
                 }
-                $this->setCustomerFamily($this->aCustomerFamily);
+                $this->setProductSaleElements($this->aProductSaleElements);
+            }
+
+            if ($this->aCurrency !== null) {
+                if ($this->aCurrency->isModified() || $this->aCurrency->isNew()) {
+                    $affectedRows += $this->aCurrency->save($con);
+                }
+                $this->setCurrency($this->aCurrency);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -734,18 +756,18 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
 
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(CustomerFamilyI18nTableMap::ID)) {
-            $modifiedColumns[':p' . $index++]  = 'ID';
+        if ($this->isColumnModified(ProductPurchasePriceTableMap::PRODUCT_SALE_ELEMENTS_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'PRODUCT_SALE_ELEMENTS_ID';
         }
-        if ($this->isColumnModified(CustomerFamilyI18nTableMap::LOCALE)) {
-            $modifiedColumns[':p' . $index++]  = 'LOCALE';
+        if ($this->isColumnModified(ProductPurchasePriceTableMap::CURRENCY_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'CURRENCY_ID';
         }
-        if ($this->isColumnModified(CustomerFamilyI18nTableMap::TITLE)) {
-            $modifiedColumns[':p' . $index++]  = 'TITLE';
+        if ($this->isColumnModified(ProductPurchasePriceTableMap::PURCHASE_PRICE)) {
+            $modifiedColumns[':p' . $index++]  = 'PURCHASE_PRICE';
         }
 
         $sql = sprintf(
-            'INSERT INTO customer_family_i18n (%s) VALUES (%s)',
+            'INSERT INTO product_purchase_price (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -754,14 +776,14 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'ID':
-                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
+                    case 'PRODUCT_SALE_ELEMENTS_ID':
+                        $stmt->bindValue($identifier, $this->product_sale_elements_id, PDO::PARAM_INT);
                         break;
-                    case 'LOCALE':
-                        $stmt->bindValue($identifier, $this->locale, PDO::PARAM_STR);
+                    case 'CURRENCY_ID':
+                        $stmt->bindValue($identifier, $this->currency_id, PDO::PARAM_INT);
                         break;
-                    case 'TITLE':
-                        $stmt->bindValue($identifier, $this->title, PDO::PARAM_STR);
+                    case 'PURCHASE_PRICE':
+                        $stmt->bindValue($identifier, $this->purchase_price, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -802,7 +824,7 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = CustomerFamilyI18nTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = ProductPurchasePriceTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -819,13 +841,13 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                return $this->getId();
+                return $this->getProductSaleElementsId();
                 break;
             case 1:
-                return $this->getLocale();
+                return $this->getCurrencyId();
                 break;
             case 2:
-                return $this->getTitle();
+                return $this->getPurchasePrice();
                 break;
             default:
                 return null;
@@ -850,15 +872,15 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
      */
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['CustomerFamilyI18n'][serialize($this->getPrimaryKey())])) {
+        if (isset($alreadyDumpedObjects['ProductPurchasePrice'][serialize($this->getPrimaryKey())])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['CustomerFamilyI18n'][serialize($this->getPrimaryKey())] = true;
-        $keys = CustomerFamilyI18nTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['ProductPurchasePrice'][serialize($this->getPrimaryKey())] = true;
+        $keys = ProductPurchasePriceTableMap::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getId(),
-            $keys[1] => $this->getLocale(),
-            $keys[2] => $this->getTitle(),
+            $keys[0] => $this->getProductSaleElementsId(),
+            $keys[1] => $this->getCurrencyId(),
+            $keys[2] => $this->getPurchasePrice(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -866,8 +888,11 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->aCustomerFamily) {
-                $result['CustomerFamily'] = $this->aCustomerFamily->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aProductSaleElements) {
+                $result['ProductSaleElements'] = $this->aProductSaleElements->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aCurrency) {
+                $result['Currency'] = $this->aCurrency->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -887,7 +912,7 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = CustomerFamilyI18nTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = ProductPurchasePriceTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -904,13 +929,13 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                $this->setId($value);
+                $this->setProductSaleElementsId($value);
                 break;
             case 1:
-                $this->setLocale($value);
+                $this->setCurrencyId($value);
                 break;
             case 2:
-                $this->setTitle($value);
+                $this->setPurchasePrice($value);
                 break;
         } // switch()
     }
@@ -934,11 +959,11 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = CustomerFamilyI18nTableMap::getFieldNames($keyType);
+        $keys = ProductPurchasePriceTableMap::getFieldNames($keyType);
 
-        if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setLocale($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setTitle($arr[$keys[2]]);
+        if (array_key_exists($keys[0], $arr)) $this->setProductSaleElementsId($arr[$keys[0]]);
+        if (array_key_exists($keys[1], $arr)) $this->setCurrencyId($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setPurchasePrice($arr[$keys[2]]);
     }
 
     /**
@@ -948,11 +973,11 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(CustomerFamilyI18nTableMap::DATABASE_NAME);
+        $criteria = new Criteria(ProductPurchasePriceTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(CustomerFamilyI18nTableMap::ID)) $criteria->add(CustomerFamilyI18nTableMap::ID, $this->id);
-        if ($this->isColumnModified(CustomerFamilyI18nTableMap::LOCALE)) $criteria->add(CustomerFamilyI18nTableMap::LOCALE, $this->locale);
-        if ($this->isColumnModified(CustomerFamilyI18nTableMap::TITLE)) $criteria->add(CustomerFamilyI18nTableMap::TITLE, $this->title);
+        if ($this->isColumnModified(ProductPurchasePriceTableMap::PRODUCT_SALE_ELEMENTS_ID)) $criteria->add(ProductPurchasePriceTableMap::PRODUCT_SALE_ELEMENTS_ID, $this->product_sale_elements_id);
+        if ($this->isColumnModified(ProductPurchasePriceTableMap::CURRENCY_ID)) $criteria->add(ProductPurchasePriceTableMap::CURRENCY_ID, $this->currency_id);
+        if ($this->isColumnModified(ProductPurchasePriceTableMap::PURCHASE_PRICE)) $criteria->add(ProductPurchasePriceTableMap::PURCHASE_PRICE, $this->purchase_price);
 
         return $criteria;
     }
@@ -967,9 +992,9 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = new Criteria(CustomerFamilyI18nTableMap::DATABASE_NAME);
-        $criteria->add(CustomerFamilyI18nTableMap::ID, $this->id);
-        $criteria->add(CustomerFamilyI18nTableMap::LOCALE, $this->locale);
+        $criteria = new Criteria(ProductPurchasePriceTableMap::DATABASE_NAME);
+        $criteria->add(ProductPurchasePriceTableMap::PRODUCT_SALE_ELEMENTS_ID, $this->product_sale_elements_id);
+        $criteria->add(ProductPurchasePriceTableMap::CURRENCY_ID, $this->currency_id);
 
         return $criteria;
     }
@@ -982,8 +1007,8 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
     public function getPrimaryKey()
     {
         $pks = array();
-        $pks[0] = $this->getId();
-        $pks[1] = $this->getLocale();
+        $pks[0] = $this->getProductSaleElementsId();
+        $pks[1] = $this->getCurrencyId();
 
         return $pks;
     }
@@ -996,8 +1021,8 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
      */
     public function setPrimaryKey($keys)
     {
-        $this->setId($keys[0]);
-        $this->setLocale($keys[1]);
+        $this->setProductSaleElementsId($keys[0]);
+        $this->setCurrencyId($keys[1]);
     }
 
     /**
@@ -1007,7 +1032,7 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
     public function isPrimaryKeyNull()
     {
 
-        return (null === $this->getId()) && (null === $this->getLocale());
+        return (null === $this->getProductSaleElementsId()) && (null === $this->getCurrencyId());
     }
 
     /**
@@ -1016,16 +1041,16 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \CustomerFamily\Model\CustomerFamilyI18n (or compatible) type.
+     * @param      object $copyObj An object of \CustomerFamily\Model\ProductPurchasePrice (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setId($this->getId());
-        $copyObj->setLocale($this->getLocale());
-        $copyObj->setTitle($this->getTitle());
+        $copyObj->setProductSaleElementsId($this->getProductSaleElementsId());
+        $copyObj->setCurrencyId($this->getCurrencyId());
+        $copyObj->setPurchasePrice($this->getPurchasePrice());
         if ($makeNew) {
             $copyObj->setNew(true);
         }
@@ -1040,7 +1065,7 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
      * objects.
      *
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return                 \CustomerFamily\Model\CustomerFamilyI18n Clone of current object.
+     * @return                 \CustomerFamily\Model\ProductPurchasePrice Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1054,26 +1079,26 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
     }
 
     /**
-     * Declares an association between this object and a ChildCustomerFamily object.
+     * Declares an association between this object and a ChildProductSaleElements object.
      *
-     * @param                  ChildCustomerFamily $v
-     * @return                 \CustomerFamily\Model\CustomerFamilyI18n The current object (for fluent API support)
+     * @param                  ChildProductSaleElements $v
+     * @return                 \CustomerFamily\Model\ProductPurchasePrice The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setCustomerFamily(ChildCustomerFamily $v = null)
+    public function setProductSaleElements(ChildProductSaleElements $v = null)
     {
         if ($v === null) {
-            $this->setId(NULL);
+            $this->setProductSaleElementsId(NULL);
         } else {
-            $this->setId($v->getId());
+            $this->setProductSaleElementsId($v->getId());
         }
 
-        $this->aCustomerFamily = $v;
+        $this->aProductSaleElements = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildCustomerFamily object, it will not be re-added.
+        // If this object has already been added to the ChildProductSaleElements object, it will not be re-added.
         if ($v !== null) {
-            $v->addCustomerFamilyI18n($this);
+            $v->addProductPurchasePrice($this);
         }
 
 
@@ -1082,26 +1107,77 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
 
 
     /**
-     * Get the associated ChildCustomerFamily object
+     * Get the associated ChildProductSaleElements object
      *
      * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildCustomerFamily The associated ChildCustomerFamily object.
+     * @return                 ChildProductSaleElements The associated ChildProductSaleElements object.
      * @throws PropelException
      */
-    public function getCustomerFamily(ConnectionInterface $con = null)
+    public function getProductSaleElements(ConnectionInterface $con = null)
     {
-        if ($this->aCustomerFamily === null && ($this->id !== null)) {
-            $this->aCustomerFamily = ChildCustomerFamilyQuery::create()->findPk($this->id, $con);
+        if ($this->aProductSaleElements === null && ($this->product_sale_elements_id !== null)) {
+            $this->aProductSaleElements = ProductSaleElementsQuery::create()->findPk($this->product_sale_elements_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aCustomerFamily->addCustomerFamilyI18ns($this);
+                $this->aProductSaleElements->addProductPurchasePrices($this);
              */
         }
 
-        return $this->aCustomerFamily;
+        return $this->aProductSaleElements;
+    }
+
+    /**
+     * Declares an association between this object and a ChildCurrency object.
+     *
+     * @param                  ChildCurrency $v
+     * @return                 \CustomerFamily\Model\ProductPurchasePrice The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setCurrency(ChildCurrency $v = null)
+    {
+        if ($v === null) {
+            $this->setCurrencyId(NULL);
+        } else {
+            $this->setCurrencyId($v->getId());
+        }
+
+        $this->aCurrency = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildCurrency object, it will not be re-added.
+        if ($v !== null) {
+            $v->addProductPurchasePrice($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildCurrency object
+     *
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildCurrency The associated ChildCurrency object.
+     * @throws PropelException
+     */
+    public function getCurrency(ConnectionInterface $con = null)
+    {
+        if ($this->aCurrency === null && ($this->currency_id !== null)) {
+            $this->aCurrency = CurrencyQuery::create()->findPk($this->currency_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aCurrency->addProductPurchasePrices($this);
+             */
+        }
+
+        return $this->aCurrency;
     }
 
     /**
@@ -1109,9 +1185,9 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
      */
     public function clear()
     {
-        $this->id = null;
-        $this->locale = null;
-        $this->title = null;
+        $this->product_sale_elements_id = null;
+        $this->currency_id = null;
+        $this->purchase_price = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
         $this->applyDefaultValues();
@@ -1134,7 +1210,8 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
         if ($deep) {
         } // if ($deep)
 
-        $this->aCustomerFamily = null;
+        $this->aProductSaleElements = null;
+        $this->aCurrency = null;
     }
 
     /**
@@ -1144,7 +1221,7 @@ abstract class CustomerFamilyI18n implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(CustomerFamilyI18nTableMap::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(ProductPurchasePriceTableMap::DEFAULT_STRING_FORMAT);
     }
 
     /**

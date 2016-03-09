@@ -23,4 +23,13 @@
         <default key="_controller">CustomerFamily\Controller\Admin\CustomerFamilyAdminController::customerUpdateAction</default>
     </route>
 
+    <!-- Prices management -->
+    <route id="customer.family.price.activate" path="/admin/module/CustomerFamily/activate" methods="post">
+        <default key="_controller">CustomerFamily\Controller\Admin\CustomerFamilyPriceController::activateAction</default>
+    </route>
+
+    <route id="customer.family.price.update" path="/admin/module/CustomerFamily/update" methods="post">
+        <default key="_controller">CustomerFamily\Controller\Admin\CustomerFamilyPriceController::updateAction</default>
+    </route>
+
 </routes>

@@ -10,6 +10,8 @@ use CustomerFamily\Model\CustomerCustomerFamilyQuery as ChildCustomerCustomerFam
 use CustomerFamily\Model\CustomerFamily as ChildCustomerFamily;
 use CustomerFamily\Model\CustomerFamilyI18n as ChildCustomerFamilyI18n;
 use CustomerFamily\Model\CustomerFamilyI18nQuery as ChildCustomerFamilyI18nQuery;
+use CustomerFamily\Model\CustomerFamilyPrice as ChildCustomerFamilyPrice;
+use CustomerFamily\Model\CustomerFamilyPriceQuery as ChildCustomerFamilyPriceQuery;
 use CustomerFamily\Model\CustomerFamilyQuery as ChildCustomerFamilyQuery;
 use CustomerFamily\Model\Map\CustomerFamilyTableMap;
 use Propel\Runtime\Propel;
@@ -88,6 +90,11 @@ abstract class CustomerFamily implements ActiveRecordInterface
      */
     protected $collCustomerCustomerFamilies;
     protected $collCustomerCustomerFamiliesPartial;
+
+    /**
+     * @var        ChildCustomerFamilyPrice one-to-one related ChildCustomerFamilyPrice object
+     */
+    protected $singleCustomerFamilyPrice;
 
     /**
      * @var        ObjectCollection|ChildCustomerFamilyI18n[] Collection to store aggregation of ChildCustomerFamilyI18n objects.
@@ -658,6 +665,8 @@ abstract class CustomerFamily implements ActiveRecordInterface
 
             $this->collCustomerCustomerFamilies = null;
 
+            $this->singleCustomerFamilyPrice = null;
+
             $this->collCustomerFamilyI18ns = null;
 
         } // if (deep)
@@ -807,6 +816,12 @@ abstract class CustomerFamily implements ActiveRecordInterface
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
+                }
+            }
+
+            if ($this->singleCustomerFamilyPrice !== null) {
+                if (!$this->singleCustomerFamilyPrice->isDeleted() && ($this->singleCustomerFamilyPrice->isNew() || $this->singleCustomerFamilyPrice->isModified())) {
+                    $affectedRows += $this->singleCustomerFamilyPrice->save($con);
                 }
             }
 
@@ -1005,6 +1020,9 @@ abstract class CustomerFamily implements ActiveRecordInterface
             if (null !== $this->collCustomerCustomerFamilies) {
                 $result['CustomerCustomerFamilies'] = $this->collCustomerCustomerFamilies->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
+            if (null !== $this->singleCustomerFamilyPrice) {
+                $result['CustomerFamilyPrice'] = $this->singleCustomerFamilyPrice->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            }
             if (null !== $this->collCustomerFamilyI18ns) {
                 $result['CustomerFamilyI18ns'] = $this->collCustomerFamilyI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
@@ -1173,6 +1191,11 @@ abstract class CustomerFamily implements ActiveRecordInterface
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addCustomerCustomerFamily($relObj->copy($deepCopy));
                 }
+            }
+
+            $relObj = $this->getCustomerFamilyPrice();
+            if ($relObj) {
+                $copyObj->setCustomerFamilyPrice($relObj->copy($deepCopy));
             }
 
             foreach ($this->getCustomerFamilyI18ns() as $relObj) {
@@ -1474,6 +1497,42 @@ abstract class CustomerFamily implements ActiveRecordInterface
     }
 
     /**
+     * Gets a single ChildCustomerFamilyPrice object, which is related to this object by a one-to-one relationship.
+     *
+     * @param      ConnectionInterface $con optional connection object
+     * @return                 ChildCustomerFamilyPrice
+     * @throws PropelException
+     */
+    public function getCustomerFamilyPrice(ConnectionInterface $con = null)
+    {
+
+        if ($this->singleCustomerFamilyPrice === null && !$this->isNew()) {
+            $this->singleCustomerFamilyPrice = ChildCustomerFamilyPriceQuery::create()->findPk($this->getPrimaryKey(), $con);
+        }
+
+        return $this->singleCustomerFamilyPrice;
+    }
+
+    /**
+     * Sets a single ChildCustomerFamilyPrice object as related to this object by a one-to-one relationship.
+     *
+     * @param                  ChildCustomerFamilyPrice $v ChildCustomerFamilyPrice
+     * @return                 \CustomerFamily\Model\CustomerFamily The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setCustomerFamilyPrice(ChildCustomerFamilyPrice $v = null)
+    {
+        $this->singleCustomerFamilyPrice = $v;
+
+        // Make sure that that the passed-in ChildCustomerFamilyPrice isn't already associated with this object
+        if ($v !== null && $v->getCustomerFamily(null, false) === null) {
+            $v->setCustomerFamily($this);
+        }
+
+        return $this;
+    }
+
+    /**
      * Clears out the collCustomerFamilyI18ns collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -1731,6 +1790,9 @@ abstract class CustomerFamily implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->singleCustomerFamilyPrice) {
+                $this->singleCustomerFamilyPrice->clearAllReferences($deep);
+            }
             if ($this->collCustomerFamilyI18ns) {
                 foreach ($this->collCustomerFamilyI18ns as $o) {
                     $o->clearAllReferences($deep);
@@ -1743,6 +1805,7 @@ abstract class CustomerFamily implements ActiveRecordInterface
         $this->currentTranslations = null;
 
         $this->collCustomerCustomerFamilies = null;
+        $this->singleCustomerFamilyPrice = null;
         $this->collCustomerFamilyI18ns = null;
     }
 
