@@ -13,6 +13,7 @@ CREATE TABLE `customer_family`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `code` VARCHAR(45) NOT NULL,
+    `is_default` TINYINT,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -52,12 +53,13 @@ DROP TABLE IF EXISTS `customer_family_price`;
 CREATE TABLE `customer_family_price`
 (
     `customer_family_id` INTEGER NOT NULL,
+    `promo` TINYINT DEFAULT 0 NOT NULL,
     `use_equation` TINYINT DEFAULT 0 NOT NULL,
     `amount_added_before` DECIMAL(16,6) DEFAULT 0,
     `amount_added_after` DECIMAL(16,6) DEFAULT 0,
     `multiplication_coefficient` DECIMAL(16,6) DEFAULT 1,
     `is_taxed` TINYINT DEFAULT 1 NOT NULL,
-    PRIMARY KEY (`customer_family_id`),
+    PRIMARY KEY (`customer_family_id`,`promo`),
     CONSTRAINT `fk_customer_family_id`
         FOREIGN KEY (`customer_family_id`)
         REFERENCES `customer_family` (`id`)

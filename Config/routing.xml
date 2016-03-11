@@ -14,6 +14,10 @@
         <requirement key="id">\d+</requirement>
     </route>
 
+    <route id="customer.family.update.default" path="/admin/module/CustomerFamily/update-default" methods="post">
+        <default key="_controller">CustomerFamily\Controller\Admin\CustomerFamilyAdminController::updateDefaultAction</default>
+    </route>
+
     <route id="customer.family.delete" path="/admin/module/CustomerFamily/delete/{id}" methods="post">
         <default key="_controller">CustomerFamily\Controller\Admin\CustomerFamilyAdminController::deleteAction</default>
         <requirement key="id">\d+</requirement>
@@ -24,10 +28,6 @@
     </route>
 
     <!-- Prices management -->
-    <route id="customer.family.price.activate" path="/admin/module/CustomerFamily/activate" methods="post">
-        <default key="_controller">CustomerFamily\Controller\Admin\CustomerFamilyPriceController::activateAction</default>
-    </route>
-
     <route id="customer.family.price.update" path="/admin/module/CustomerFamily/update" methods="post">
         <default key="_controller">CustomerFamily\Controller\Admin\CustomerFamilyPriceController::updateAction</default>
     </route>

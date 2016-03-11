@@ -38,7 +38,7 @@ class CustomerCustomerFamilyForm extends BaseForm
      * @param string                    $value
      * @param ExecutionContextInterface $context
      */
-    public function checkProfessionalInformations($value, ExecutionContextInterface $context)
+    public function checkProfessionalInformation($value, ExecutionContextInterface $context)
     {
         $customerFamily = CustomerFamily::getCustomerFamilyByCode(CustomerFamily::CUSTOMER_FAMILY_PROFESSIONAL);
 
@@ -111,7 +111,7 @@ class CustomerCustomerFamilyForm extends BaseForm
                 array(
                     'constraints' => array(
                         new Constraints\Callback(array("methods" => array(
-                            array($this, "checkProfessionalInformations")
+                            array($this, "checkProfessionalInformation")
                         )))
                     ),
                     'required' => false,
@@ -132,7 +132,7 @@ class CustomerCustomerFamilyForm extends BaseForm
                 array(
                     'constraints' => array(
                         new Constraints\Callback(array("methods" => array(
-                            array($this, "checkProfessionalInformations")
+                            array($this, "checkProfessionalInformation")
                         )))
                     ),
                     'required' => false,

@@ -24,11 +24,13 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildCustomerFamilyQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildCustomerFamilyQuery orderByCode($order = Criteria::ASC) Order by the code column
+ * @method     ChildCustomerFamilyQuery orderByIsDefault($order = Criteria::ASC) Order by the is_default column
  * @method     ChildCustomerFamilyQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildCustomerFamilyQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildCustomerFamilyQuery groupById() Group by the id column
  * @method     ChildCustomerFamilyQuery groupByCode() Group by the code column
+ * @method     ChildCustomerFamilyQuery groupByIsDefault() Group by the is_default column
  * @method     ChildCustomerFamilyQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildCustomerFamilyQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -53,11 +55,13 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildCustomerFamily findOneById(int $id) Return the first ChildCustomerFamily filtered by the id column
  * @method     ChildCustomerFamily findOneByCode(string $code) Return the first ChildCustomerFamily filtered by the code column
+ * @method     ChildCustomerFamily findOneByIsDefault(int $is_default) Return the first ChildCustomerFamily filtered by the is_default column
  * @method     ChildCustomerFamily findOneByCreatedAt(string $created_at) Return the first ChildCustomerFamily filtered by the created_at column
  * @method     ChildCustomerFamily findOneByUpdatedAt(string $updated_at) Return the first ChildCustomerFamily filtered by the updated_at column
  *
  * @method     array findById(int $id) Return ChildCustomerFamily objects filtered by the id column
  * @method     array findByCode(string $code) Return ChildCustomerFamily objects filtered by the code column
+ * @method     array findByIsDefault(int $is_default) Return ChildCustomerFamily objects filtered by the is_default column
  * @method     array findByCreatedAt(string $created_at) Return ChildCustomerFamily objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildCustomerFamily objects filtered by the updated_at column
  *
@@ -148,7 +152,7 @@ abstract class CustomerFamilyQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, CODE, CREATED_AT, UPDATED_AT FROM customer_family WHERE ID = :p0';
+        $sql = 'SELECT ID, CODE, IS_DEFAULT, CREATED_AT, UPDATED_AT FROM customer_family WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -305,6 +309,47 @@ abstract class CustomerFamilyQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CustomerFamilyTableMap::CODE, $code, $comparison);
+    }
+
+    /**
+     * Filter the query on the is_default column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByIsDefault(1234); // WHERE is_default = 1234
+     * $query->filterByIsDefault(array(12, 34)); // WHERE is_default IN (12, 34)
+     * $query->filterByIsDefault(array('min' => 12)); // WHERE is_default > 12
+     * </code>
+     *
+     * @param     mixed $isDefault The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCustomerFamilyQuery The current query, for fluid interface
+     */
+    public function filterByIsDefault($isDefault = null, $comparison = null)
+    {
+        if (is_array($isDefault)) {
+            $useMinMax = false;
+            if (isset($isDefault['min'])) {
+                $this->addUsingAlias(CustomerFamilyTableMap::IS_DEFAULT, $isDefault['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($isDefault['max'])) {
+                $this->addUsingAlias(CustomerFamilyTableMap::IS_DEFAULT, $isDefault['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(CustomerFamilyTableMap::IS_DEFAULT, $isDefault, $comparison);
     }
 
     /**

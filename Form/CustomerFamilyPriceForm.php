@@ -19,6 +19,10 @@ class CustomerFamilyPriceForm extends BaseForm
                 'integer'
             )
             ->add(
+                'promo',
+                'integer'
+            )
+            ->add(
                 'use_equation',
                 'checkbox',
                 []

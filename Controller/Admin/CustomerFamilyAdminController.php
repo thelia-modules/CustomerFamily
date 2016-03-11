@@ -23,11 +23,13 @@ use CustomerFamily\Form\CustomerFamilyUpdateForm;
 use CustomerFamily\Model\CustomerFamilyQuery;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Thelia\Controller\Admin\BaseAdminController;
+use Thelia\Core\HttpFoundation\JsonResponse;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
 use Thelia\Form\CustomerUpdateForm;
+use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\Base\CustomerQuery;
 use Thelia\Model\Customer;
 use Thelia\Tools\URL;
@@ -103,6 +105,68 @@ class CustomerFamilyAdminController extends BaseAdminController
         );
 
         return self::renderAdminConfig($form, $message, $error);
+    }
+
+    /**
+     * Update default family
+     * There must be at least one default family
+     *
+     * @return mixed|\Symfony\Component\HttpFoundation\Response|static
+     */
+    public function updateDefaultAction()
+    {
+        if (null !== $response = $this->checkAuth([AdminResources::MODULE], ['CustomerFamily'], AccessManager::UPDATE)) {
+            return $response;
+        }
+
+        $error = null;
+        $ex = null;
+        $form = $this->createForm('customer_family_update_default_form');
+
+        try {
+            $vForm = $this->validateForm($form);
+
+            // Get customer_family to update
+            $customerFamily = CustomerFamilyQuery::create()->findOneById($vForm->get('customer_family_id')->getData());
+
+            // If the customer_family exists
+            if (null !== $customerFamily) {
+                // If the family to update is not already the default one
+                if (!$customerFamily->getIsDefault()) {
+                    // Remove old default family
+                    if (null !== $defaultCustomerFamilies = CustomerFamilyQuery::create()->findByIsDefault(1)) {
+                        /** @var \CustomerFamily\Model\CustomerFamily $defaultCustomerFamily */
+                        foreach ($defaultCustomerFamilies as $defaultCustomerFamily) {
+                            $defaultCustomerFamily
+                                ->setIsDefault(0)
+                                ->save();
+                        }
+                    }
+                    // Save new default family
+                    $customerFamily
+                        ->setIsDefault(1)
+                        ->save();
+                }
+            }
+
+        } catch (FormValidationException $ex) {
+            $error = $this->createStandardFormValidationErrorMessage($ex);
+        } catch (\Exception $ex) {
+            $error = $ex->getMessage();
+        }
+
+        if ($error !== null) {
+            $this->setupFormErrorContext(
+                $this->getTranslator()->trans("DeliveryRound configuration", [], CustomerFamily::MODULE_DOMAIN),
+                $error,
+                $form,
+                $ex
+            );
+            return JsonResponse::create(['error'=>$error], 500);
+        }
+
+        return RedirectResponse::create(URL::getInstance()->absoluteUrl("/admin/module/CustomerFamily"));
+
     }
 
     public function deleteAction($id)

@@ -21,50 +21,6 @@ use Thelia\Tools\URL;
 class CustomerFamilyPriceController extends BaseAdminController
 {
     /**
-     * Activate or deactivate price calculation
-     *
-     * @return mixed|\Symfony\Component\HttpFoundation\Response|static
-     */
-    public function activateAction()
-    {
-        // Check rights
-        if (null !== $response = $this->checkAuth(
-                [AdminResources::MODULE],
-                ['CustomerFamily'],
-                [AccessManager::VIEW, AccessManager::CREATE, AccessManager::UPDATE]
-            )) {
-            return $response;
-        }
-
-        $form = $this->createForm('customer_family_price_activate');
-        $error = null;
-        $ex = null;
-
-        try {
-            $vForm = $this->validateForm($form);
-
-            CustomerFamily::setConfigValue(CustomerFamily::PRICE_CALC_ACTIVE, $vForm->get('activate')->getData());
-
-        } catch (FormValidationException $ex) {
-            $error = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (\Exception $ex) {
-            $error = $ex->getMessage();
-        }
-
-        if ($error !== null) {
-            $this->setupFormErrorContext(
-                $this->getTranslator()->trans("DeliveryRound configuration", [], CustomerFamily::MODULE_DOMAIN),
-                $error,
-                $form,
-                $ex
-            );
-            return JsonResponse::create(['error'=>$error], 500);
-        }
-
-        return RedirectResponse::create(URL::getInstance()->absoluteUrl("/admin/module/CustomerFamily"));
-    }
-
-    /**
      * Add or update amounts and factor to calculate prices for customer families
      *
      * @return mixed|\Symfony\Component\HttpFoundation\Response|\Thelia\Core\HttpFoundation\Response|static
@@ -87,11 +43,14 @@ class CustomerFamilyPriceController extends BaseAdminController
         try {
             $vForm = $this->validateForm($form);
 
-            // If no entry exists for the given CustomerFamilyId, create it
+            // If no entry exists for the given CustomerFamilyId & promo, create it
             if (null === $customerFamilyPrice = CustomerFamilyPriceQuery::create()
-                    ->findOneByCustomerFamilyId($vForm->get('customer_family_id')->getData())) {
+                    ->findPk([$vForm->get('customer_family_id')->getData(), $vForm->get('promo')->getData()])) {
+                // Create new CustomerFamilyPrice
                 $customerFamilyPrice = new CustomerFamilyPrice();
-                $customerFamilyPrice->setCustomerFamilyId($vForm->get('customer_family_id')->getData());
+                $customerFamilyPrice
+                    ->setCustomerFamilyId($vForm->get('customer_family_id')->getData())
+                    ->setPromo($vForm->get('promo')->getData());
             }
 
             // Save data

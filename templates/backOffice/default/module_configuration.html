@@ -36,86 +36,108 @@
                         </div>
 
                         {form name="customer.family.delete.form"}
-                        {if $form_error}
-                            <div class="alert alert-danger">{$form_error_message}</div
-                        {/if}
+                            {if $form_error}
+                                <div class="alert alert-danger">{$form_error_message}</div
+                            {/if}
                         {/form}
 
                         <div class="col-md-12">
                             <table class="table">
                                 <thead>
-                                <tr>
-                                    <th>
-                                        {intl l="ID"}
-                                    </th>
-                                    <th>
-                                        {intl l="Code"}
-                                    </th>
-                                    <th>
-                                        {intl l="Title"}
-                                    </th>
-                                    <th>
-                                        {intl l="Action"}
-                                    </th>
-                                </tr>
+                                    <tr>
+                                        <th>
+                                            {intl l="ID"}
+                                        </th>
+                                        <th>
+                                            {intl l="Code"}
+                                        </th>
+                                        <th>
+                                            {intl l="Title"}
+                                        </th>
+                                        <th>
+                                            {intl l="Default"}
+                                        </th>
+                                        <th>
+                                            {intl l="Action"}
+                                        </th>
+                                    </tr>
                                 </thead>
                                 <tbody>
-                                {ifloop rel="customer_family"}
-                                {loop type="customer_family" name="customer_family" lang=$edit_language_id  force_return="on"}
-                                    <tr>
-                                        <td>
-                                            {$CUSTOMER_FAMILY_ID}
-                                        </td>
-                                        <td>
-                                            {$CODE}
-                                        </td>
-                                        <td>
-                                            {$TITLE_CUSTOMER_FAMILY}
-                                        </td>
-                                        <td>
-                                            <a class="btn btn-info pull-left js-action-update" data-id="{$CUSTOMER_FAMILY_ID}" data-code="{$CODE}" data-title="{$TITLE_CUSTOMER_FAMILY}" style="margin-right: 5px;">{intl l="Edit" d="customerfamily"}</a>
-                                            <a class="btn btn-danger pull-left js-action-delete" data-id="{$CUSTOMER_FAMILY_ID}" style="margin-right: 5px;">{intl l="Delete"}</a>
-                                        </td>
-                                    </tr>
-                                {/loop}
-                                {/ifloop}
-                                {elseloop rel="customer_family"}
-                                    <tr>
-                                        <td colspan="4" class="text-center">
-                                            {intl l="No family" d="CustomerFamily"}
-                                        </td>
-                                    </tr>
-                                {/elseloop}
-                                </tbody>
-                                <tfoot class="text-center">
-                                <tr>
-                                    <td colspan="4">
-                                        {form name="customer.family.create.form"}
-                                            <form action="{url path="/admin/module/CustomerFamily/create"}" method="POST" class="form-inline">
-                                                {if $form_error}
-                                                    <div class="alert alert-danger">{$form_error_message}</div
-                                                {/if}
+                                    {ifloop rel="customer_family"}
+
+                                        <!-- Default family -->
+                                        {form name='customer_family_update_default_form'}
+                                            <form action="{url path='/admin/module/CustomerFamily/update-default'}" method="post" id="update-default-family-form">
+
                                                 {form_hidden_fields form=$form}
-                                                {form_field form=$form field="locale"}
-                                                    <input type="hidden" name="{$name}" value="{$edit_language_locale}" />
+
+                                                {form_field form=$form field="customer_family_id"}
+                                                    <input type="hidden" name="{$name}" id="default_family_id">
                                                 {/form_field}
-                                                {form_field form=$form field="code"}
-                                                    <div class="form-group{if $error} has-error{/if}">
-                                                        <input class="form-control" type="text" required placeholder="{$label}" name="{$name}" value="{$value}" />
-                                                    </div>
-                                                {/form_field}
-                                                {form_field form=$form field="title"}
-                                                    <div class="form-group{if $error} has-error{/if}">
-                                                        <input class="form-control" type="text" required placeholder="{$label}" name="{$name}" value="{$value}" />
-                                                    </div>
-                                                {/form_field}
-                                                <div class="form-group">
-                                                    <button type="submit" class="btn btn-primary js-action-create">{intl l="Add"}</button>
-                                                </div>
                                             </form>
                                         {/form}
-                                    </td>
-                                </tr>
+
+                                        <!-- Families list -->
+                                        {loop type="customer_family" name="customer_family" lang=$edit_language_id  force_return="on"}
+                                            <tr>
+                                                <td>
+                                                    {$CUSTOMER_FAMILY_ID}
+                                                </td>
+                                                <td>
+                                                    {$CODE}
+                                                </td>
+                                                <td>
+                                                    {$TITLE_CUSTOMER_FAMILY}
+                                                </td>
+                                                <td>
+                                                    <div class="switch-small update-default-family" data-id="{$CUSTOMER_FAMILY_ID}" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok-circle'></i>" data-off-label="<i class='glyphicon glyphicon-remove-circle'></i>">
+                                                        <input type="radio" name="is_default" {if $IS_DEFAULT}checked{/if} />
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <a class="btn btn-info pull-left js-action-update" data-code="{$CODE}" data-title="{$TITLE_CUSTOMER_FAMILY}" style="margin-right: 5px;">{intl l="Edit" d="customerfamily"}</a>
+                                                    <a class="btn btn-danger pull-left js-action-delete" data-id="{$CUSTOMER_FAMILY_ID}" style="margin-right: 5px;">{intl l="Delete"}</a>
+                                                </td>
+                                            </tr>
+                                        {/loop}
+                                    {/ifloop}
+                                    {elseloop rel="customer_family"}
+                                        <tr>
+                                            <td colspan="4" class="text-center">
+                                                {intl l="No family" d="CustomerFamily"}
+                                            </td>
+                                        </tr>
+                                    {/elseloop}
+                                </tbody>
+                                <tfoot class="text-center">
+                                    <tr>
+                                        <td colspan="4">
+                                            {form name="customer.family.create.form"}
+                                                <form action="{url path="/admin/module/CustomerFamily/create"}" method="POST" class="form-inline">
+                                                    {if $form_error}
+                                                        <div class="alert alert-danger">{$form_error_message}</div
+                                                    {/if}
+                                                    {form_hidden_fields form=$form}
+                                                    {form_field form=$form field="locale"}
+                                                        <input type="hidden" name="{$name}" value="{$edit_language_locale}" />
+                                                    {/form_field}
+                                                    {form_field form=$form field="code"}
+                                                        <div class="form-group{if $error} has-error{/if}">
+                                                            <input class="form-control" type="text" required placeholder="{$label}" name="{$name}" value="{$value}" />
+                                                        </div>
+                                                    {/form_field}
+                                                    {form_field form=$form field="title"}
+                                                        <div class="form-group{if $error} has-error{/if}">
+                                                            <input class="form-control" type="text" required placeholder="{$label}" name="{$name}" value="{$value}" />
+                                                        </div>
+                                                    {/form_field}
+                                                    <div class="form-group">
+                                                        <button type="submit" class="btn btn-primary js-action-create">{intl l="Add"}</button>
+                                                    </div>
+                                                </form>
+                                            {/form}
+                                        </td>
+                                    </tr>
                                 </tfoot>
                             </table>
 
@@ -207,13 +229,18 @@
                                         {assign var='is_taxed' value=1}
                                         {assign var='use_equation' value=0}
 
+                                        <!-- Standard price equation -->
                                         <tr>
                                             {form name='customer_family_price_update'}
                                                 <form action="{url path='/admin/module/CustomerFamily/update'}" method="post">
 
                                                     {form_hidden_fields form=$form}
 
-                                                    {loop type='customer_family_price' name='customer_family_price_loop' customer_family_id=$CUSTOMER_FAMILY_ID}
+                                                    {form_field form=$form field='promo'}
+                                                        <input type="hidden" name="{$name}" value="0">
+                                                    {/form_field}
+
+                                                    {loop type='customer_family_price' name='customer_family_price_loop' promo=0 customer_family_id=$CUSTOMER_FAMILY_ID}
                                                         {assign var='amount_added_before' value=$AMOUNT_ADDED_BEFORE}
                                                         {assign var='coefficient' value=$COEFFICIENT}
                                                         {assign var='amount_added_after' value=$AMOUNT_ADDED_AFTER}
@@ -258,12 +285,90 @@
                                                 </form>
                                             {/form}
                                         </tr>
+
+                                        {assign var='amount_added_before' value=0}
+                                        {assign var='coefficient' value=1}
+                                        {assign var='amount_added_after' value=0}
+                                        {assign var='is_taxed' value=1}
+                                        {assign var='use_equation' value=0}
+
+                                        <!-- Promo price equation -->
+                                        <tr>
+                                            {form name='customer_family_price_update'}
+                                                <form action="{url path='/admin/module/CustomerFamily/update'}" method="post">
+
+                                                    {form_hidden_fields form=$form}
+
+                                                    {form_field form=$form field='promo'}
+                                                        <input type="hidden" name="{$name}" value="1">
+                                                    {/form_field}
+
+                                                    {loop type='customer_family_price' name='customer_family_price_promo_loop' promo=1 customer_family_id=$CUSTOMER_FAMILY_ID}
+                                                        {assign var='amount_added_before' value=$AMOUNT_ADDED_BEFORE}
+                                                        {assign var='coefficient' value=$COEFFICIENT}
+                                                        {assign var='amount_added_after' value=$AMOUNT_ADDED_AFTER}
+                                                        {assign var='is_taxed' value=$IS_TAXED}
+                                                        {assign var='use_equation' value=$USE_EQUATION}
+                                                    {/loop}
+
+                                                    <td>
+                                                        {$TITLE_CUSTOMER_FAMILY} - {intl l='Promo' d='customerfamily.bo.default'}
+                                                        {form_field form=$form field="customer_family_id"}
+                                                            <input type="hidden" name="{$name}" value="{$CUSTOMER_FAMILY_ID}">
+                                                        {/form_field}
+                                                    </td>
+                                                    <td>
+                                                        {form_field form=$form field="use_equation"}
+                                                            <input type="checkbox" name="{$name}" {if $use_equation}checked{/if}>
+                                                        {/form_field}
+                                                    </td>
+                                                    <td>
+                                                        {form_field form=$form field="amount_added_before"}
+                                                            <input type="number" name="{$name}" maxlength="16" value="{$amount_added_before}" class="form-control">
+                                                        {/form_field}
+                                                    </td>
+                                                    <td>
+                                                        {form_field form=$form field="coefficient"}
+                                                            <input type="number" name="{$name}" maxlength="16" value="{$coefficient}" class="form-control">
+                                                        {/form_field}
+                                                    </td>
+                                                    <td>
+                                                        {form_field form=$form field="amount_added_after"}
+                                                            <input type="number" name="{$name}" maxlength="16" value="{$amount_added_after}" class="form-control">
+                                                        {/form_field}
+                                                    </td>
+                                                    <td>
+                                                        {form_field form=$form field="is_taxed"}
+                                                            <input type="checkbox" name="{$name}" {if $is_taxed}checked{/if}>
+                                                        {/form_field}
+                                                    </td>
+                                                    <td>
+                                                        <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
+                                                    </td>
+                                                </form>
+                                            {/form}
+                                        </tr>
                                     {/loop}
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="update-default-family-failed" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3>{intl l="An error occured" d='customerfamily.bo.default'}</h3>
+            </div>
+            <div class="modal-body" id="update-default-family-failed-body">
+
             </div>
         </div>
     </div>

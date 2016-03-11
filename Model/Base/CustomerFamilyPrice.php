@@ -60,6 +60,13 @@ abstract class CustomerFamilyPrice implements ActiveRecordInterface
     protected $customer_family_id;
 
     /**
+     * The value for the promo field.
+     * Note: this column has a database default value of: 0
+     * @var        int
+     */
+    protected $promo;
+
+    /**
      * The value for the use_equation field.
      * Note: this column has a database default value of: 0
      * @var        int
@@ -115,6 +122,7 @@ abstract class CustomerFamilyPrice implements ActiveRecordInterface
      */
     public function applyDefaultValues()
     {
+        $this->promo = 0;
         $this->use_equation = 0;
         $this->amount_added_before = '0';
         $this->amount_added_after = '0';
@@ -394,6 +402,17 @@ abstract class CustomerFamilyPrice implements ActiveRecordInterface
     }
 
     /**
+     * Get the [promo] column value.
+     *
+     * @return   int
+     */
+    public function getPromo()
+    {
+
+        return $this->promo;
+    }
+
+    /**
      * Get the [use_equation] column value.
      *
      * @return   int
@@ -472,6 +491,27 @@ abstract class CustomerFamilyPrice implements ActiveRecordInterface
 
         return $this;
     } // setCustomerFamilyId()
+
+    /**
+     * Set the value of [promo] column.
+     *
+     * @param      int $v new value
+     * @return   \CustomerFamily\Model\CustomerFamilyPrice The current object (for fluent API support)
+     */
+    public function setPromo($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->promo !== $v) {
+            $this->promo = $v;
+            $this->modifiedColumns[CustomerFamilyPriceTableMap::PROMO] = true;
+        }
+
+
+        return $this;
+    } // setPromo()
 
     /**
      * Set the value of [use_equation] column.
@@ -588,6 +628,10 @@ abstract class CustomerFamilyPrice implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->promo !== 0) {
+                return false;
+            }
+
             if ($this->use_equation !== 0) {
                 return false;
             }
@@ -638,19 +682,22 @@ abstract class CustomerFamilyPrice implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : CustomerFamilyPriceTableMap::translateFieldName('CustomerFamilyId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->customer_family_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : CustomerFamilyPriceTableMap::translateFieldName('UseEquation', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : CustomerFamilyPriceTableMap::translateFieldName('Promo', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->promo = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : CustomerFamilyPriceTableMap::translateFieldName('UseEquation', TableMap::TYPE_PHPNAME, $indexType)];
             $this->use_equation = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : CustomerFamilyPriceTableMap::translateFieldName('AmountAddedBefore', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CustomerFamilyPriceTableMap::translateFieldName('AmountAddedBefore', TableMap::TYPE_PHPNAME, $indexType)];
             $this->amount_added_before = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CustomerFamilyPriceTableMap::translateFieldName('AmountAddedAfter', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : CustomerFamilyPriceTableMap::translateFieldName('AmountAddedAfter', TableMap::TYPE_PHPNAME, $indexType)];
             $this->amount_added_after = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : CustomerFamilyPriceTableMap::translateFieldName('MultiplicationCoefficient', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : CustomerFamilyPriceTableMap::translateFieldName('MultiplicationCoefficient', TableMap::TYPE_PHPNAME, $indexType)];
             $this->multiplication_coefficient = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : CustomerFamilyPriceTableMap::translateFieldName('IsTaxed', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : CustomerFamilyPriceTableMap::translateFieldName('IsTaxed', TableMap::TYPE_PHPNAME, $indexType)];
             $this->is_taxed = (null !== $col) ? (int) $col : null;
             $this->resetModified();
 
@@ -660,7 +707,7 @@ abstract class CustomerFamilyPrice implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 6; // 6 = CustomerFamilyPriceTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 7; // 7 = CustomerFamilyPriceTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \CustomerFamily\Model\CustomerFamilyPrice object", 0, $e);
@@ -884,6 +931,9 @@ abstract class CustomerFamilyPrice implements ActiveRecordInterface
         if ($this->isColumnModified(CustomerFamilyPriceTableMap::CUSTOMER_FAMILY_ID)) {
             $modifiedColumns[':p' . $index++]  = 'CUSTOMER_FAMILY_ID';
         }
+        if ($this->isColumnModified(CustomerFamilyPriceTableMap::PROMO)) {
+            $modifiedColumns[':p' . $index++]  = 'PROMO';
+        }
         if ($this->isColumnModified(CustomerFamilyPriceTableMap::USE_EQUATION)) {
             $modifiedColumns[':p' . $index++]  = 'USE_EQUATION';
         }
@@ -912,6 +962,9 @@ abstract class CustomerFamilyPrice implements ActiveRecordInterface
                 switch ($columnName) {
                     case 'CUSTOMER_FAMILY_ID':
                         $stmt->bindValue($identifier, $this->customer_family_id, PDO::PARAM_INT);
+                        break;
+                    case 'PROMO':
+                        $stmt->bindValue($identifier, $this->promo, PDO::PARAM_INT);
                         break;
                     case 'USE_EQUATION':
                         $stmt->bindValue($identifier, $this->use_equation, PDO::PARAM_INT);
@@ -987,18 +1040,21 @@ abstract class CustomerFamilyPrice implements ActiveRecordInterface
                 return $this->getCustomerFamilyId();
                 break;
             case 1:
-                return $this->getUseEquation();
+                return $this->getPromo();
                 break;
             case 2:
-                return $this->getAmountAddedBefore();
+                return $this->getUseEquation();
                 break;
             case 3:
-                return $this->getAmountAddedAfter();
+                return $this->getAmountAddedBefore();
                 break;
             case 4:
-                return $this->getMultiplicationCoefficient();
+                return $this->getAmountAddedAfter();
                 break;
             case 5:
+                return $this->getMultiplicationCoefficient();
+                break;
+            case 6:
                 return $this->getIsTaxed();
                 break;
             default:
@@ -1024,18 +1080,19 @@ abstract class CustomerFamilyPrice implements ActiveRecordInterface
      */
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['CustomerFamilyPrice'][$this->getPrimaryKey()])) {
+        if (isset($alreadyDumpedObjects['CustomerFamilyPrice'][serialize($this->getPrimaryKey())])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['CustomerFamilyPrice'][$this->getPrimaryKey()] = true;
+        $alreadyDumpedObjects['CustomerFamilyPrice'][serialize($this->getPrimaryKey())] = true;
         $keys = CustomerFamilyPriceTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getCustomerFamilyId(),
-            $keys[1] => $this->getUseEquation(),
-            $keys[2] => $this->getAmountAddedBefore(),
-            $keys[3] => $this->getAmountAddedAfter(),
-            $keys[4] => $this->getMultiplicationCoefficient(),
-            $keys[5] => $this->getIsTaxed(),
+            $keys[1] => $this->getPromo(),
+            $keys[2] => $this->getUseEquation(),
+            $keys[3] => $this->getAmountAddedBefore(),
+            $keys[4] => $this->getAmountAddedAfter(),
+            $keys[5] => $this->getMultiplicationCoefficient(),
+            $keys[6] => $this->getIsTaxed(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1084,18 +1141,21 @@ abstract class CustomerFamilyPrice implements ActiveRecordInterface
                 $this->setCustomerFamilyId($value);
                 break;
             case 1:
-                $this->setUseEquation($value);
+                $this->setPromo($value);
                 break;
             case 2:
-                $this->setAmountAddedBefore($value);
+                $this->setUseEquation($value);
                 break;
             case 3:
-                $this->setAmountAddedAfter($value);
+                $this->setAmountAddedBefore($value);
                 break;
             case 4:
-                $this->setMultiplicationCoefficient($value);
+                $this->setAmountAddedAfter($value);
                 break;
             case 5:
+                $this->setMultiplicationCoefficient($value);
+                break;
+            case 6:
                 $this->setIsTaxed($value);
                 break;
         } // switch()
@@ -1123,11 +1183,12 @@ abstract class CustomerFamilyPrice implements ActiveRecordInterface
         $keys = CustomerFamilyPriceTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setCustomerFamilyId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setUseEquation($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setAmountAddedBefore($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setAmountAddedAfter($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setMultiplicationCoefficient($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setIsTaxed($arr[$keys[5]]);
+        if (array_key_exists($keys[1], $arr)) $this->setPromo($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setUseEquation($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setAmountAddedBefore($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setAmountAddedAfter($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setMultiplicationCoefficient($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setIsTaxed($arr[$keys[6]]);
     }
 
     /**
@@ -1140,6 +1201,7 @@ abstract class CustomerFamilyPrice implements ActiveRecordInterface
         $criteria = new Criteria(CustomerFamilyPriceTableMap::DATABASE_NAME);
 
         if ($this->isColumnModified(CustomerFamilyPriceTableMap::CUSTOMER_FAMILY_ID)) $criteria->add(CustomerFamilyPriceTableMap::CUSTOMER_FAMILY_ID, $this->customer_family_id);
+        if ($this->isColumnModified(CustomerFamilyPriceTableMap::PROMO)) $criteria->add(CustomerFamilyPriceTableMap::PROMO, $this->promo);
         if ($this->isColumnModified(CustomerFamilyPriceTableMap::USE_EQUATION)) $criteria->add(CustomerFamilyPriceTableMap::USE_EQUATION, $this->use_equation);
         if ($this->isColumnModified(CustomerFamilyPriceTableMap::AMOUNT_ADDED_BEFORE)) $criteria->add(CustomerFamilyPriceTableMap::AMOUNT_ADDED_BEFORE, $this->amount_added_before);
         if ($this->isColumnModified(CustomerFamilyPriceTableMap::AMOUNT_ADDED_AFTER)) $criteria->add(CustomerFamilyPriceTableMap::AMOUNT_ADDED_AFTER, $this->amount_added_after);
@@ -1161,28 +1223,35 @@ abstract class CustomerFamilyPrice implements ActiveRecordInterface
     {
         $criteria = new Criteria(CustomerFamilyPriceTableMap::DATABASE_NAME);
         $criteria->add(CustomerFamilyPriceTableMap::CUSTOMER_FAMILY_ID, $this->customer_family_id);
+        $criteria->add(CustomerFamilyPriceTableMap::PROMO, $this->promo);
 
         return $criteria;
     }
 
     /**
-     * Returns the primary key for this object (row).
-     * @return   int
+     * Returns the composite primary key for this object.
+     * The array elements will be in same order as specified in XML.
+     * @return array
      */
     public function getPrimaryKey()
     {
-        return $this->getCustomerFamilyId();
+        $pks = array();
+        $pks[0] = $this->getCustomerFamilyId();
+        $pks[1] = $this->getPromo();
+
+        return $pks;
     }
 
     /**
-     * Generic method to set the primary key (customer_family_id column).
+     * Set the [composite] primary key.
      *
-     * @param       int $key Primary key.
+     * @param      array $keys The elements of the composite key (order must match the order in XML file).
      * @return void
      */
-    public function setPrimaryKey($key)
+    public function setPrimaryKey($keys)
     {
-        $this->setCustomerFamilyId($key);
+        $this->setCustomerFamilyId($keys[0]);
+        $this->setPromo($keys[1]);
     }
 
     /**
@@ -1192,7 +1261,7 @@ abstract class CustomerFamilyPrice implements ActiveRecordInterface
     public function isPrimaryKeyNull()
     {
 
-        return null === $this->getCustomerFamilyId();
+        return (null === $this->getCustomerFamilyId()) && (null === $this->getPromo());
     }
 
     /**
@@ -1209,6 +1278,7 @@ abstract class CustomerFamilyPrice implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setCustomerFamilyId($this->getCustomerFamilyId());
+        $copyObj->setPromo($this->getPromo());
         $copyObj->setUseEquation($this->getUseEquation());
         $copyObj->setAmountAddedBefore($this->getAmountAddedBefore());
         $copyObj->setAmountAddedAfter($this->getAmountAddedAfter());
@@ -1258,9 +1328,10 @@ abstract class CustomerFamilyPrice implements ActiveRecordInterface
 
         $this->aCustomerFamily = $v;
 
-        // Add binding for other direction of this 1:1 relationship.
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildCustomerFamily object, it will not be re-added.
         if ($v !== null) {
-            $v->setCustomerFamilyPrice($this);
+            $v->addCustomerFamilyPrice($this);
         }
 
 
@@ -1279,8 +1350,13 @@ abstract class CustomerFamilyPrice implements ActiveRecordInterface
     {
         if ($this->aCustomerFamily === null && ($this->customer_family_id !== null)) {
             $this->aCustomerFamily = ChildCustomerFamilyQuery::create()->findPk($this->customer_family_id, $con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aCustomerFamily->setCustomerFamilyPrice($this);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aCustomerFamily->addCustomerFamilyPrices($this);
+             */
         }
 
         return $this->aCustomerFamily;
@@ -1292,6 +1368,7 @@ abstract class CustomerFamilyPrice implements ActiveRecordInterface
     public function clear()
     {
         $this->customer_family_id = null;
+        $this->promo = null;
         $this->use_equation = null;
         $this->amount_added_before = null;
         $this->amount_added_after = null;

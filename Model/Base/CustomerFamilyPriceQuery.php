@@ -22,6 +22,7 @@ use Propel\Runtime\Exception\PropelException;
  *
  *
  * @method     ChildCustomerFamilyPriceQuery orderByCustomerFamilyId($order = Criteria::ASC) Order by the customer_family_id column
+ * @method     ChildCustomerFamilyPriceQuery orderByPromo($order = Criteria::ASC) Order by the promo column
  * @method     ChildCustomerFamilyPriceQuery orderByUseEquation($order = Criteria::ASC) Order by the use_equation column
  * @method     ChildCustomerFamilyPriceQuery orderByAmountAddedBefore($order = Criteria::ASC) Order by the amount_added_before column
  * @method     ChildCustomerFamilyPriceQuery orderByAmountAddedAfter($order = Criteria::ASC) Order by the amount_added_after column
@@ -29,6 +30,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildCustomerFamilyPriceQuery orderByIsTaxed($order = Criteria::ASC) Order by the is_taxed column
  *
  * @method     ChildCustomerFamilyPriceQuery groupByCustomerFamilyId() Group by the customer_family_id column
+ * @method     ChildCustomerFamilyPriceQuery groupByPromo() Group by the promo column
  * @method     ChildCustomerFamilyPriceQuery groupByUseEquation() Group by the use_equation column
  * @method     ChildCustomerFamilyPriceQuery groupByAmountAddedBefore() Group by the amount_added_before column
  * @method     ChildCustomerFamilyPriceQuery groupByAmountAddedAfter() Group by the amount_added_after column
@@ -47,6 +49,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildCustomerFamilyPrice findOneOrCreate(ConnectionInterface $con = null) Return the first ChildCustomerFamilyPrice matching the query, or a new ChildCustomerFamilyPrice object populated from the query conditions when no match is found
  *
  * @method     ChildCustomerFamilyPrice findOneByCustomerFamilyId(int $customer_family_id) Return the first ChildCustomerFamilyPrice filtered by the customer_family_id column
+ * @method     ChildCustomerFamilyPrice findOneByPromo(int $promo) Return the first ChildCustomerFamilyPrice filtered by the promo column
  * @method     ChildCustomerFamilyPrice findOneByUseEquation(int $use_equation) Return the first ChildCustomerFamilyPrice filtered by the use_equation column
  * @method     ChildCustomerFamilyPrice findOneByAmountAddedBefore(string $amount_added_before) Return the first ChildCustomerFamilyPrice filtered by the amount_added_before column
  * @method     ChildCustomerFamilyPrice findOneByAmountAddedAfter(string $amount_added_after) Return the first ChildCustomerFamilyPrice filtered by the amount_added_after column
@@ -54,6 +57,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildCustomerFamilyPrice findOneByIsTaxed(int $is_taxed) Return the first ChildCustomerFamilyPrice filtered by the is_taxed column
  *
  * @method     array findByCustomerFamilyId(int $customer_family_id) Return ChildCustomerFamilyPrice objects filtered by the customer_family_id column
+ * @method     array findByPromo(int $promo) Return ChildCustomerFamilyPrice objects filtered by the promo column
  * @method     array findByUseEquation(int $use_equation) Return ChildCustomerFamilyPrice objects filtered by the use_equation column
  * @method     array findByAmountAddedBefore(string $amount_added_before) Return ChildCustomerFamilyPrice objects filtered by the amount_added_before column
  * @method     array findByAmountAddedAfter(string $amount_added_after) Return ChildCustomerFamilyPrice objects filtered by the amount_added_after column
@@ -106,10 +110,10 @@ abstract class CustomerFamilyPriceQuery extends ModelCriteria
      * Go fast if the query is untouched.
      *
      * <code>
-     * $obj  = $c->findPk(12, $con);
+     * $obj = $c->findPk(array(12, 34), $con);
      * </code>
      *
-     * @param mixed $key Primary key to use for the query
+     * @param array[$customer_family_id, $promo] $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
      * @return ChildCustomerFamilyPrice|array|mixed the result, formatted by the current formatter
@@ -119,7 +123,7 @@ abstract class CustomerFamilyPriceQuery extends ModelCriteria
         if ($key === null) {
             return null;
         }
-        if ((null !== ($obj = CustomerFamilyPriceTableMap::getInstanceFromPool((string) $key))) && !$this->formatter) {
+        if ((null !== ($obj = CustomerFamilyPriceTableMap::getInstanceFromPool(serialize(array((string) $key[0], (string) $key[1]))))) && !$this->formatter) {
             // the object is already in the instance pool
             return $obj;
         }
@@ -147,10 +151,11 @@ abstract class CustomerFamilyPriceQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT CUSTOMER_FAMILY_ID, USE_EQUATION, AMOUNT_ADDED_BEFORE, AMOUNT_ADDED_AFTER, MULTIPLICATION_COEFFICIENT, IS_TAXED FROM customer_family_price WHERE CUSTOMER_FAMILY_ID = :p0';
+        $sql = 'SELECT CUSTOMER_FAMILY_ID, PROMO, USE_EQUATION, AMOUNT_ADDED_BEFORE, AMOUNT_ADDED_AFTER, MULTIPLICATION_COEFFICIENT, IS_TAXED FROM customer_family_price WHERE CUSTOMER_FAMILY_ID = :p0 AND PROMO = :p1';
         try {
             $stmt = $con->prepare($sql);
-            $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
+            $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
+            $stmt->bindValue(':p1', $key[1], PDO::PARAM_INT);
             $stmt->execute();
         } catch (Exception $e) {
             Propel::log($e->getMessage(), Propel::LOG_ERR);
@@ -160,7 +165,7 @@ abstract class CustomerFamilyPriceQuery extends ModelCriteria
         if ($row = $stmt->fetch(\PDO::FETCH_NUM)) {
             $obj = new ChildCustomerFamilyPrice();
             $obj->hydrate($row);
-            CustomerFamilyPriceTableMap::addInstanceToPool($obj, (string) $key);
+            CustomerFamilyPriceTableMap::addInstanceToPool($obj, serialize(array((string) $key[0], (string) $key[1])));
         }
         $stmt->closeCursor();
 
@@ -189,7 +194,7 @@ abstract class CustomerFamilyPriceQuery extends ModelCriteria
     /**
      * Find objects by primary key
      * <code>
-     * $objs = $c->findPks(array(12, 56, 832), $con);
+     * $objs = $c->findPks(array(array(12, 56), array(832, 123), array(123, 456)), $con);
      * </code>
      * @param     array $keys Primary keys to use for the query
      * @param     ConnectionInterface $con an optional connection object
@@ -219,8 +224,10 @@ abstract class CustomerFamilyPriceQuery extends ModelCriteria
      */
     public function filterByPrimaryKey($key)
     {
+        $this->addUsingAlias(CustomerFamilyPriceTableMap::CUSTOMER_FAMILY_ID, $key[0], Criteria::EQUAL);
+        $this->addUsingAlias(CustomerFamilyPriceTableMap::PROMO, $key[1], Criteria::EQUAL);
 
-        return $this->addUsingAlias(CustomerFamilyPriceTableMap::CUSTOMER_FAMILY_ID, $key, Criteria::EQUAL);
+        return $this;
     }
 
     /**
@@ -232,8 +239,17 @@ abstract class CustomerFamilyPriceQuery extends ModelCriteria
      */
     public function filterByPrimaryKeys($keys)
     {
+        if (empty($keys)) {
+            return $this->add(null, '1<>1', Criteria::CUSTOM);
+        }
+        foreach ($keys as $key) {
+            $cton0 = $this->getNewCriterion(CustomerFamilyPriceTableMap::CUSTOMER_FAMILY_ID, $key[0], Criteria::EQUAL);
+            $cton1 = $this->getNewCriterion(CustomerFamilyPriceTableMap::PROMO, $key[1], Criteria::EQUAL);
+            $cton0->addAnd($cton1);
+            $this->addOr($cton0);
+        }
 
-        return $this->addUsingAlias(CustomerFamilyPriceTableMap::CUSTOMER_FAMILY_ID, $keys, Criteria::IN);
+        return $this;
     }
 
     /**
@@ -277,6 +293,47 @@ abstract class CustomerFamilyPriceQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CustomerFamilyPriceTableMap::CUSTOMER_FAMILY_ID, $customerFamilyId, $comparison);
+    }
+
+    /**
+     * Filter the query on the promo column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPromo(1234); // WHERE promo = 1234
+     * $query->filterByPromo(array(12, 34)); // WHERE promo IN (12, 34)
+     * $query->filterByPromo(array('min' => 12)); // WHERE promo > 12
+     * </code>
+     *
+     * @param     mixed $promo The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCustomerFamilyPriceQuery The current query, for fluid interface
+     */
+    public function filterByPromo($promo = null, $comparison = null)
+    {
+        if (is_array($promo)) {
+            $useMinMax = false;
+            if (isset($promo['min'])) {
+                $this->addUsingAlias(CustomerFamilyPriceTableMap::PROMO, $promo['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($promo['max'])) {
+                $this->addUsingAlias(CustomerFamilyPriceTableMap::PROMO, $promo['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(CustomerFamilyPriceTableMap::PROMO, $promo, $comparison);
     }
 
     /**
@@ -569,7 +626,9 @@ abstract class CustomerFamilyPriceQuery extends ModelCriteria
     public function prune($customerFamilyPrice = null)
     {
         if ($customerFamilyPrice) {
-            $this->addUsingAlias(CustomerFamilyPriceTableMap::CUSTOMER_FAMILY_ID, $customerFamilyPrice->getCustomerFamilyId(), Criteria::NOT_EQUAL);
+            $this->addCond('pruneCond0', $this->getAliasedColName(CustomerFamilyPriceTableMap::CUSTOMER_FAMILY_ID), $customerFamilyPrice->getCustomerFamilyId(), Criteria::NOT_EQUAL);
+            $this->addCond('pruneCond1', $this->getAliasedColName(CustomerFamilyPriceTableMap::PROMO), $customerFamilyPrice->getPromo(), Criteria::NOT_EQUAL);
+            $this->combine(array('pruneCond0', 'pruneCond1'), Criteria::LOGICAL_OR);
         }
 
         return $this;

@@ -21,6 +21,7 @@ use CustomerFamily\Model\CustomerFamily as CustomerFamilyModel;
 /**
  * Class CustomerFamily
  * @package CustomerFamily
+ * @contributor Etienne Perriere <eperriere@openstudio.fr>
  */
 class CustomerFamily extends BaseModule
 {
@@ -36,6 +37,7 @@ class CustomerFamily extends BaseModule
     /** @cont string */
     const CUSTOMER_FAMILY_PROFESSIONAL = "professional";
 
+    /** @const string */
     const PRICE_CALC_ACTIVE = 'customer_family_price_activated';
 
     /**
@@ -55,7 +57,7 @@ class CustomerFamily extends BaseModule
 
         //Customer
         self::getCustomerFamilyByCode(self::CUSTOMER_FAMILY_PARTICULAR, "Particulier", "fr_FR");
-        self::getCustomerFamilyByCode(self::CUSTOMER_FAMILY_PARTICULAR, "Particular", "en_US");
+        self::getCustomerFamilyByCode(self::CUSTOMER_FAMILY_PARTICULAR, "Private individual", "en_US");
 
         //Professional
         self::getCustomerFamilyByCode(self::CUSTOMER_FAMILY_PROFESSIONAL, "Professionnel", "fr_FR");
@@ -75,6 +77,13 @@ class CustomerFamily extends BaseModule
             $title = $code;
         }
 
+        // Set 'particular' as default family
+        if ($code == self::CUSTOMER_FAMILY_PARTICULAR) {
+            $isDefault = 1;
+        } else {
+            $isDefault = 0;
+        }
+
         /** @var CustomerFamilyModel $customerFamily */
         if (null == $customerFamily = CustomerFamilyQuery::create()
                 ->useCustomerFamilyI18nQuery()
@@ -89,18 +98,16 @@ class CustomerFamily extends BaseModule
                 $customerF
                     ->setLocale($locale)
                     ->setTitle($title)
-                    ->save()
-                ;
+                    ->save();
             } else {
                 $customerFamily = new CustomerFamilyModel();
                 $customerFamily
                     ->setCode($code)
+                    ->setIsDefault($isDefault)
                     ->setLocale($locale)
                     ->setTitle($title)
-                    ->save()
-                ;
+                    ->save();
             }
-
         }
 
         return $customerFamily;

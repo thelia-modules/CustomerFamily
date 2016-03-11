@@ -33,10 +33,14 @@
 
         $module.find(".switch-small").bootstrapSwitch();
 
-        // Price calculation activation
-        $module.find(".price-calculation-activation").on("switch-change", function(e, data){
-            var form = $("#activate-price-calculation");
+        // Default family
+        $module.find(".update-default-family").on("switch-change", function(e, data){
+
+            var form = $module.find("#update-default-family-form");
             $('body').append('<div class="modal-backdrop fade in" id="loading-event"><div class="loading"></div></div>');
+
+            $('#default_family_id').val($(this).data('id'));
+
             $.ajax({
                 url: form.attr('action'),
                 type: form.attr('method'),
@@ -44,11 +48,12 @@
             })
             .done(function(){
                 $("#loading-event").remove();
+                location.href = "{url path='/admin/module/CustomerFamily'}";
             })
             .fail(function(jqXHR, textStatus, errorThrown){
                 $("#loading-event").remove();
-                $('#price-calculation-failed-body').html(jqXHR.responseJSON.error);
-                $("#price-calculation-failed").modal("show");
+                $('#update-default-family-failed-body').html(jqXHR.responseJSON.error);
+                $("#update-default-family-failed").modal("show");
             });
         });
 

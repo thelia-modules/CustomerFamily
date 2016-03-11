@@ -8,6 +8,7 @@
 		<unique>
 			<unique-column name="code" />
 		</unique>
+		<column name="is_default" type="TINYINT" />
 		<behavior name="timestampable" />
 		<behavior name="i18n">
 			<parameter name="i18n_columns" value="title" />
@@ -35,6 +36,7 @@
 		<foreign-key foreignTable="customer_family" name="fk_customer_family_id" onDelete="CASCADE" onUpdate="RESTRICT">
 			<reference foreign="id" local="customer_family_id" />
 		</foreign-key>
+		<column name="promo" primaryKey="true" type="TINYINT" required="true" defaultValue="0"/>
 		<column name="use_equation" type="TINYINT" required="true" defaultValue="0"/>
 		<column name="amount_added_before" type="DECIMAL" size="16" scale="6" defaultValue="0" />
 		<column name="amount_added_after" type="DECIMAL" size="16" scale="6" defaultValue="0" />

@@ -20,7 +20,11 @@ class CustomerFamilyPriceLoop extends BaseLoop implements PropelSearchLoopInterf
      */
     protected function getArgDefinitions()
     {
-        return new ArgumentCollection(Argument::createIntListTypeArgument('customer_family_id'));
+        return new ArgumentCollection(
+            Argument::createIntListTypeArgument('customer_family_id'),
+            Argument::createBooleanTypeArgument('promo'),
+            Argument::createBooleanTypeArgument('use_equation')
+        );
     }
 
     /**
@@ -32,6 +36,14 @@ class CustomerFamilyPriceLoop extends BaseLoop implements PropelSearchLoopInterf
 
         if (null !== $customerFamilyId = $this->getCustomerFamilyId()) {
             $search->filterByCustomerFamilyId($customerFamilyId, Criteria::IN);
+        }
+
+        if (null !== $promo = $this->getPromo()) {
+            $search->filterByPromo($promo);
+        }
+
+        if (null !== $useEquation = $this->getUseEquation()) {
+            $search->filterByUseEquation($useEquation);
         }
 
         return $search;
@@ -50,6 +62,8 @@ class CustomerFamilyPriceLoop extends BaseLoop implements PropelSearchLoopInterf
 
             $loopResultRow
                 ->set('CUSTOMER_FAMILY_ID', $customerFamilyPrice->getCustomerFamilyId())
+                ->set('PROMO', $customerFamilyPrice->getPromo())
+                ->set('USE_EQUATION', $customerFamilyPrice->getUseEquation())
                 ->set('AMOUNT_ADDED_BEFORE', $customerFamilyPrice->getAmountAddedBefore())
                 ->set('AMOUNT_ADDED_AFTER', $customerFamilyPrice->getAmountAddedAfter())
                 ->set('COEFFICIENT', $customerFamilyPrice->getMultiplicationCoefficient())
