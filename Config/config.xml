@@ -48,6 +48,11 @@
 		<service id="customer.family.purchase.price" class="CustomerFamily\EventListeners\PseExtendPriceFormListener" scope="request">
 			<tag name="kernel.event_subscriber"/>
 		</service>
+
+		<!-- Listening order creation -->
+		<service id="customer.family.order" class="CustomerFamily\EventListeners\CustomerFamilyOrderPurchasePriceListener" scope="request">
+			<tag name="kernel.event_subscriber"/>
+		</service>
 	</services>
 
 	<hooks>
