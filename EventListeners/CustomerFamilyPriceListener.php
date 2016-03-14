@@ -18,6 +18,9 @@ use Thelia\Core\Security\SecurityContext;
 use Thelia\Exception\TaxEngineException;
 use Thelia\Model\Currency;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
+use Thelia\Model\Product;
+use Thelia\Model\ProductQuery;
+use Thelia\Model\ProductSaleElements;
 use Thelia\TaxEngine\TaxEngine;
 
 /**
@@ -45,7 +48,9 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
     {
         return [
             TheliaEvents::getLoopExtendsEvent(TheliaEvents::LOOP_EXTENDS_BUILD_MODEL_CRITERIA, 'product') => ['extendProductModelCriteria', 128],
-            TheliaEvents::getLoopExtendsEvent(TheliaEvents::LOOP_EXTENDS_PARSE_RESULTS, 'product') => ['extendProductParseResult', 128]
+            TheliaEvents::getLoopExtendsEvent(TheliaEvents::LOOP_EXTENDS_PARSE_RESULTS, 'product') => ['extendProductParseResult', 128],
+            TheliaEvents::getLoopExtendsEvent(TheliaEvents::LOOP_EXTENDS_BUILD_MODEL_CRITERIA, 'product_sale_elements') => ['extendProductModelCriteria', 128],
+            TheliaEvents::getLoopExtendsEvent(TheliaEvents::LOOP_EXTENDS_PARSE_RESULTS, 'product_sale_elements') => ['extendProductParseResult', 128]
         ];
     }
 
@@ -62,16 +67,24 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
             $customerFamilyPromoPrice = $this->getCustomerFamilyPromoPrice($customerFamilyId);
 
             if ($customerFamilyPrice !== null || $customerFamilyPromoPrice !== null) {
-                // Get search & currency
-                $search = $event->getModelCriteria();
+                // Get currency, search
                 $currencyId = Currency::getDefaultCurrency()->getId();
+                $search = $event->getModelCriteria();
+
+                // If $search is a ProductQuery, table alias is 'pse'
+                // Else $search is a ProductSaleElementsQuery ans there is no table alias
+                if ($search instanceof ProductQuery) {
+                    $searchType = 'pse';
+                } else {
+                    $searchType = null;
+                }
 
                 // Link each PSE with its corresponding purchase price, according to the PSE id
                 $productPurchasePriceJoin = new Join();
                 $productPurchasePriceJoin->addExplicitCondition(
                     ProductSaleElementsTableMap::TABLE_NAME,
                     'ID',
-                    'pse',
+                    $searchType,
                     ProductPurchasePriceTableMap::TABLE_NAME,
                     'PRODUCT_SALE_ELEMENTS_ID'
                 );
@@ -82,37 +95,9 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
                     ->addJoinObject($productPurchasePriceJoin, 'purchase_price_join')
                     ->addJoinCondition('purchase_price_join', ProductPurchasePriceTableMap::CURRENCY_ID.' = ?', $currencyId, null, \PDO::PARAM_INT);
 
-                // Check if products' prices have to be changed depending on the customer's family
-                if ($customerFamilyPrice !== null) {
-                    $search
-                        ->withColumn(
-                            'IF (' . ProductPurchasePriceTableMap::PURCHASE_PRICE . ' IS NULL,
-                                0,
-                                (' .
-                                    ProductPurchasePriceTableMap::PURCHASE_PRICE .
-                                    '+' . $customerFamilyPrice->getAmountAddedBefore() .
-                                ') * ' . $customerFamilyPrice->getMultiplicationCoefficient() .
-                                ' + ' . $customerFamilyPrice->getAmountAddedAfter() .
-                            ')',
-                            'CUSTOMER_FAMILY_PRICE'
-                        );
-                }
-
-                // Check if products' promo prices have to be changed depending on the customer's family
-                if ($customerFamilyPromoPrice !== null) {
-                    $search
-                        ->withColumn(
-                            'IF (' . ProductPurchasePriceTableMap::PURCHASE_PRICE . ' IS NULL,
-                                0,
-                                (' .
-                                    ProductPurchasePriceTableMap::PURCHASE_PRICE .
-                                    '+' . $customerFamilyPromoPrice->getAmountAddedBefore() .
-                                ') * ' . $customerFamilyPromoPrice->getMultiplicationCoefficient() .
-                                ' + ' . $customerFamilyPromoPrice->getAmountAddedAfter() .
-                            ')',
-                            'CUSTOMER_FAMILY_PROMO_PRICE'
-                        );
-                }
+                // Add
+                $this->addProductCalculatedPrice($customerFamilyPrice, $search);
+                $this->addProductCalculatedPromoPrice($customerFamilyPromoPrice, $search);
             }
         }
     }
@@ -136,7 +121,7 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
                 $securityContext = $this->securityContext;
 
                 foreach ($loopResult as $loopResultRow) {
-                    /** @var \Thelia\Model\Product $product */
+                    /** @var \Thelia\Model\Product | \Thelia\Model\ProductSaleElements $product */
                     $product = $loopResultRow->model;
 
                     if (!empty($product->getVirtualColumn('CUSTOMER_FAMILY_PRICE')) ||
@@ -155,6 +140,8 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
             }
         }
     }
+
+    /********************************/
 
     /**
      * @param \Thelia\Core\Security\SecurityContext $securityContext
@@ -203,13 +190,67 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
             ->findOneByCustomerFamilyId($customerFamilyId);
     }
 
+    /********************************/
+
     /**
-     * @param \Thelia\Model\Product                         $product
-     * @param \Thelia\Core\Template\Element\LoopResultRow   $loopResultRow
-     * @param \CustomerFamily\Model\CustomerFamilyPrice     $customerFamilyPrice
-     * @param \CustomerFamily\Model\CustomerFamilyPrice     $customerFamilyPromoPrice
-     * @param \Thelia\Model\Country                         $taxCountry
-     * @param SecurityContext                               $securityContext
+     * @param \CustomerFamily\Model\CustomerFamilyPrice $customerFamilyPrice
+     * @param \Propel\Runtime\ActiveQuery\ModelCriteria $search
+     */
+    protected function addProductCalculatedPrice($customerFamilyPrice, $search)
+    {
+        // Check if products' prices have to be changed depending on the customer's family
+        if ($customerFamilyPrice !== null) {
+            $search
+                ->withColumn(
+                    'IF (' . ProductPurchasePriceTableMap::PURCHASE_PRICE . ' IS NULL,
+                        NULL,
+                        (' .
+                            ProductPurchasePriceTableMap::PURCHASE_PRICE .
+                            '+' . $customerFamilyPrice->getAmountAddedBefore() .
+                        ') * ' . $customerFamilyPrice->getMultiplicationCoefficient() .
+                        ' + ' . $customerFamilyPrice->getAmountAddedAfter() .
+                    ')',
+                    'CUSTOMER_FAMILY_PRICE'
+                );
+        } else {
+            $search->withColumn('NULL', 'CUSTOMER_FAMILY_PRICE');
+        }
+    }
+
+    /**
+     * @param \CustomerFamily\Model\CustomerFamilyPrice $customerFamilyPromoPrice
+     * @param \Propel\Runtime\ActiveQuery\ModelCriteria $search
+     */
+    protected function addProductCalculatedPromoPrice($customerFamilyPromoPrice, $search)
+    {
+        // Check if products' promo prices have to be changed depending on the customer's family
+        if ($customerFamilyPromoPrice !== null) {
+            $search
+                ->withColumn(
+                    'IF (' . ProductPurchasePriceTableMap::PURCHASE_PRICE . ' IS NULL,
+                        NULL,
+                        (' .
+                            ProductPurchasePriceTableMap::PURCHASE_PRICE .
+                            '+' . $customerFamilyPromoPrice->getAmountAddedBefore() .
+                        ') * ' . $customerFamilyPromoPrice->getMultiplicationCoefficient() .
+                        ' + ' . $customerFamilyPromoPrice->getAmountAddedAfter() .
+                    ')',
+                    'CUSTOMER_FAMILY_PROMO_PRICE'
+                );
+        } else {
+            $search->withColumn('NULL', 'CUSTOMER_FAMILY_PROMO_PRICE');
+        }
+    }
+
+    /********************************/
+
+    /**
+     * @param \Thelia\Model\Product | \Thelia\Model\ProductSaleElements $product
+     * @param \Thelia\Core\Template\Element\LoopResultRow               $loopResultRow
+     * @param \CustomerFamily\Model\CustomerFamilyPrice                 $customerFamilyPrice
+     * @param \CustomerFamily\Model\CustomerFamilyPrice                 $customerFamilyPromoPrice
+     * @param \Thelia\Model\Country                                     $taxCountry
+     * @param SecurityContext                                           $securityContext
      */
     protected function changeProductPrice(
         $product,
@@ -240,10 +281,14 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
             /** @var \CustomerFamily\Model\CustomerFamilyPrice $customerFamilyPrice */
             if ($customerFamilyPrice->getIsTaxed()) {
                 try {
-                    $taxedPrice = $product->getTaxedPrice($taxCountry, $price);
-                } catch (TaxEngineException $e) {
-                    $taxedPrice = null;
-                }
+                    // If $product is a Product, getTaxedPrice() takes a Country and a price as arguments
+                    // Else if $product is a ProductSaleElements, getTaxedPrice() takes a Country and the price virtual column name as arguments
+                    if ($product instanceof Product) {
+                        $taxedPrice = $product->getTaxedPrice($taxCountry, $price);
+                    } elseif ($product instanceof ProductSaleElements) {
+                        $taxedPrice = $product->getTaxedPrice($taxCountry, 'CUSTOMER_FAMILY_PRICE');
+                    }
+                } catch (TaxEngineException $e) {}
             }
 
             $priceTax = $taxedPrice - $price;
@@ -270,13 +315,14 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
             /** @var \CustomerFamily\Model\CustomerFamilyPrice $customerFamilyPromoPrice */
             if ($customerFamilyPromoPrice->getIsTaxed()) {
                 try {
-                    $taxedPromoPrice = $product->getTaxedPromoPrice(
-                        $taxCountry,
-                        $promoPrice
-                    );
-                } catch (TaxEngineException $e) {
-                    $taxedPromoPrice = null;
-                }
+                    // If $product is a Product, getTaxedPrice() takes a Country and a price as arguments
+                    // Else if $product is a ProductSaleElements, getTaxedPrice() takes a Country and the price virtual column name as arguments
+                    if ($product instanceof Product) {
+                        $taxedPromoPrice = $product->getTaxedPromoPrice($taxCountry, $promoPrice);
+                    } elseif ($product instanceof ProductSaleElements) {
+                        $taxedPromoPrice = $product->getTaxedPromoPrice($taxCountry, 'CUSTOMER_FAMILY_PROMO_PRICE');
+                    }
+                } catch (TaxEngineException $e) {}
             }
 
             $promoPriceTax = $taxedPromoPrice - $promoPrice;
@@ -288,9 +334,12 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
                 ->set("TAXED_PROMO_PRICE", $taxedPromoPrice);
         }
 
-        $loopResultRow
-            ->set("BEST_PRICE", $promoPrice < $price ? $promoPrice : $price)
-            ->set("BEST_PRICE_TAX", $promoPriceTax < $priceTax ? $promoPriceTax : $priceTax)
-            ->set("BEST_TAXED_PRICE", $taxedPromoPrice < $taxedPrice ? $taxedPromoPrice : $taxedPrice);
+        // If current row is a product
+        if ($product instanceof Product) {
+            $loopResultRow
+                ->set("BEST_PRICE", $promoPrice < $price ? $promoPrice : $price)
+                ->set("BEST_PRICE_TAX", $promoPriceTax < $priceTax ? $promoPriceTax : $priceTax)
+                ->set("BEST_TAXED_PRICE", $taxedPromoPrice < $taxedPrice ? $taxedPromoPrice : $taxedPrice);
+        }
     }
 }

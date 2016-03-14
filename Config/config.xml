@@ -56,6 +56,11 @@
 			<tag name="hook.event_listener" event="customer.edit" type="back" templates="render:customer-edit.html" />
 		</hook>
 
+		<!-- Admin product edit purchase price -->
+		<hook id="customer.family.purchase.price">
+			<tag name="hook.event_listener" event="product.combinations-row" type="back" templates="render:product-edit-price.html"/>
+		</hook>
+
 		<!-- Additional fields for the register form -->
 		<hook id="customer.family.register.form" class="CustomerFamily\Hook\CustomerFamilyRegisterFormHook" scope="request">
 			<tag name="hook.event_listener" event="register.form-bottom" type="front" method="onRegisterFormBottom"/>
