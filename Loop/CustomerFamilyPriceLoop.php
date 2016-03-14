@@ -11,6 +11,11 @@ use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 
+/**
+ * Class CustomerFamilyPriceLoop
+ * @package CustomerFamily\Loop
+ * @author Etienne Perriere <eperriere@openstudio.fr>
+ */
 class CustomerFamilyPriceLoop extends BaseLoop implements PropelSearchLoopInterface
 {
     /**

@@ -8,6 +8,7 @@
 		<loop name="customer_family" class="CustomerFamily\Loop\CustomerFamilyLoop" />
 		<loop name="customer_customer_family" class="CustomerFamily\Loop\CustomerCustomerFamilyLoop" />
 		<loop name="customer_family_price" class="CustomerFamily\Loop\CustomerFamilyPriceLoop" />
+		<loop name="product_purchase_price" class="CustomerFamily\Loop\ProductPurchasePriceLoop" />
 	</loops>
 
 	<forms>
@@ -42,9 +43,19 @@
 			<argument type="service" id="thelia.taxEngine"/>
 			<tag name="kernel.event_subscriber"/>
 		</service>
+
+		<!-- Listening PSE price edition -->
+		<service id="customer.family.purchase.price" class="CustomerFamily\EventListeners\PseExtendPriceFormListener" scope="request">
+			<tag name="kernel.event_subscriber"/>
+		</service>
 	</services>
 
 	<hooks>
+		<!-- Global hook class -->
+		<hook id="customer.family.hook" class="CustomerFamily\Hook\CustomerFamilyHook">
+			<tag name="hook.event_listener" event="main.head-css" type="back" method="onAddCss"/>
+		</hook>
+
 		<!-- Admin configuration templates -->
 		<hook id="customer.family.config">
 			<tag name="hook.event_listener" event="module.configuration" type="back" templates="render:module_configuration.html" />
@@ -57,8 +68,8 @@
 		</hook>
 
 		<!-- Admin product edit purchase price -->
-		<hook id="customer.family.purchase.price">
-			<tag name="hook.event_listener" event="product.combinations-row" type="back" templates="render:product-edit-price.html"/>
+		<hook id="customer.family.product.price.edit" class="CustomerFamily\Hook\CustomerFamilyProductPriceHook">
+			<tag name="hook.event_listener" event="product.combinations-row" type="back" method="onPsePriceEdit" />
 		</hook>
 
 		<!-- Additional fields for the register form -->
@@ -67,7 +78,7 @@
 			<tag name="hook.event_listener" event="register.after-javascript-include" type="front" method="onRegisterAfterJSInclude"/>
 		</hook>
 
-		<!-- Showing customer family informations -->
+		<!-- Showing customer family information -->
 		<hook id="customer.family.account.display" class="CustomerFamily\Hook\CustomerFamilyAccountDisplayHook" scope="request">
 			<tag name="hook.event_listener" event="account.additional" type="front" method="onAccountAdditional"/>
 		</hook>

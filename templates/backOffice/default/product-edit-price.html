@@ -1,1 +1,17 @@
-<p>toto</p>
+{loop type="product_purchase_price" name="product_purchase_price_loop" pse_id=$pseId currency_id=$currencyId}
+    <tr></tr>
+    <tr class="purchase-price">
+        {form name="thelia.admin.product_sale_element.update"}
+            {form_field field='purchase_price' value_key=$idx}
+                <td></td>
+                <td colspan="2" class="text-right">
+                    <label for="{$label_attr.for}">{intl l='Purchase price (w/o taxes)' d='customerfamily.bo.default'}</label>
+                </td>
+                <td colspan="1">
+                    <input class="input-sm text-right form-control" type="text" name="{$name}" id="{$label_attr.for}" value="{$PURCHASE_PRICE}" />
+                </td>
+                <td colspan="7"></td>
+            {/form_field}
+        {/form}
+    </tr>
+{/loop}
