@@ -8,6 +8,7 @@ use CustomerFamily\Model\CustomerFamilyQuery;
 use CustomerFamily\Model\Map\CustomerCustomerFamilyTableMap;
 use CustomerFamily\Model\Map\CustomerFamilyTableMap;
 use CustomerFamily\Model\Map\ProductPurchasePriceTableMap;
+use CustomerFamily\Service\CustomerFamilyService;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -32,11 +33,13 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
 {
     protected $securityContext;
     protected $taxEngine;
+    protected $customerFamilyService;
 
-    public function __construct(SecurityContext $securityContext, TaxEngine $taxEngine)
+    public function __construct(SecurityContext $securityContext, TaxEngine $taxEngine, CustomerFamilyService $customerFamilyService)
     {
         $this->securityContext = $securityContext;
         $this->taxEngine = $taxEngine;
+        $this->customerFamilyService = $customerFamilyService;
     }
 
     /**
@@ -61,13 +64,13 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
     public function extendProductModelCriteria(LoopExtendsBuildModelCriteriaEvent $event)
     {
         // Get customer's family
-        if (null !== $customerFamilyId = $this->getCustomerFamilyId($this->securityContext)) {
+        if (null !== $customerFamilyId = $this->customerFamilyService->getCustomerFamilyId()) {
             // Get associated prices
-            $customerFamilyPrice = $this->getCustomerFamilyPrice($customerFamilyId);
-            $customerFamilyPromoPrice = $this->getCustomerFamilyPromoPrice($customerFamilyId);
+            $customerFamilyPrice = $this->customerFamilyService->getUsingEquationCustomerFamilyPrice($customerFamilyId, 0);
+            $customerFamilyPromoPrice = $this->customerFamilyService->getUsingEquationCustomerFamilyPrice($customerFamilyId, 1);
 
             if ($customerFamilyPrice !== null || $customerFamilyPromoPrice !== null) {
-                // Get currency, search
+                // Get currency & search
                 $currencyId = Currency::getDefaultCurrency()->getId();
                 $search = $event->getModelCriteria();
 
@@ -109,10 +112,10 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
     public function extendProductParseResult(LoopExtendsParseResultsEvent $event)
     {
         // Get customer's family
-        if (null !== $customerFamilyId = $this->getCustomerFamilyId($this->securityContext)) {
+        if (null !== $customerFamilyId = $this->customerFamilyService->getCustomerFamilyId()) {
             // Get associated prices
-            $customerFamilyPrice = $this->getCustomerFamilyPrice($customerFamilyId);
-            $customerFamilyPromoPrice = $this->getCustomerFamilyPromoPrice($customerFamilyId);
+            $customerFamilyPrice = $this->customerFamilyService->getUsingEquationCustomerFamilyPrice($customerFamilyId, 0);
+            $customerFamilyPromoPrice = $this->customerFamilyService->getUsingEquationCustomerFamilyPrice($customerFamilyId, 1);
 
             if ($customerFamilyPrice !== null || $customerFamilyPromoPrice !== null) {
                 // Get loop result, tax country & security context
@@ -139,55 +142,6 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
                 }
             }
         }
-    }
-
-    /********************************/
-
-    /**
-     * @param \Thelia\Core\Security\SecurityContext $securityContext
-     * @return mixed
-     * @throws \Propel\Runtime\Exception\PropelException
-     */
-    protected function getCustomerFamilyId($securityContext)
-    {
-        // If there is a logged customer
-        if ($securityContext->hasCustomerUser()) {
-            $customerFamilyId = CustomerCustomerFamilyQuery::create()
-                ->filterByCustomerId($securityContext->getCustomerUser()->getId())
-                ->select(CustomerCustomerFamilyTableMap::CUSTOMER_FAMILY_ID)
-                ->findOne();
-        } else {
-            $customerFamilyId = CustomerFamilyQuery::create()
-                ->filterByIsDefault(1)
-                ->select(CustomerFamilyTableMap::ID)
-                ->findOne();
-        }
-
-        return $customerFamilyId;
-    }
-
-    /**
-     * @param $customerFamilyId
-     * @return \CustomerFamily\Model\CustomerFamilyPrice
-     */
-    protected function getCustomerFamilyPrice($customerFamilyId)
-    {
-        return CustomerFamilyPriceQuery::create()
-            ->filterByPromo(0)
-            ->filterByUseEquation(1)
-            ->findOneByCustomerFamilyId($customerFamilyId);
-    }
-
-    /**
-     * @param $customerFamilyId
-     * @return \CustomerFamily\Model\CustomerFamilyPrice
-     */
-    protected function getCustomerFamilyPromoPrice($customerFamilyId)
-    {
-        return CustomerFamilyPriceQuery::create()
-            ->filterByPromo(1)
-            ->filterByUseEquation(1)
-            ->findOneByCustomerFamilyId($customerFamilyId);
     }
 
     /********************************/

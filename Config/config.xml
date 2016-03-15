@@ -24,6 +24,13 @@
 	</forms>
 
 	<services>
+		<!-- Service class -->
+		<service id="customer.family.service" class="CustomerFamily\Service\CustomerFamilyService" scope="request">
+			<argument type="service" id="thelia.securityContext"/>
+			<argument type="service" id="thelia.taxEngine"/>
+		</service>
+
+		<!-- Main listener -->
 		<service id="customer.family.action" class="CustomerFamily\EventListeners\CustomerFamilyListener" scope="request">
 			<argument type="service" id="request" />
 			<argument type="service" id="thelia.parser" />
@@ -37,15 +44,21 @@
 			<tag name="kernel.event_subscriber"/>
 		</service>
 
+		<!-- Listening PSE price edition -->
+		<service id="customer.family.purchase.price" class="CustomerFamily\EventListeners\PseExtendPriceFormListener" scope="request">
+			<tag name="kernel.event_subscriber"/>
+		</service>
+
 		<!-- Listening product loop creation -->
 		<service id="customer.family.price" class="CustomerFamily\EventListeners\CustomerFamilyPriceListener" scope="request">
 			<argument type="service" id="thelia.securityContext"/>
 			<argument type="service" id="thelia.taxEngine"/>
+			<argument type="service" id="customer.family.service"/>
 			<tag name="kernel.event_subscriber"/>
 		</service>
 
-		<!-- Listening PSE price edition -->
-		<service id="customer.family.purchase.price" class="CustomerFamily\EventListeners\PseExtendPriceFormListener" scope="request">
+		<!-- Listening cart add -->
+		<service id="customer.family.cart" class="CustomerFamily\EventListeners\CustomerFamilyCartListener" scope="request">
 			<tag name="kernel.event_subscriber"/>
 		</service>
 
