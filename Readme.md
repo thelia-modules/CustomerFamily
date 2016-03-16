@@ -2,6 +2,8 @@
 
 Create customer families (professional, private individual, ...) and manage specific prices.
 
+Also allow to define purchase prices for products.
+
 ## Compatibility
 * To use on Thelia 2.3.x, use tag [1.3](https://github.com/thelia-modules/CustomerFamily/tree/1.3)
 * To use on Thelia 2.2.x, use tag [1.2](https://github.com/thelia-modules/CustomerFamily/tree/1.2)
@@ -114,6 +116,35 @@ This loop returns the customer family's equation data
 ```
 {loop type="customer_family_price" name="customer_family_price_loop" customer_family_id=1 promo=0}
     {$AMOUNT_ADDED_BEFORE}
+    ...
+{/loop}
+```
+
+## Loop customer_family_pse_calculated_prices
+
+This loop returns the PSE's calculated price based on the given customer family & currency
+
+### Input arguments
+
+|Argument |Description |Version |
+|---      |---         |--- |
+|**pse_id** | *mandatory*, PSE id | 1.3
+|**currency_id** | currency id *(if not given, use default currency)* | 1.3
+|**customer_family_id** | *mandatory*, customer family id | 1.3
+
+### Output values
+
+|Argument |Description |Version |
+|---      |---         |--- |
+|**CALCULATED_PRICE** | customer family id | 1.3
+|**CALCULATED_TAXED_PRICE** | equation for the promo price or not | 1.3
+|**CALCULATED_PROMO_PRICE** | is the equation used to calculate price | 1.3
+|**CALCULATED_TAXED_PROMO_PRICE** | amount directly added to the purchase price | 1.3
+
+### Example
+```
+{loop type="customer_family_pse_calculated_prices" name="customer_family_pse_calculated_prices_loop" pse_id=22 customer_family_id=1}
+    {$CALCULATED_TAXED_PRICE}
     ...
 {/loop}
 ```
