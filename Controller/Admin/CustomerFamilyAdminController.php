@@ -166,7 +166,7 @@ class CustomerFamilyAdminController extends BaseAdminController
 
         if ($error !== null) {
             $this->setupFormErrorContext(
-                $this->getTranslator()->trans("DeliveryRound configuration", [], CustomerFamily::MODULE_DOMAIN),
+                $this->getTranslator()->trans("CustomerFamily - default family configuration", [], CustomerFamily::MODULE_DOMAIN),
                 $error,
                 $form,
                 $ex
