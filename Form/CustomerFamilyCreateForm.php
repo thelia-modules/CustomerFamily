@@ -14,7 +14,7 @@ namespace CustomerFamily\Form;
 
 use CustomerFamily\CustomerFamily;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\ExecutionContextInterface;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
 use Symfony\Component\Validator\Constraints\Callback;
@@ -35,25 +35,18 @@ class CustomerFamilyCreateForm extends BaseForm
     }
 
     /**
-     *
-     * in this function you add all the fields you need for your Form.
-     * Form this you have to call add method on $this->formBuilder attribute :
-     *
-     * $this->formBuilder->add("name", "text")
-     *   ->add("email", "email", array(
-     *           "attr" => array(
-     *               "class" => "field"
-     *           ),
-     *           "label" => "email",
-     *           "constraints" => array(
-     *               new \Symfony\Component\Validator\Constraints\NotBlank()
-     *           )
-     *       )
-     *   )
-     *   ->add('age', 'integer');
-     *
-     * @return null
+     * @param $value
+     * @param ExecutionContextInterface $context
      */
+    public function checkLocale($value, ExecutionContextInterface $context)
+    {
+        if (!LangQuery::create()->findOneByCode($value) === null) {
+            $context->addViolation(Translator::getInstance()->trans(
+                "Invalid locale"
+            ));
+        }
+    }
+
     protected function buildForm()
     {
         $this->formBuilder
@@ -113,18 +106,5 @@ class CustomerFamilyCreateForm extends BaseForm
                     )
                 )
             );
-    }
-
-    /**
-     * @param $value
-     * @param ExecutionContextInterface $context
-     */
-    public function checkLocale($value, ExecutionContextInterface $context)
-    {
-        if (!LangQuery::create()->findOneByCode($value) === null) {
-            $context->addViolation(Translator::getInstance()->trans(
-                "Invalid locale"
-            ));
-        }
     }
 }

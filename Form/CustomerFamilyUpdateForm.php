@@ -26,26 +26,6 @@ class CustomerFamilyUpdateForm extends CustomerFamilyCreateForm
         return 'customer_family_update_form';
     }
 
-    /**
-     *
-     * in this function you add all the fields you need for your Form.
-     * Form this you have to call add method on $this->formBuilder attribute :
-     *
-     * $this->formBuilder->add("name", "text")
-     *   ->add("email", "email", array(
-     *           "attr" => array(
-     *               "class" => "field"
-     *           ),
-     *           "label" => "email",
-     *           "constraints" => array(
-     *               new \Symfony\Component\Validator\Constraints\NotBlank()
-     *           )
-     *       )
-     *   )
-     *   ->add('age', 'integer');
-     *
-     * @return null
-     */
     protected function buildForm()
     {
         parent::buildForm();

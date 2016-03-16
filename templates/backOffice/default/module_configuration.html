@@ -95,7 +95,7 @@
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <a class="btn btn-info pull-left js-action-update" data-code="{$CODE}" data-title="{$TITLE_CUSTOMER_FAMILY}" style="margin-right: 5px;">{intl l="Edit" d="customerfamily"}</a>
+                                                    <a class="btn btn-info pull-left js-action-update" data-id="{$CUSTOMER_FAMILY_ID}" data-code="{$CODE}" data-title="{$TITLE_CUSTOMER_FAMILY}" style="margin-right: 5px;">{intl l="Edit" d="customerfamily"}</a>
                                                     <a class="btn btn-danger pull-left js-action-delete" data-id="{$CUSTOMER_FAMILY_ID}" style="margin-right: 5px;">{intl l="Delete"}</a>
                                                 </td>
                                             </tr>
@@ -145,7 +145,7 @@
                     </div>
 
                     {form name="customer.family.delete.form"}
-                        <div class="modal js-modal-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal js-modal-delete" tabindex="-1" role="dialog" aria-labelledby="Delete family" aria-hidden="true">
                             <div class="modal-dialog">
                                 <form action="" method="POST">
                                     {form_hidden_fields form=$form}
@@ -164,7 +164,7 @@
                     {/form}
 
                     {form name="customer.family.update.form"}
-                        <div class="modal js-modal-update" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal js-modal-update" tabindex="-1" role="dialog" aria-labelledby="Update family" aria-hidden="true">
                             <div class="modal-dialog">
                                 <form action="" method="POST">
                                     {form_hidden_fields form=$form}
@@ -232,7 +232,7 @@
                                         <!-- Standard price equation -->
                                         <tr>
                                             {form name='customer_family_price_update'}
-                                                <form action="{url path='/admin/module/CustomerFamily/update'}" method="post">
+                                                <form action="{url path='/admin/module/CustomerFamily/update-price-calculation'}" method="post">
 
                                                     {form_hidden_fields form=$form}
 
@@ -295,7 +295,7 @@
                                         <!-- Promo price equation -->
                                         <tr>
                                             {form name='customer_family_price_update'}
-                                                <form action="{url path='/admin/module/CustomerFamily/update'}" method="post">
+                                                <form action="{url path='/admin/module/CustomerFamily/update-price-calculation'}" method="post">
 
                                                     {form_hidden_fields form=$form}
 

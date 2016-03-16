@@ -15,7 +15,6 @@ namespace CustomerFamily\Hook;
 use CustomerFamily\CustomerFamily;
 use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\Hook\BaseHook;
-use Thelia\Form\CustomerCreateForm;
 
 class CustomerFamilyRegisterFormHook extends BaseHook
 {

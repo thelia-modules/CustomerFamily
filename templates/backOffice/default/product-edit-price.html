@@ -1,17 +1,52 @@
 {loop type="product_purchase_price" name="product_purchase_price_loop" pse_id=$pseId currency_id=$currencyId}
-    <tr></tr>
-    <tr class="purchase-price">
-        {form name="thelia.admin.product_sale_element.update"}
-            {form_field field='purchase_price' value_key=$idx}
-                <td></td>
-                <td colspan="2" class="text-right">
-                    <label for="{$label_attr.for}">{intl l='Purchase price (w/o taxes)' d='customerfamily.bo.default'}</label>
-                </td>
-                <td colspan="1">
-                    <input class="input-sm text-right form-control" type="text" name="{$name}" id="{$label_attr.for}" value="{$PURCHASE_PRICE}" />
-                </td>
-                <td colspan="7"></td>
-            {/form_field}
-        {/form}
-    </tr>
+    {assign var="purchasePrice" value=$PURCHASE_PRICE}
+{/loop}
+
+<tr></tr>
+<!-- Purchase price -->
+<tr class="purchase-price">
+    {form name="thelia.admin.product_sale_element.update"}
+        {form_field field='purchase_price' value_key=$idx}
+            <td></td>
+            <td colspan="2" class="text-right">
+                <label for="purchase_price">{intl l='Purchase price (w/o taxes)' d='customerfamily.bo.default'}</label>
+            </td>
+            <td colspan="1">
+                <input class="input-sm text-right form-control" type="text" name="{$name}" value="{$purchasePrice}" />
+            </td>
+            <td colspan="7"></td>
+        {/form_field}
+    {/form}
+</tr>
+{loop type='customer_family' name='customer_family_loop_prices'}
+    {loop type='customer_family_pse_calculated_prices' name='calculated_prices' pse_id=$pseId customer_family_id=$CUSTOMER_FAMILY_ID}
+        <tr></tr>
+        <tr class="purchase-price">
+            <!-- Customer family title -->
+            <td>
+                {intl l='Price for:' d='customerfamily.bo.default'} <b>{$TITLE_CUSTOMER_FAMILY}</b>
+            </td>
+            <!-- Calculated standard price -->
+            <td colspan="2" class="text-right">
+                <span class="glyphicon glyphicon-arrow-right pull-left" aria-hidden="true"></span>
+                <b>{intl l='Calculated price' d='customerfamily.bo.default'}</b>
+            </td>
+            <td>
+                <input class="input-sm text-right form-control" type="text" value="{$CALCULATED_PRICE}" disabled />
+            </td>
+            <td>
+                <input class="input-sm text-right form-control" type="text" value="{$CALCULATED_TAXED_PRICE}" disabled />
+            </td>
+            <!-- Calculated promo price -->
+            <td colspan="4" class="text-right">
+                <b>{intl l='Calculated promo price' d='customerfamily.bo.default'}</b>
+            </td>
+            <td>
+                <input class="input-sm text-right form-control" type="text" value="{$CALCULATED_PROMO_PRICE}" disabled />
+            </td>
+            <td>
+                <input class="input-sm text-right form-control" type="text" value="{$CALCULATED_TAXED_PROMO_PRICE}" disabled />
+            </td>
+        </tr>
+    {/loop}
 {/loop}

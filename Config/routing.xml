@@ -28,8 +28,12 @@
     </route>
 
     <!-- Prices management -->
-    <route id="customer.family.price.update" path="/admin/module/CustomerFamily/update" methods="post">
+    <route id="customer.family.price.update" path="/admin/module/CustomerFamily/update-price-calculation" methods="post">
         <default key="_controller">CustomerFamily\Controller\Admin\CustomerFamilyPriceController::updateAction</default>
+    </route>
+
+    <route id="customer.family.price.calculate" path="/admin/module/CustomerFamily/calculate-all-prices" methods="get">
+        <default key="_controller">CustomerFamily\Controller\Admin\CustomerFamilyPriceController::calculatePricesAction</default>
     </route>
 
 </routes>

@@ -10,14 +10,11 @@ use Thelia\Form\BaseForm;
  */
 class CustomerFamilyUpdateDefaultForm extends BaseForm
 {
+    public function getName()
+    {
+        return 'customer_family_update_default_form';
+    }
 
-    /**
-     *
-     * in this function you add all the fields you need for your Form.
-     * Form this you have to call add method on $this->formBuilder attribute :
-     *
-     * @return null
-     */
     protected function buildForm()
     {
         $this->formBuilder
@@ -25,10 +22,5 @@ class CustomerFamilyUpdateDefaultForm extends BaseForm
                 'customer_family_id',
                 'integer'
             );
-    }
-
-    public function getName()
-    {
-        return 'customer_family_update_default_form';
     }
 }

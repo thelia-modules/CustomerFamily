@@ -20,6 +20,7 @@ use CustomerFamily\Model\CustomerCustomerFamily;
 use CustomerFamily\Model\CustomerCustomerFamilyQuery;
 use CustomerFamily\Model\CustomerFamilyQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerEvent;
@@ -60,19 +61,6 @@ class CustomerFamilyListener implements EventSubscriberInterface
 
     /**
      * Returns an array of event names this subscriber wants to listen to.
-     *
-     * The array keys are event names and the value can be:
-     *
-     *  * The method name to call (priority defaults to 0)
-     *  * An array composed of the method name to call and the priority
-     *  * An array of arrays composed of the method names to call and respective
-     *    priorities, or 0 if unset
-     *
-     * For instance:
-     *
-     *  * array('eventName' => 'methodName')
-     *  * array('eventName' => array('methodName', $priority))
-     *  * array('eventName' => array(array('methodName1', $priority), array('methodName2'))
      *
      * @return array The event names to listen to
      *
@@ -147,8 +135,10 @@ class CustomerFamilyListener implements EventSubscriberInterface
 
     /**
      * @param CustomerEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function afterCreateCustomer(CustomerEvent $event)
+    public function afterCreateCustomer(CustomerEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $form = $this->request->request->get(self::THELIA_CUSTOMER_CREATE_FORM_NAME);
 
@@ -177,13 +167,15 @@ class CustomerFamilyListener implements EventSubscriberInterface
             ->setVat($vat)
         ;
 
-        $event->getDispatcher()->dispatch(CustomerFamilyEvents::CUSTOMER_CUSTOMER_FAMILY_UPDATE, $updateEvent);
+        $dispatcher->dispatch(CustomerFamilyEvents::CUSTOMER_CUSTOMER_FAMILY_UPDATE, $updateEvent);
     }
 
     /**
      * @param CustomerCreateOrUpdateEvent $event
+     * @param $eventName
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function customerUpdateProfile(CustomerCreateOrUpdateEvent $event)
+    public function customerUpdateProfile(CustomerCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $form = $this->request->request->get(self::THELIA_CUSTOMER_UPDATE_FORM_NAME);
 
@@ -211,7 +203,7 @@ class CustomerFamilyListener implements EventSubscriberInterface
             ->setVat($vat)
         ;
 
-        $event->getDispatcher()->dispatch(CustomerFamilyEvents::CUSTOMER_CUSTOMER_FAMILY_UPDATE, $updateEvent);
+        $dispatcher->dispatch(CustomerFamilyEvents::CUSTOMER_CUSTOMER_FAMILY_UPDATE, $updateEvent);
     }
 
     /**

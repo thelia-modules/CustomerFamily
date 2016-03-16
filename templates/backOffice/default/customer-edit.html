@@ -1,8 +1,9 @@
-{loop name="customer_customer_family" type="customer_customer_family" customer_id=$ID}
+{loop name="customer_customer_family" type="customer_customer_family" customer_id=$customer_id}
     {assign var="_customer_family_id_" value=$CUSTOMER_FAMILY_ID}
     {assign var="_siret_" value=$SIRET}
     {assign var="_vat_" value=$VAT}
 {/loop}
+
 <div class="row">
     <div class="col-md-12 general-block-decorator">
         <div class="row">
@@ -17,7 +18,7 @@
                     {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
                     {form_field form=$form field='customer_id'}
-                        <input type="hidden" name="{$name}" value="{$ID}" />
+                        <input type="hidden" name="{$name}" value="{$customer_id}" />
                     {/form_field}
 
                     {form_field form=$form field='customer_family_id'}

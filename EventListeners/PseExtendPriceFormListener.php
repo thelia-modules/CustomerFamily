@@ -53,8 +53,7 @@ class PseExtendPriceFormListener implements EventSubscriberInterface
                             new Constraints\NotBlank,
                             new Constraints\GreaterThanOrEqual(['value' => 0])
                         ]
-                    ],
-                    'label_attr' => ['for' => 'purchase_price']
+                    ]
                 ]
             );
     }

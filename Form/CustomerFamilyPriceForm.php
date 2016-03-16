@@ -11,6 +11,11 @@ use Thelia\Form\BaseForm;
  */
 class CustomerFamilyPriceForm extends BaseForm
 {
+    public function getName()
+    {
+        return 'customer_family_price_update';
+    }
+
     protected function buildForm()
     {
         $this->formBuilder
@@ -57,10 +62,5 @@ class CustomerFamilyPriceForm extends BaseForm
                 []
             )
         ;
-    }
-
-    public function getName()
-    {
-        return 'customer_family_price_update';
     }
 }

@@ -7,7 +7,6 @@ use CustomerFamily\Model\CustomerFamilyPrice;
 use CustomerFamily\Model\CustomerFamilyPriceQuery;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Thelia\Controller\Admin\BaseAdminController;
-use Thelia\Core\HttpFoundation\JsonResponse;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Exception\FormValidationException;

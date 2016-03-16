@@ -2,11 +2,6 @@
 
 namespace CustomerFamily\EventListeners;
 
-use CustomerFamily\Model\CustomerCustomerFamilyQuery;
-use CustomerFamily\Model\CustomerFamilyPriceQuery;
-use CustomerFamily\Model\CustomerFamilyQuery;
-use CustomerFamily\Model\Map\CustomerCustomerFamilyTableMap;
-use CustomerFamily\Model\Map\CustomerFamilyTableMap;
 use CustomerFamily\Model\Map\ProductPurchasePriceTableMap;
 use CustomerFamily\Service\CustomerFamilyService;
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -64,10 +59,10 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
     public function extendProductModelCriteria(LoopExtendsBuildModelCriteriaEvent $event)
     {
         // Get customer's family
-        if (null !== $customerFamilyId = $this->customerFamilyService->getCustomerFamilyId()) {
+        if (null !== $customerFamilyId = $this->customerFamilyService->getCustomerCustomerFamilyId()) {
             // Get associated prices
-            $customerFamilyPrice = $this->customerFamilyService->getUsingEquationCustomerFamilyPrice($customerFamilyId, 0);
-            $customerFamilyPromoPrice = $this->customerFamilyService->getUsingEquationCustomerFamilyPrice($customerFamilyId, 1);
+            $customerFamilyPrice = $this->customerFamilyService->getCustomerFamilyPrice($customerFamilyId, 0, 1);
+            $customerFamilyPromoPrice = $this->customerFamilyService->getCustomerFamilyPrice($customerFamilyId, 1, 1);
 
             if ($customerFamilyPrice !== null || $customerFamilyPromoPrice !== null) {
                 // Get currency & search
@@ -112,10 +107,10 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
     public function extendProductParseResult(LoopExtendsParseResultsEvent $event)
     {
         // Get customer's family
-        if (null !== $customerFamilyId = $this->customerFamilyService->getCustomerFamilyId()) {
+        if (null !== $customerFamilyId = $this->customerFamilyService->getCustomerCustomerFamilyId()) {
             // Get associated prices
-            $customerFamilyPrice = $this->customerFamilyService->getUsingEquationCustomerFamilyPrice($customerFamilyId, 0);
-            $customerFamilyPromoPrice = $this->customerFamilyService->getUsingEquationCustomerFamilyPrice($customerFamilyId, 1);
+            $customerFamilyPrice = $this->customerFamilyService->getCustomerFamilyPrice($customerFamilyId, 0, 1);
+            $customerFamilyPromoPrice = $this->customerFamilyService->getCustomerFamilyPrice($customerFamilyId, 1, 1);
 
             if ($customerFamilyPrice !== null || $customerFamilyPromoPrice !== null) {
                 // Get loop result, tax country & security context
