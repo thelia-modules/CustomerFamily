@@ -1,0 +1,50 @@
+{loop type='product' name='product_default_pse_loop' id=$product_id}
+    {loop type="product_purchase_price" name="product_purchase_price_loop" pse_id=$PRODUCT_SALE_ELEMENT currency_id=$edit_currency_id}
+        {assign var="purchasePrice" value=$PURCHASE_PRICE}
+    {/loop}
+
+    {form_field field='purchase_price'}
+        <div class="form-group">
+            <label for="purchase_price" class="control-label">{intl l='Purchase price (w/o taxes)' d='customerfamily.bo.default'} : </label>
+            <div class="input-group">
+                <input type="text" name="{$name}" class="form-control" value="{$purchasePrice}" placeholder="{intl l='Purchase price (w/o taxes)' d='customerfamily.bo.default'}">
+                <span class="input-group-addon">{currency attr="symbol"}</span>
+            </div>
+        </div>
+    {/form_field}
+
+    {loop type='customer_family' name='customer_family_loop_prices'}
+        {loop type='customer_family_pse_calculated_prices' name='calculated_prices' pse_id=$PRODUCT_SALE_ELEMENT customer_family_id=$CUSTOMER_FAMILY_ID currency_id=$edit_currency_id}
+            <div class="form-group">
+                <!-- Family name -->
+                <label class="control-label">
+                    {intl l='Calculated prices for:' d='customerfamily.bo.default'}
+                    <a href="{url path="/admin/module/CustomerFamily"}">{$TITLE_CUSTOMER_FAMILY}</a>
+                </label>
+
+                <div class="form-horizontal">
+                    <!-- Calculated untaxed price -->
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Untaxed</label>
+                            <div class="col-md-8 input-group">
+                                <input type="text" class="form-control" value="{$CALCULATED_PRICE}" disabled>
+                                <span class="input-group-addon">{currency attr="symbol"}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Calculated taxed price -->
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Taxed</label>
+                            <div class="col-md-8 input-group">
+                                <input type="text" class="form-control" value="{$CALCULATED_TAXED_PRICE}" disabled>
+                                <span class="input-group-addon">{currency attr="symbol"}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {/loop}
+    {/loop}
+{/loop}

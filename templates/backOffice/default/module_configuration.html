@@ -205,8 +205,15 @@
                     <div class="row">
                         <div class="col-md-12">
 
-                            <h4 class="text-center">{intl l="Define if your prices are the products' ones or if they are calculated by the equation with your parameters" d='customerfamily.bo.default'}</h4>
-                            <h3 class="text-center">{intl l='[ ( ( product_purchase_price + fix_amount_1 ) x factor ) + fix_amount_2 ] x taxes' d='customerfamily.bo.default'}</h3>
+                            <h4 class="text-center">
+                                {intl l="Define if your prices are the products' ones or if they are calculated by the equation with your parameters." d='customerfamily.bo.default'}
+                            </h4>
+                            <h4 class="text-center">
+                                {intl l="Not using the equation will display the fix product price to customers." d='customerfamily.bo.default'}
+                            </h4>
+                            <h3 class="text-center">
+                                {intl l='Equation: [ ( ( product_purchase_price + fix_amount_1 ) x factor ) + fix_amount_2 ] x taxes' d='customerfamily.bo.default'}
+                            </h3>
                             <br>
                             <table class="table table-striped">
                                 <thead>

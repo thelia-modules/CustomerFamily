@@ -21,7 +21,6 @@
 		<form name="customer.customer.family.form" class="CustomerFamily\Form\CustomerCustomerFamilyForm" />
 
 		<form name="customer_family_price_update" class="CustomerFamily\Form\CustomerFamilyPriceForm" />
-		<form name="customer_family_price_activate" class="CustomerFamily\Form\CustomerFamilyPriceActivateForm" />
 	</forms>
 
 	<services>
@@ -45,8 +44,13 @@
 			<tag name="kernel.event_subscriber"/>
 		</service>
 
+		<!-- Listening produt price edition -->
+		<service id="customer.family.product.purchase.price" class="CustomerFamily\EventListeners\PseExtendPriceFormListener">
+			<tag name="kernel.event_subscriber"/>
+		</service>
+
 		<!-- Listening PSE price edition -->
-		<service id="customer.family.purchase.price" class="CustomerFamily\EventListeners\PseExtendPriceFormListener">
+		<service id="customer.family.pse.purchase.price" class="CustomerFamily\EventListeners\ProductExtendPriceFormListener">
 			<tag name="kernel.event_subscriber"/>
 		</service>
 
@@ -90,6 +94,8 @@
 		<!-- Admin product edit purchase price -->
 		<hook id="customer.family.product.price.edit" class="CustomerFamily\Hook\CustomerFamilyProductPriceHook">
 			<tag name="hook.event_listener" event="product.combinations-row" type="back" method="onPsePriceEdit" />
+			<tag name="hook.event_listener" event="product.details-pricing-form" type="back" templates="render:product-details-pricing.html" />
+			<tag name="hook.event_listener" event="product.details-promotion-form" type="back" templates="render:product-details-promo.html" />
 			<tag name="hook.event_listener" event="product.edit-js" type="back" templates="render:assets/js/product-edit-js.html" />
 		</hook>
 

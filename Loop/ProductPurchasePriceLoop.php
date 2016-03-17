@@ -26,8 +26,8 @@ class ProductPurchasePriceLoop extends BaseLoop implements PropelSearchLoopInter
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createIntListTypeArgument('pse_id'),
-            Argument::createIntListTypeArgument('currency_id')
+            Argument::createIntTypeArgument('pse_id', null, true),
+            Argument::createIntTypeArgument('currency_id', null, true)
         );
     }
 
@@ -38,13 +38,9 @@ class ProductPurchasePriceLoop extends BaseLoop implements PropelSearchLoopInter
     {
         $search = ProductPurchasePriceQuery::create();
 
-        if (null !== $pseId = $this->getPseId()) {
-            $search->filterByProductSaleElementsId($pseId, Criteria::IN);
-        }
+        $search->filterByProductSaleElementsId($this->getPseId());
 
-        if (null !== $currency = $this->getCurrencyId()) {
-            $search->filterByCurrencyId($currency, Criteria::IN);
-        }
+        $search->filterByCurrencyId($this->getCurrencyId());
 
         return $search;
     }
