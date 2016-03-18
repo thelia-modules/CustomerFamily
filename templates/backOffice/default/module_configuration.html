@@ -1,6 +1,6 @@
 <div class="general-block-decorator" id="CustomerFamily">
     <div class="title">
-        {intl l="Customer Family" d="customerfamily.bo.default"}
+        {intl l="Customer Family" d='customerfamily.bo.default'}
     </div>
 
     <div class="row">
@@ -95,7 +95,7 @@
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <a class="btn btn-info pull-left js-action-update" data-id="{$CUSTOMER_FAMILY_ID}" data-code="{$CODE}" data-title="{$TITLE_CUSTOMER_FAMILY}" style="margin-right: 5px;">{intl l="Edit" d="customerfamily"}</a>
+                                                    <a class="btn btn-info pull-left js-action-update" data-id="{$CUSTOMER_FAMILY_ID}" data-code="{$CODE}" data-title="{$TITLE_CUSTOMER_FAMILY}" style="margin-right: 5px;">{intl l="Edit" d='customerfamily.bo.default'}</a>
                                                     <a class="btn btn-danger pull-left js-action-delete" data-id="{$CUSTOMER_FAMILY_ID}" style="margin-right: 5px;">{intl l="Delete"}</a>
                                                 </td>
                                             </tr>
@@ -104,7 +104,7 @@
                                     {elseloop rel="customer_family"}
                                         <tr>
                                             <td colspan="4" class="text-center">
-                                                {intl l="No family" d="CustomerFamily"}
+                                                {intl l="No family" d='customerfamily.bo.default'}
                                             </td>
                                         </tr>
                                     {/elseloop}
@@ -151,7 +151,7 @@
                                     {form_hidden_fields form=$form}
                                     <div class="modal-content">
                                         <div class="modal-body">
-                                            {intl l="Do you really want to delete this customer family ?" d="customerfamily"}
+                                            {intl l="Do you really want to delete this customer family ?" d='customerfamily.bo.default'}
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-default" data-dismiss="modal">{intl l="No"}</button>
@@ -268,17 +268,17 @@
                                                     </td>
                                                     <td>
                                                         {form_field form=$form field="amount_added_before"}
-                                                            <input type="number" name="{$name}" maxlength="16" value="{$amount_added_before}" class="form-control">
+                                                            <input type="number" name="{$name}" maxlength="16" step="any" value="{$amount_added_before}" class="form-control">
                                                         {/form_field}
                                                     </td>
                                                     <td>
                                                         {form_field form=$form field="coefficient"}
-                                                            <input type="number" name="{$name}" maxlength="16" value="{$coefficient}" class="form-control">
+                                                            <input type="number" name="{$name}" maxlength="16" step="any" value="{$coefficient}" class="form-control">
                                                         {/form_field}
                                                     </td>
                                                     <td>
                                                         {form_field form=$form field="amount_added_after"}
-                                                            <input type="number" name="{$name}" maxlength="16" value="{$amount_added_after}" class="form-control">
+                                                            <input type="number" name="{$name}" maxlength="16" step="any" value="{$amount_added_after}" class="form-control">
                                                         {/form_field}
                                                     </td>
                                                     <td>
@@ -331,17 +331,17 @@
                                                     </td>
                                                     <td>
                                                         {form_field form=$form field="amount_added_before"}
-                                                            <input type="number" name="{$name}" maxlength="16" value="{$amount_added_before}" class="form-control">
+                                                            <input type="number" name="{$name}" maxlength="16" step="any" value="{$amount_added_before}" class="form-control">
                                                         {/form_field}
                                                     </td>
                                                     <td>
                                                         {form_field form=$form field="coefficient"}
-                                                            <input type="number" name="{$name}" maxlength="16" value="{$coefficient}" class="form-control">
+                                                            <input type="number" name="{$name}" maxlength="16" step="any" value="{$coefficient}" class="form-control">
                                                         {/form_field}
                                                     </td>
                                                     <td>
                                                         {form_field form=$form field="amount_added_after"}
-                                                            <input type="number" name="{$name}" maxlength="16" value="{$amount_added_after}" class="form-control">
+                                                            <input type="number" name="{$name}" maxlength="16" step="any" value="{$amount_added_after}" class="form-control">
                                                         {/form_field}
                                                     </td>
                                                     <td>

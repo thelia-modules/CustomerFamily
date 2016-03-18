@@ -6,6 +6,7 @@ return array(
     'An error occured' => 'Une erreur est survenue',
     'Apply taxes' => 'Appliquer les taxes',
     'Calculated price' => 'Prix calculé',
+    'Calculated prices for:' => 'Prix calculé pour :',
     'Calculated promo price' => 'Prix promo calculé',
     'Cancel' => 'Annuler',
     'Code' => 'Code',

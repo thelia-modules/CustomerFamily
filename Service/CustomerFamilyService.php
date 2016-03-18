@@ -9,6 +9,7 @@ use CustomerFamily\Model\Map\CustomerCustomerFamilyTableMap;
 use CustomerFamily\Model\Map\CustomerFamilyTableMap;
 use CustomerFamily\Model\ProductPurchasePriceQuery;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Exception\TaxEngineException;
 use Thelia\Model\Currency;
 use Thelia\TaxEngine\TaxEngine;
 
@@ -108,40 +109,46 @@ class CustomerFamilyService
         }
 
         if (null !== $productPurchasePrice = $this->getPseProductPurchasePrice($pse->getId(), $currencyId)) {
-            $purchasePrice = $productPurchasePrice->getPurchasePrice();
-            // Standard price
-            $price = $taxedPrice = null;
+            // Initialize prices
+            $price = $taxedPrice = $promoPrice = $taxedPromoPrice = null;
 
+            // Standard price
             if (null !== $customerFamilyPrice = $this->getCustomerFamilyPrice($customerFamilyId, 0, 1)) {
                 // Calculate price
-                $price = ($purchasePrice + $customerFamilyPrice->getAmountAddedBefore())
+                $price = round(
+                    ($productPurchasePrice->getPurchasePrice() + $customerFamilyPrice->getAmountAddedBefore())
                     * $customerFamilyPrice->getMultiplicationCoefficient()
-                    + $customerFamilyPrice->getAmountAddedAfter();
+                    + $customerFamilyPrice->getAmountAddedAfter(),
+                    2
+                );
 
                 $pse->setVirtualColumn('CUSTOMER_FAMILY_PRICE', $price);
 
-                $taxedPrice = $price;
-
-                if ($customerFamilyPrice->getIsTaxed()) {
+                // Tax
+                try {
                     $taxedPrice = $pse->getTaxedPrice($taxCountry, 'CUSTOMER_FAMILY_PRICE');
+                } catch (TaxEngineException $e) {
+                    $taxedPrice = null;
                 }
             }
 
             // Promo price
-            $promoPrice = $taxedPromoPrice = null;
-
             if (null !== $customerFamilyPromoPrice = $this->getCustomerFamilyPrice($customerFamilyId, 1, 1)) {
                 // Calculate promo price
-                $promoPrice = ($purchasePrice + $customerFamilyPromoPrice->getAmountAddedBefore())
+                $promoPrice = round(
+                    ($productPurchasePrice->getPurchasePrice() + $customerFamilyPromoPrice->getAmountAddedBefore())
                     * $customerFamilyPromoPrice->getMultiplicationCoefficient()
-                    + $customerFamilyPromoPrice->getAmountAddedAfter();
+                    + $customerFamilyPromoPrice->getAmountAddedAfter(),
+                    2
+                );
 
                 $pse->setVirtualColumn('CUSTOMER_FAMILY_PROMO_PRICE', $promoPrice);
 
-                $taxedPromoPrice = $promoPrice;
-
-                if ($customerFamilyPromoPrice->getIsTaxed()) {
+                // Tax
+                try {
                     $taxedPromoPrice = $pse->getTaxedPrice($taxCountry, 'CUSTOMER_FAMILY_PROMO_PRICE');
+                } catch (TaxEngineException $e) {
+                    $taxedPromoPrice = null;
                 }
             }
 

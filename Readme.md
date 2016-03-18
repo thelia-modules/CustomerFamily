@@ -33,11 +33,17 @@ Use the first tab to create, edit or remove families. You can also define defaul
 
 The second tab allows you to define how prices are calculated for each family, depending on the products purchase price.
 
-## Loop customer_family
+Product's prices are automatically changed in the 'product' loop, you don't need to use 'customer_family_pse_calculated_prices' loop (see below) to get product's prices.
+
+## Loops
+
+Use provided loops to display for example taxed or untaxed price depending on the customer's family.
+
+### customer_family
 
 This loop returns client families
 
-### Input arguments
+#### Input arguments
 
 |Argument |Description |Version |
 |---      |---         |--- |
@@ -45,7 +51,7 @@ This loop returns client families
 |**exclude_id** | exclude family id | 1.0
 |**is_default** | filter default family | 1.3
 
-### Output values
+#### Output values
 
 |Argument |Description |Version |
 |---      |---         |--- |
@@ -54,25 +60,25 @@ This loop returns client families
 |**TITLE_CUSTOMER_FAMILY** | customer family title | 1.0
 |**IS_DEFAULT** | default customer family | 1.3
 
-### Example
+#### Example
 ```
 {loop type="customer_family" name="customer_family_loop" current_product=$product_id limit="4"}
     {$CODE} ({$TITLE_CUSTOMER_FAMILY})
 {/loop}
 ```
 
-## Loop customer_customer_family
+### customer_customer_family
 
 This loop returns customer family for specific customer
 
-### Input arguments
+#### Input arguments
 
 |Argument |Description |Version |
 |---      |---         |--- |
 |**customer_id** | customer id | 1.0
 |**customer_family_id** | family id | 1.0
 
-### Output values
+#### Output values
 
 |Argument |Description |Version |
 |---      |---         |--- |
@@ -81,18 +87,18 @@ This loop returns customer family for specific customer
 |**SIRET** | siret number | 1.0
 |**VAT** | vat number id | 1.0
 
-### Example
+#### Example
 ```
 {loop type="customer_customer_family" name="customer_customer_family_loop" customer_id="4"}
     {SIRET}
 {/loop}
 ```
 
-## Loop customer_family_price
+### customer_family_price
 
 This loop returns the customer family's equation data
 
-### Input arguments
+#### Input arguments
 
 |Argument |Description |Version |
 |---      |---         |--- |
@@ -100,7 +106,7 @@ This loop returns the customer family's equation data
 |**promo** | equation for the promo price or not | 1.3
 |**use_equation** | is the equation used to calculate price | 1.3
 
-### Output values
+#### Output values
 
 |Argument |Description |Version |
 |---      |---         |--- |
@@ -112,7 +118,7 @@ This loop returns the customer family's equation data
 |**COEFFICIENT** | coefficient the purchase price added to AMOUNT_ADDED_BEFORE is multiplied by | 1.3
 |**IS_TAXED** | are taxes applied on the final calculated price | 1.3
 
-### Example
+#### Example
 ```
 {loop type="customer_family_price" name="customer_family_price_loop" customer_family_id=1 promo=0}
     {$AMOUNT_ADDED_BEFORE}
@@ -120,11 +126,11 @@ This loop returns the customer family's equation data
 {/loop}
 ```
 
-## Loop customer_family_pse_calculated_prices
+### customer_family_pse_calculated_prices
 
 This loop returns the PSE's calculated price based on the given customer family & currency
 
-### Input arguments
+#### Input arguments
 
 |Argument |Description |Version |
 |---      |---         |--- |
@@ -132,7 +138,7 @@ This loop returns the PSE's calculated price based on the given customer family 
 |**currency_id** | currency id *(if not given, use default currency)* | 1.3
 |**customer_family_id** | *mandatory*, customer family id | 1.3
 
-### Output values
+#### Output values
 
 |Argument |Description |Version |
 |---      |---         |--- |
@@ -141,7 +147,7 @@ This loop returns the PSE's calculated price based on the given customer family 
 |**CALCULATED_PROMO_PRICE** | is the equation used to calculate price | 1.3
 |**CALCULATED_TAXED_PROMO_PRICE** | amount directly added to the purchase price | 1.3
 
-### Example
+#### Example
 ```
 {loop type="customer_family_pse_calculated_prices" name="customer_family_pse_calculated_prices_loop" pse_id=22 customer_family_id=1}
     {$CALCULATED_TAXED_PRICE}

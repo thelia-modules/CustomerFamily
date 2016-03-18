@@ -34,6 +34,11 @@ class CustomerFamilyCartListener implements EventSubscriberInterface
         ];
     }
 
+    /**
+     * @param CartEvent $cartEvent
+     * @throws \Exception
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function addCartItem(CartEvent $cartEvent)
     {
         $pseId = $cartEvent->getProductSaleElementsId();

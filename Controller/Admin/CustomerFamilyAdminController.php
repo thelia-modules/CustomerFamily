@@ -166,7 +166,7 @@ class CustomerFamilyAdminController extends BaseAdminController
 
         if ($error !== null) {
             $this->setupFormErrorContext(
-                $this->getTranslator()->trans("CustomerFamily - default family configuration", [], CustomerFamily::MODULE_DOMAIN),
+                $this->getTranslator()->trans("Error updating default family", [], CustomerFamily::MODULE_DOMAIN),
                 $error,
                 $form,
                 $ex
@@ -331,6 +331,6 @@ class CustomerFamilyAdminController extends BaseAdminController
         }
 
         // A loop is used in the template
-        return new CustomerUpdateForm($request, 'form', $data);
+        return new CustomerUpdateForm($this->getRequest(), 'form', $data);
     }
 }

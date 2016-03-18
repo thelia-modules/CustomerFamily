@@ -128,8 +128,6 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
                         $this->changeProductPrice(
                             $product,
                             $loopResultRow,
-                            $customerFamilyPrice,
-                            $customerFamilyPromoPrice,
                             $taxCountry,
                             $securityContext
                         );
@@ -196,16 +194,12 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
     /**
      * @param \Thelia\Model\Product | \Thelia\Model\ProductSaleElements $product
      * @param \Thelia\Core\Template\Element\LoopResultRow               $loopResultRow
-     * @param \CustomerFamily\Model\CustomerFamilyPrice                 $customerFamilyPrice
-     * @param \CustomerFamily\Model\CustomerFamilyPrice                 $customerFamilyPromoPrice
      * @param \Thelia\Model\Country                                     $taxCountry
      * @param SecurityContext                                           $securityContext
      */
     protected function changeProductPrice(
         $product,
         $loopResultRow,
-        $customerFamilyPrice,
-        $customerFamilyPromoPrice,
         $taxCountry,
         SecurityContext $securityContext
     ) {
@@ -218,26 +212,24 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
 
         // Replace price
         if (!empty($product->getVirtualColumn('CUSTOMER_FAMILY_PRICE'))) {
-            $price = $product->getVirtualColumn('CUSTOMER_FAMILY_PRICE');
+            $price = round($product->getVirtualColumn('CUSTOMER_FAMILY_PRICE'), 2);
 
             // If the customer has permanent discount, apply it
             if ($securityContext->hasCustomerUser() && $securityContext->getCustomerUser()->getDiscount() > 0) {
                 $price = $price * (1 - ($securityContext->getCustomerUser()->getDiscount() / 100));
             }
-            $taxedPrice = $price;
 
             // Tax price
-            /** @var \CustomerFamily\Model\CustomerFamilyPrice $customerFamilyPrice */
-            if ($customerFamilyPrice->getIsTaxed()) {
-                try {
-                    // If $product is a Product, getTaxedPrice() takes a Country and a price as arguments
-                    // Else if $product is a ProductSaleElements, getTaxedPrice() takes a Country and the price virtual column name as arguments
-                    if ($product instanceof Product) {
-                        $taxedPrice = $product->getTaxedPrice($taxCountry, $price);
-                    } elseif ($product instanceof ProductSaleElements) {
-                        $taxedPrice = $product->getTaxedPrice($taxCountry, 'CUSTOMER_FAMILY_PRICE');
-                    }
-                } catch (TaxEngineException $e) {}
+            try {
+                // If $product is a Product, getTaxedPrice() takes a Country and a price as arguments
+                // Else if $product is a ProductSaleElements, getTaxedPrice() takes a Country and the price virtual column name as arguments
+                if ($product instanceof Product) {
+                    $taxedPrice = $product->getTaxedPrice($taxCountry, $price);
+                } elseif ($product instanceof ProductSaleElements) {
+                    $taxedPrice = $product->getTaxedPrice($taxCountry, 'CUSTOMER_FAMILY_PRICE');
+                }
+            } catch (TaxEngineException $e) {
+                $taxedPrice = null;
             }
 
             $priceTax = $taxedPrice - $price;
@@ -251,32 +243,29 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
 
         // Replace promo price
         if (!empty($product->getVirtualColumn('CUSTOMER_FAMILY_PROMO_PRICE'))) {
-            $promoPrice = $product->getVirtualColumn('CUSTOMER_FAMILY_PROMO_PRICE');
+            $promoPrice = round($product->getVirtualColumn('CUSTOMER_FAMILY_PROMO_PRICE'), 2);
 
             // If the customer has permanent discount, apply it
             if ($securityContext->hasCustomerUser() && $securityContext->getCustomerUser()->getDiscount() > 0) {
                 $promoPrice = $promoPrice * (1 - ($securityContext->getCustomerUser()->getDiscount() / 100));
             }
 
-            $taxedPromoPrice = $promoPrice;
-
-            // Tax price
-            /** @var \CustomerFamily\Model\CustomerFamilyPrice $customerFamilyPromoPrice */
-            if ($customerFamilyPromoPrice->getIsTaxed()) {
-                try {
-                    // If $product is a Product, getTaxedPrice() takes a Country and a price as arguments
-                    // Else if $product is a ProductSaleElements, getTaxedPrice() takes a Country and the price virtual column name as arguments
-                    if ($product instanceof Product) {
-                        $taxedPromoPrice = $product->getTaxedPromoPrice($taxCountry, $promoPrice);
-                    } elseif ($product instanceof ProductSaleElements) {
-                        $taxedPromoPrice = $product->getTaxedPromoPrice($taxCountry, 'CUSTOMER_FAMILY_PROMO_PRICE');
-                    }
-                } catch (TaxEngineException $e) {}
+            // Tax promo price
+            try {
+                // If $product is a Product, getTaxedPrice() takes a Country and a price as arguments
+                // Else if $product is a ProductSaleElements, getTaxedPrice() takes a Country and the price virtual column name as arguments
+                if ($product instanceof Product) {
+                    $taxedPromoPrice = $product->getTaxedPromoPrice($taxCountry, $promoPrice);
+                } elseif ($product instanceof ProductSaleElements) {
+                    $taxedPromoPrice = $product->getTaxedPromoPrice($taxCountry, 'CUSTOMER_FAMILY_PROMO_PRICE');
+                }
+            } catch (TaxEngineException $e) {
+                $taxedPromoPrice = null;
             }
 
             $promoPriceTax = $taxedPromoPrice - $promoPrice;
 
-            // Set new price & tax into the loop
+            // Set new promo price & tax into the loop
             $loopResultRow
                 ->set("PROMO_PRICE", $promoPrice)
                 ->set("PROMO_PRICE_TAX", $promoPriceTax)
