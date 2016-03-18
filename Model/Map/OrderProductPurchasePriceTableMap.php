@@ -58,7 +58,7 @@ class OrderProductPurchasePriceTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 2;
+    const NUM_COLUMNS = 3;
 
     /**
      * The number of lazy-loaded columns
@@ -68,7 +68,7 @@ class OrderProductPurchasePriceTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 2;
+    const NUM_HYDRATE_COLUMNS = 3;
 
     /**
      * the column name for the ORDER_PRODUCT_ID field
@@ -79,6 +79,11 @@ class OrderProductPurchasePriceTableMap extends TableMap
      * the column name for the PURCHASE_PRICE field
      */
     const PURCHASE_PRICE = 'order_product_purchase_price.PURCHASE_PRICE';
+
+    /**
+     * the column name for the SALE_DAY_EQUATION field
+     */
+    const SALE_DAY_EQUATION = 'order_product_purchase_price.SALE_DAY_EQUATION';
 
     /**
      * The default string format for model objects of the related table
@@ -92,12 +97,12 @@ class OrderProductPurchasePriceTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('OrderProductId', 'PurchasePrice', ),
-        self::TYPE_STUDLYPHPNAME => array('orderProductId', 'purchasePrice', ),
-        self::TYPE_COLNAME       => array(OrderProductPurchasePriceTableMap::ORDER_PRODUCT_ID, OrderProductPurchasePriceTableMap::PURCHASE_PRICE, ),
-        self::TYPE_RAW_COLNAME   => array('ORDER_PRODUCT_ID', 'PURCHASE_PRICE', ),
-        self::TYPE_FIELDNAME     => array('order_product_id', 'purchase_price', ),
-        self::TYPE_NUM           => array(0, 1, )
+        self::TYPE_PHPNAME       => array('OrderProductId', 'PurchasePrice', 'SaleDayEquation', ),
+        self::TYPE_STUDLYPHPNAME => array('orderProductId', 'purchasePrice', 'saleDayEquation', ),
+        self::TYPE_COLNAME       => array(OrderProductPurchasePriceTableMap::ORDER_PRODUCT_ID, OrderProductPurchasePriceTableMap::PURCHASE_PRICE, OrderProductPurchasePriceTableMap::SALE_DAY_EQUATION, ),
+        self::TYPE_RAW_COLNAME   => array('ORDER_PRODUCT_ID', 'PURCHASE_PRICE', 'SALE_DAY_EQUATION', ),
+        self::TYPE_FIELDNAME     => array('order_product_id', 'purchase_price', 'sale_day_equation', ),
+        self::TYPE_NUM           => array(0, 1, 2, )
     );
 
     /**
@@ -107,12 +112,12 @@ class OrderProductPurchasePriceTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('OrderProductId' => 0, 'PurchasePrice' => 1, ),
-        self::TYPE_STUDLYPHPNAME => array('orderProductId' => 0, 'purchasePrice' => 1, ),
-        self::TYPE_COLNAME       => array(OrderProductPurchasePriceTableMap::ORDER_PRODUCT_ID => 0, OrderProductPurchasePriceTableMap::PURCHASE_PRICE => 1, ),
-        self::TYPE_RAW_COLNAME   => array('ORDER_PRODUCT_ID' => 0, 'PURCHASE_PRICE' => 1, ),
-        self::TYPE_FIELDNAME     => array('order_product_id' => 0, 'purchase_price' => 1, ),
-        self::TYPE_NUM           => array(0, 1, )
+        self::TYPE_PHPNAME       => array('OrderProductId' => 0, 'PurchasePrice' => 1, 'SaleDayEquation' => 2, ),
+        self::TYPE_STUDLYPHPNAME => array('orderProductId' => 0, 'purchasePrice' => 1, 'saleDayEquation' => 2, ),
+        self::TYPE_COLNAME       => array(OrderProductPurchasePriceTableMap::ORDER_PRODUCT_ID => 0, OrderProductPurchasePriceTableMap::PURCHASE_PRICE => 1, OrderProductPurchasePriceTableMap::SALE_DAY_EQUATION => 2, ),
+        self::TYPE_RAW_COLNAME   => array('ORDER_PRODUCT_ID' => 0, 'PURCHASE_PRICE' => 1, 'SALE_DAY_EQUATION' => 2, ),
+        self::TYPE_FIELDNAME     => array('order_product_id' => 0, 'purchase_price' => 1, 'sale_day_equation' => 2, ),
+        self::TYPE_NUM           => array(0, 1, 2, )
     );
 
     /**
@@ -133,6 +138,7 @@ class OrderProductPurchasePriceTableMap extends TableMap
         // columns
         $this->addForeignPrimaryKey('ORDER_PRODUCT_ID', 'OrderProductId', 'INTEGER' , 'order_product', 'ID', true, null, null);
         $this->addColumn('PURCHASE_PRICE', 'PurchasePrice', 'DECIMAL', false, 16, 0);
+        $this->addColumn('SALE_DAY_EQUATION', 'SaleDayEquation', 'LONGVARCHAR', true, null, null);
     } // initialize()
 
     /**
@@ -283,9 +289,11 @@ class OrderProductPurchasePriceTableMap extends TableMap
         if (null === $alias) {
             $criteria->addSelectColumn(OrderProductPurchasePriceTableMap::ORDER_PRODUCT_ID);
             $criteria->addSelectColumn(OrderProductPurchasePriceTableMap::PURCHASE_PRICE);
+            $criteria->addSelectColumn(OrderProductPurchasePriceTableMap::SALE_DAY_EQUATION);
         } else {
             $criteria->addSelectColumn($alias . '.ORDER_PRODUCT_ID');
             $criteria->addSelectColumn($alias . '.PURCHASE_PRICE');
+            $criteria->addSelectColumn($alias . '.SALE_DAY_EQUATION');
         }
     }
 

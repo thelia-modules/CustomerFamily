@@ -69,7 +69,8 @@
 		</service>
 
 		<!-- Listening order creation -->
-		<service id="customer.family.order" class="CustomerFamily\EventListeners\CustomerFamilyOrderPurchasePriceListener">
+		<service id="customer.family.order" class="CustomerFamily\EventListeners\CustomerFamilyOrderListener">
+            <argument type="service" id="customer.family.service"/>
 			<tag name="kernel.event_subscriber"/>
 		</service>
 

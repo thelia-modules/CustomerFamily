@@ -62,6 +62,18 @@
 			<reference foreign="id" local="order_product_id" />
 		</foreign-key>
 		<column name="purchase_price" type="DECIMAL" size="16" scale="6" defaultValue="0"/>
+		<column name="sale_day_equation" type="LONGVARCHAR" required="true"/>
+	</table>
+
+	<table name="customer_family_order">
+        <column name="order_id" primaryKey="true" required="true" type="INTEGER"/>
+        <foreign-key foreignTable="order" name="fk_customer_family_order_id" onDelete="CASCADE">
+            <reference foreign="id" local="order_id" />
+        </foreign-key>
+        <column name="customer_family_code" required="true" type="VARCHAR" size="45"/>
+        <foreign-key foreignTable="customer_family" name="fk_customer_family_code" onDelete="NONE" onUpdate="CASCADE">
+            <reference foreign="code" local="customer_family_code" />
+        </foreign-key>
 	</table>
 
 	<external-schema filename="local/config/schema.xml" referenceOnly="true" />

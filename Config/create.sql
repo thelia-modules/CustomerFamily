@@ -7,9 +7,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- customer_family
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `customer_family`;
-
-CREATE TABLE `customer_family`
+CREATE TABLE IF NOT EXISTS `customer_family`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `code` VARCHAR(45) NOT NULL,
@@ -24,9 +22,7 @@ CREATE TABLE `customer_family`
 -- customer_customer_family
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `customer_customer_family`;
-
-CREATE TABLE `customer_customer_family`
+CREATE TABLE IF NOT EXISTS `customer_customer_family`
 (
     `customer_id` INTEGER NOT NULL,
     `customer_family_id` INTEGER NOT NULL,
@@ -48,9 +44,7 @@ CREATE TABLE `customer_customer_family`
 -- customer_family_price
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `customer_family_price`;
-
-CREATE TABLE `customer_family_price`
+CREATE TABLE IF NOT EXISTS `customer_family_price`
 (
     `customer_family_id` INTEGER NOT NULL,
     `promo` TINYINT DEFAULT 0 NOT NULL,
@@ -71,9 +65,7 @@ CREATE TABLE `customer_family_price`
 -- product_purchase_price
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `product_purchase_price`;
-
-CREATE TABLE `product_purchase_price`
+CREATE TABLE IF NOT EXISTS `product_purchase_price`
 (
     `product_sale_elements_id` INTEGER NOT NULL,
     `currency_id` INTEGER NOT NULL,
@@ -96,9 +88,7 @@ CREATE TABLE `product_purchase_price`
 -- order_product_purchase_price
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `order_product_purchase_price`;
-
-CREATE TABLE `order_product_purchase_price`
+CREATE TABLE IF NOT EXISTS `order_product_purchase_price`
 (
     `order_product_id` INTEGER NOT NULL,
     `purchase_price` DECIMAL(16,6) DEFAULT 0,
@@ -115,9 +105,7 @@ CREATE TABLE `order_product_purchase_price`
 -- customer_family_order
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `customer_family_order`;
-
-CREATE TABLE `customer_family_order`
+CREATE TABLE IF NOT EXISTS `customer_family_order`
 (
     `order_id` INTEGER NOT NULL,
     `customer_family_code` VARCHAR(45) NOT NULL,
@@ -137,9 +125,7 @@ CREATE TABLE `customer_family_order`
 -- customer_family_i18n
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `customer_family_i18n`;
-
-CREATE TABLE `customer_family_i18n`
+CREATE TABLE IF NOT EXISTS `customer_family_i18n`
 (
     `id` INTEGER NOT NULL,
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,

@@ -24,9 +24,11 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildOrderProductPurchasePriceQuery orderByOrderProductId($order = Criteria::ASC) Order by the order_product_id column
  * @method     ChildOrderProductPurchasePriceQuery orderByPurchasePrice($order = Criteria::ASC) Order by the purchase_price column
+ * @method     ChildOrderProductPurchasePriceQuery orderBySaleDayEquation($order = Criteria::ASC) Order by the sale_day_equation column
  *
  * @method     ChildOrderProductPurchasePriceQuery groupByOrderProductId() Group by the order_product_id column
  * @method     ChildOrderProductPurchasePriceQuery groupByPurchasePrice() Group by the purchase_price column
+ * @method     ChildOrderProductPurchasePriceQuery groupBySaleDayEquation() Group by the sale_day_equation column
  *
  * @method     ChildOrderProductPurchasePriceQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildOrderProductPurchasePriceQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -41,9 +43,11 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildOrderProductPurchasePrice findOneByOrderProductId(int $order_product_id) Return the first ChildOrderProductPurchasePrice filtered by the order_product_id column
  * @method     ChildOrderProductPurchasePrice findOneByPurchasePrice(string $purchase_price) Return the first ChildOrderProductPurchasePrice filtered by the purchase_price column
+ * @method     ChildOrderProductPurchasePrice findOneBySaleDayEquation(string $sale_day_equation) Return the first ChildOrderProductPurchasePrice filtered by the sale_day_equation column
  *
  * @method     array findByOrderProductId(int $order_product_id) Return ChildOrderProductPurchasePrice objects filtered by the order_product_id column
  * @method     array findByPurchasePrice(string $purchase_price) Return ChildOrderProductPurchasePrice objects filtered by the purchase_price column
+ * @method     array findBySaleDayEquation(string $sale_day_equation) Return ChildOrderProductPurchasePrice objects filtered by the sale_day_equation column
  *
  */
 abstract class OrderProductPurchasePriceQuery extends ModelCriteria
@@ -132,7 +136,7 @@ abstract class OrderProductPurchasePriceQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ORDER_PRODUCT_ID, PURCHASE_PRICE FROM order_product_purchase_price WHERE ORDER_PRODUCT_ID = :p0';
+        $sql = 'SELECT ORDER_PRODUCT_ID, PURCHASE_PRICE, SALE_DAY_EQUATION FROM order_product_purchase_price WHERE ORDER_PRODUCT_ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -303,6 +307,35 @@ abstract class OrderProductPurchasePriceQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(OrderProductPurchasePriceTableMap::PURCHASE_PRICE, $purchasePrice, $comparison);
+    }
+
+    /**
+     * Filter the query on the sale_day_equation column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterBySaleDayEquation('fooValue');   // WHERE sale_day_equation = 'fooValue'
+     * $query->filterBySaleDayEquation('%fooValue%'); // WHERE sale_day_equation LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $saleDayEquation The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderProductPurchasePriceQuery The current query, for fluid interface
+     */
+    public function filterBySaleDayEquation($saleDayEquation = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($saleDayEquation)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $saleDayEquation)) {
+                $saleDayEquation = str_replace('*', '%', $saleDayEquation);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(OrderProductPurchasePriceTableMap::SALE_DAY_EQUATION, $saleDayEquation, $comparison);
     }
 
     /**

@@ -4,10 +4,12 @@ namespace CustomerFamily\Model\Base;
 
 use \Exception;
 use \PDO;
-use CustomerFamily\Model\OrderProductPurchasePriceQuery as ChildOrderProductPurchasePriceQuery;
-use CustomerFamily\Model\Map\OrderProductPurchasePriceTableMap;
-use CustomerFamily\Model\Thelia\Model\OrderProduct as ChildOrderProduct;
-use CustomerFamily\Model\Thelia\Model\OrderProductQuery;
+use CustomerFamily\Model\CustomerFamily as ChildCustomerFamily;
+use CustomerFamily\Model\CustomerFamilyOrderQuery as ChildCustomerFamilyOrderQuery;
+use CustomerFamily\Model\CustomerFamilyQuery as ChildCustomerFamilyQuery;
+use CustomerFamily\Model\Map\CustomerFamilyOrderTableMap;
+use CustomerFamily\Model\Thelia\Model\Order as ChildOrder;
+use CustomerFamily\Model\Thelia\Model\OrderQuery;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -19,12 +21,12 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 
-abstract class OrderProductPurchasePrice implements ActiveRecordInterface
+abstract class CustomerFamilyOrder implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\CustomerFamily\\Model\\Map\\OrderProductPurchasePriceTableMap';
+    const TABLE_MAP = '\\CustomerFamily\\Model\\Map\\CustomerFamilyOrderTableMap';
 
 
     /**
@@ -54,28 +56,26 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
     protected $virtualColumns = array();
 
     /**
-     * The value for the order_product_id field.
+     * The value for the order_id field.
      * @var        int
      */
-    protected $order_product_id;
+    protected $order_id;
 
     /**
-     * The value for the purchase_price field.
-     * Note: this column has a database default value of: '0'
+     * The value for the customer_family_code field.
      * @var        string
      */
-    protected $purchase_price;
+    protected $customer_family_code;
 
     /**
-     * The value for the sale_day_equation field.
-     * @var        string
+     * @var        Order
      */
-    protected $sale_day_equation;
+    protected $aOrder;
 
     /**
-     * @var        OrderProduct
+     * @var        CustomerFamily
      */
-    protected $aOrderProduct;
+    protected $aCustomerFamily;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -86,23 +86,10 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
     protected $alreadyInSave = false;
 
     /**
-     * Applies default values to this object.
-     * This method should be called from the object's constructor (or
-     * equivalent initialization method).
-     * @see __construct()
-     */
-    public function applyDefaultValues()
-    {
-        $this->purchase_price = '0';
-    }
-
-    /**
-     * Initializes internal state of CustomerFamily\Model\Base\OrderProductPurchasePrice object.
-     * @see applyDefaults()
+     * Initializes internal state of CustomerFamily\Model\Base\CustomerFamilyOrder object.
      */
     public function __construct()
     {
-        $this->applyDefaultValues();
     }
 
     /**
@@ -194,9 +181,9 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>OrderProductPurchasePrice</code> instance.  If
-     * <code>obj</code> is an instance of <code>OrderProductPurchasePrice</code>, delegates to
-     * <code>equals(OrderProductPurchasePrice)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>CustomerFamilyOrder</code> instance.  If
+     * <code>obj</code> is an instance of <code>CustomerFamilyOrder</code>, delegates to
+     * <code>equals(CustomerFamilyOrder)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param  mixed   $obj The object to compare to.
      * @return boolean Whether equal to the object specified.
@@ -279,7 +266,7 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return OrderProductPurchasePrice The current object, for fluid interface
+     * @return CustomerFamilyOrder The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -311,7 +298,7 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
      * @param string $data The source data to import from
      *
-     * @return OrderProductPurchasePrice The current object, for fluid interface
+     * @return CustomerFamilyOrder The current object, for fluid interface
      */
     public function importFrom($parser, $data)
     {
@@ -357,104 +344,76 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
     }
 
     /**
-     * Get the [order_product_id] column value.
+     * Get the [order_id] column value.
      *
      * @return   int
      */
-    public function getOrderProductId()
+    public function getOrderId()
     {
 
-        return $this->order_product_id;
+        return $this->order_id;
     }
 
     /**
-     * Get the [purchase_price] column value.
+     * Get the [customer_family_code] column value.
      *
      * @return   string
      */
-    public function getPurchasePrice()
+    public function getCustomerFamilyCode()
     {
 
-        return $this->purchase_price;
+        return $this->customer_family_code;
     }
 
     /**
-     * Get the [sale_day_equation] column value.
-     *
-     * @return   string
-     */
-    public function getSaleDayEquation()
-    {
-
-        return $this->sale_day_equation;
-    }
-
-    /**
-     * Set the value of [order_product_id] column.
+     * Set the value of [order_id] column.
      *
      * @param      int $v new value
-     * @return   \CustomerFamily\Model\OrderProductPurchasePrice The current object (for fluent API support)
+     * @return   \CustomerFamily\Model\CustomerFamilyOrder The current object (for fluent API support)
      */
-    public function setOrderProductId($v)
+    public function setOrderId($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->order_product_id !== $v) {
-            $this->order_product_id = $v;
-            $this->modifiedColumns[OrderProductPurchasePriceTableMap::ORDER_PRODUCT_ID] = true;
+        if ($this->order_id !== $v) {
+            $this->order_id = $v;
+            $this->modifiedColumns[CustomerFamilyOrderTableMap::ORDER_ID] = true;
         }
 
-        if ($this->aOrderProduct !== null && $this->aOrderProduct->getId() !== $v) {
-            $this->aOrderProduct = null;
+        if ($this->aOrder !== null && $this->aOrder->getId() !== $v) {
+            $this->aOrder = null;
         }
 
 
         return $this;
-    } // setOrderProductId()
+    } // setOrderId()
 
     /**
-     * Set the value of [purchase_price] column.
+     * Set the value of [customer_family_code] column.
      *
      * @param      string $v new value
-     * @return   \CustomerFamily\Model\OrderProductPurchasePrice The current object (for fluent API support)
+     * @return   \CustomerFamily\Model\CustomerFamilyOrder The current object (for fluent API support)
      */
-    public function setPurchasePrice($v)
+    public function setCustomerFamilyCode($v)
     {
         if ($v !== null) {
             $v = (string) $v;
         }
 
-        if ($this->purchase_price !== $v) {
-            $this->purchase_price = $v;
-            $this->modifiedColumns[OrderProductPurchasePriceTableMap::PURCHASE_PRICE] = true;
+        if ($this->customer_family_code !== $v) {
+            $this->customer_family_code = $v;
+            $this->modifiedColumns[CustomerFamilyOrderTableMap::CUSTOMER_FAMILY_CODE] = true;
+        }
+
+        if ($this->aCustomerFamily !== null && $this->aCustomerFamily->getCode() !== $v) {
+            $this->aCustomerFamily = null;
         }
 
 
         return $this;
-    } // setPurchasePrice()
-
-    /**
-     * Set the value of [sale_day_equation] column.
-     *
-     * @param      string $v new value
-     * @return   \CustomerFamily\Model\OrderProductPurchasePrice The current object (for fluent API support)
-     */
-    public function setSaleDayEquation($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->sale_day_equation !== $v) {
-            $this->sale_day_equation = $v;
-            $this->modifiedColumns[OrderProductPurchasePriceTableMap::SALE_DAY_EQUATION] = true;
-        }
-
-
-        return $this;
-    } // setSaleDayEquation()
+    } // setCustomerFamilyCode()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -466,10 +425,6 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
-            if ($this->purchase_price !== '0') {
-                return false;
-            }
-
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -497,14 +452,11 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
         try {
 
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : OrderProductPurchasePriceTableMap::translateFieldName('OrderProductId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->order_product_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : CustomerFamilyOrderTableMap::translateFieldName('OrderId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->order_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : OrderProductPurchasePriceTableMap::translateFieldName('PurchasePrice', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->purchase_price = (null !== $col) ? (string) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : OrderProductPurchasePriceTableMap::translateFieldName('SaleDayEquation', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->sale_day_equation = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : CustomerFamilyOrderTableMap::translateFieldName('CustomerFamilyCode', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->customer_family_code = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -513,10 +465,10 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 3; // 3 = OrderProductPurchasePriceTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 2; // 2 = CustomerFamilyOrderTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException("Error populating \CustomerFamily\Model\OrderProductPurchasePrice object", 0, $e);
+            throw new PropelException("Error populating \CustomerFamily\Model\CustomerFamilyOrder object", 0, $e);
         }
     }
 
@@ -535,8 +487,11 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
-        if ($this->aOrderProduct !== null && $this->order_product_id !== $this->aOrderProduct->getId()) {
-            $this->aOrderProduct = null;
+        if ($this->aOrder !== null && $this->order_id !== $this->aOrder->getId()) {
+            $this->aOrder = null;
+        }
+        if ($this->aCustomerFamily !== null && $this->customer_family_code !== $this->aCustomerFamily->getCode()) {
+            $this->aCustomerFamily = null;
         }
     } // ensureConsistency
 
@@ -561,13 +516,13 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(OrderProductPurchasePriceTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(CustomerFamilyOrderTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildOrderProductPurchasePriceQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildCustomerFamilyOrderQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -577,7 +532,8 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aOrderProduct = null;
+            $this->aOrder = null;
+            $this->aCustomerFamily = null;
         } // if (deep)
     }
 
@@ -587,8 +543,8 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see OrderProductPurchasePrice::setDeleted()
-     * @see OrderProductPurchasePrice::isDeleted()
+     * @see CustomerFamilyOrder::setDeleted()
+     * @see CustomerFamilyOrder::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -597,12 +553,12 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(OrderProductPurchasePriceTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(CustomerFamilyOrderTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
         try {
-            $deleteQuery = ChildOrderProductPurchasePriceQuery::create()
+            $deleteQuery = ChildCustomerFamilyOrderQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -639,7 +595,7 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(OrderProductPurchasePriceTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(CustomerFamilyOrderTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
@@ -659,7 +615,7 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                OrderProductPurchasePriceTableMap::addInstanceToPool($this);
+                CustomerFamilyOrderTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -694,11 +650,18 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aOrderProduct !== null) {
-                if ($this->aOrderProduct->isModified() || $this->aOrderProduct->isNew()) {
-                    $affectedRows += $this->aOrderProduct->save($con);
+            if ($this->aOrder !== null) {
+                if ($this->aOrder->isModified() || $this->aOrder->isNew()) {
+                    $affectedRows += $this->aOrder->save($con);
                 }
-                $this->setOrderProduct($this->aOrderProduct);
+                $this->setOrder($this->aOrder);
+            }
+
+            if ($this->aCustomerFamily !== null) {
+                if ($this->aCustomerFamily->isModified() || $this->aCustomerFamily->isNew()) {
+                    $affectedRows += $this->aCustomerFamily->save($con);
+                }
+                $this->setCustomerFamily($this->aCustomerFamily);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -734,18 +697,15 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
 
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(OrderProductPurchasePriceTableMap::ORDER_PRODUCT_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'ORDER_PRODUCT_ID';
+        if ($this->isColumnModified(CustomerFamilyOrderTableMap::ORDER_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'ORDER_ID';
         }
-        if ($this->isColumnModified(OrderProductPurchasePriceTableMap::PURCHASE_PRICE)) {
-            $modifiedColumns[':p' . $index++]  = 'PURCHASE_PRICE';
-        }
-        if ($this->isColumnModified(OrderProductPurchasePriceTableMap::SALE_DAY_EQUATION)) {
-            $modifiedColumns[':p' . $index++]  = 'SALE_DAY_EQUATION';
+        if ($this->isColumnModified(CustomerFamilyOrderTableMap::CUSTOMER_FAMILY_CODE)) {
+            $modifiedColumns[':p' . $index++]  = 'CUSTOMER_FAMILY_CODE';
         }
 
         $sql = sprintf(
-            'INSERT INTO order_product_purchase_price (%s) VALUES (%s)',
+            'INSERT INTO customer_family_order (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -754,14 +714,11 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'ORDER_PRODUCT_ID':
-                        $stmt->bindValue($identifier, $this->order_product_id, PDO::PARAM_INT);
+                    case 'ORDER_ID':
+                        $stmt->bindValue($identifier, $this->order_id, PDO::PARAM_INT);
                         break;
-                    case 'PURCHASE_PRICE':
-                        $stmt->bindValue($identifier, $this->purchase_price, PDO::PARAM_STR);
-                        break;
-                    case 'SALE_DAY_EQUATION':
-                        $stmt->bindValue($identifier, $this->sale_day_equation, PDO::PARAM_STR);
+                    case 'CUSTOMER_FAMILY_CODE':
+                        $stmt->bindValue($identifier, $this->customer_family_code, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -802,7 +759,7 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = OrderProductPurchasePriceTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = CustomerFamilyOrderTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -819,13 +776,10 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                return $this->getOrderProductId();
+                return $this->getOrderId();
                 break;
             case 1:
-                return $this->getPurchasePrice();
-                break;
-            case 2:
-                return $this->getSaleDayEquation();
+                return $this->getCustomerFamilyCode();
                 break;
             default:
                 return null;
@@ -850,15 +804,14 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
      */
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['OrderProductPurchasePrice'][$this->getPrimaryKey()])) {
+        if (isset($alreadyDumpedObjects['CustomerFamilyOrder'][$this->getPrimaryKey()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['OrderProductPurchasePrice'][$this->getPrimaryKey()] = true;
-        $keys = OrderProductPurchasePriceTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['CustomerFamilyOrder'][$this->getPrimaryKey()] = true;
+        $keys = CustomerFamilyOrderTableMap::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getOrderProductId(),
-            $keys[1] => $this->getPurchasePrice(),
-            $keys[2] => $this->getSaleDayEquation(),
+            $keys[0] => $this->getOrderId(),
+            $keys[1] => $this->getCustomerFamilyCode(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -866,8 +819,11 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->aOrderProduct) {
-                $result['OrderProduct'] = $this->aOrderProduct->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aOrder) {
+                $result['Order'] = $this->aOrder->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aCustomerFamily) {
+                $result['CustomerFamily'] = $this->aCustomerFamily->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -887,7 +843,7 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = OrderProductPurchasePriceTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = CustomerFamilyOrderTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -904,13 +860,10 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                $this->setOrderProductId($value);
+                $this->setOrderId($value);
                 break;
             case 1:
-                $this->setPurchasePrice($value);
-                break;
-            case 2:
-                $this->setSaleDayEquation($value);
+                $this->setCustomerFamilyCode($value);
                 break;
         } // switch()
     }
@@ -934,11 +887,10 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = OrderProductPurchasePriceTableMap::getFieldNames($keyType);
+        $keys = CustomerFamilyOrderTableMap::getFieldNames($keyType);
 
-        if (array_key_exists($keys[0], $arr)) $this->setOrderProductId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setPurchasePrice($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setSaleDayEquation($arr[$keys[2]]);
+        if (array_key_exists($keys[0], $arr)) $this->setOrderId($arr[$keys[0]]);
+        if (array_key_exists($keys[1], $arr)) $this->setCustomerFamilyCode($arr[$keys[1]]);
     }
 
     /**
@@ -948,11 +900,10 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(OrderProductPurchasePriceTableMap::DATABASE_NAME);
+        $criteria = new Criteria(CustomerFamilyOrderTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(OrderProductPurchasePriceTableMap::ORDER_PRODUCT_ID)) $criteria->add(OrderProductPurchasePriceTableMap::ORDER_PRODUCT_ID, $this->order_product_id);
-        if ($this->isColumnModified(OrderProductPurchasePriceTableMap::PURCHASE_PRICE)) $criteria->add(OrderProductPurchasePriceTableMap::PURCHASE_PRICE, $this->purchase_price);
-        if ($this->isColumnModified(OrderProductPurchasePriceTableMap::SALE_DAY_EQUATION)) $criteria->add(OrderProductPurchasePriceTableMap::SALE_DAY_EQUATION, $this->sale_day_equation);
+        if ($this->isColumnModified(CustomerFamilyOrderTableMap::ORDER_ID)) $criteria->add(CustomerFamilyOrderTableMap::ORDER_ID, $this->order_id);
+        if ($this->isColumnModified(CustomerFamilyOrderTableMap::CUSTOMER_FAMILY_CODE)) $criteria->add(CustomerFamilyOrderTableMap::CUSTOMER_FAMILY_CODE, $this->customer_family_code);
 
         return $criteria;
     }
@@ -967,8 +918,8 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = new Criteria(OrderProductPurchasePriceTableMap::DATABASE_NAME);
-        $criteria->add(OrderProductPurchasePriceTableMap::ORDER_PRODUCT_ID, $this->order_product_id);
+        $criteria = new Criteria(CustomerFamilyOrderTableMap::DATABASE_NAME);
+        $criteria->add(CustomerFamilyOrderTableMap::ORDER_ID, $this->order_id);
 
         return $criteria;
     }
@@ -979,18 +930,18 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
      */
     public function getPrimaryKey()
     {
-        return $this->getOrderProductId();
+        return $this->getOrderId();
     }
 
     /**
-     * Generic method to set the primary key (order_product_id column).
+     * Generic method to set the primary key (order_id column).
      *
      * @param       int $key Primary key.
      * @return void
      */
     public function setPrimaryKey($key)
     {
-        $this->setOrderProductId($key);
+        $this->setOrderId($key);
     }
 
     /**
@@ -1000,7 +951,7 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
     public function isPrimaryKeyNull()
     {
 
-        return null === $this->getOrderProductId();
+        return null === $this->getOrderId();
     }
 
     /**
@@ -1009,16 +960,15 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \CustomerFamily\Model\OrderProductPurchasePrice (or compatible) type.
+     * @param      object $copyObj An object of \CustomerFamily\Model\CustomerFamilyOrder (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setOrderProductId($this->getOrderProductId());
-        $copyObj->setPurchasePrice($this->getPurchasePrice());
-        $copyObj->setSaleDayEquation($this->getSaleDayEquation());
+        $copyObj->setOrderId($this->getOrderId());
+        $copyObj->setCustomerFamilyCode($this->getCustomerFamilyCode());
         if ($makeNew) {
             $copyObj->setNew(true);
         }
@@ -1033,7 +983,7 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
      * objects.
      *
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return                 \CustomerFamily\Model\OrderProductPurchasePrice Clone of current object.
+     * @return                 \CustomerFamily\Model\CustomerFamilyOrder Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1047,25 +997,25 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
     }
 
     /**
-     * Declares an association between this object and a ChildOrderProduct object.
+     * Declares an association between this object and a ChildOrder object.
      *
-     * @param                  ChildOrderProduct $v
-     * @return                 \CustomerFamily\Model\OrderProductPurchasePrice The current object (for fluent API support)
+     * @param                  ChildOrder $v
+     * @return                 \CustomerFamily\Model\CustomerFamilyOrder The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setOrderProduct(ChildOrderProduct $v = null)
+    public function setOrder(ChildOrder $v = null)
     {
         if ($v === null) {
-            $this->setOrderProductId(NULL);
+            $this->setOrderId(NULL);
         } else {
-            $this->setOrderProductId($v->getId());
+            $this->setOrderId($v->getId());
         }
 
-        $this->aOrderProduct = $v;
+        $this->aOrder = $v;
 
         // Add binding for other direction of this 1:1 relationship.
         if ($v !== null) {
-            $v->setOrderProductPurchasePrice($this);
+            $v->setCustomerFamilyOrder($this);
         }
 
 
@@ -1074,21 +1024,74 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
 
 
     /**
-     * Get the associated ChildOrderProduct object
+     * Get the associated ChildOrder object
      *
      * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildOrderProduct The associated ChildOrderProduct object.
+     * @return                 ChildOrder The associated ChildOrder object.
      * @throws PropelException
      */
-    public function getOrderProduct(ConnectionInterface $con = null)
+    public function getOrder(ConnectionInterface $con = null)
     {
-        if ($this->aOrderProduct === null && ($this->order_product_id !== null)) {
-            $this->aOrderProduct = OrderProductQuery::create()->findPk($this->order_product_id, $con);
+        if ($this->aOrder === null && ($this->order_id !== null)) {
+            $this->aOrder = OrderQuery::create()->findPk($this->order_id, $con);
             // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aOrderProduct->setOrderProductPurchasePrice($this);
+            $this->aOrder->setCustomerFamilyOrder($this);
         }
 
-        return $this->aOrderProduct;
+        return $this->aOrder;
+    }
+
+    /**
+     * Declares an association between this object and a ChildCustomerFamily object.
+     *
+     * @param                  ChildCustomerFamily $v
+     * @return                 \CustomerFamily\Model\CustomerFamilyOrder The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setCustomerFamily(ChildCustomerFamily $v = null)
+    {
+        if ($v === null) {
+            $this->setCustomerFamilyCode(NULL);
+        } else {
+            $this->setCustomerFamilyCode($v->getCode());
+        }
+
+        $this->aCustomerFamily = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildCustomerFamily object, it will not be re-added.
+        if ($v !== null) {
+            $v->addCustomerFamilyOrder($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildCustomerFamily object
+     *
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildCustomerFamily The associated ChildCustomerFamily object.
+     * @throws PropelException
+     */
+    public function getCustomerFamily(ConnectionInterface $con = null)
+    {
+        if ($this->aCustomerFamily === null && (($this->customer_family_code !== "" && $this->customer_family_code !== null))) {
+            $this->aCustomerFamily = ChildCustomerFamilyQuery::create()
+                ->filterByCustomerFamilyOrder($this) // here
+                ->findOne($con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aCustomerFamily->addCustomerFamilyOrders($this);
+             */
+        }
+
+        return $this->aCustomerFamily;
     }
 
     /**
@@ -1096,12 +1099,10 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
      */
     public function clear()
     {
-        $this->order_product_id = null;
-        $this->purchase_price = null;
-        $this->sale_day_equation = null;
+        $this->order_id = null;
+        $this->customer_family_code = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
-        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);
@@ -1121,7 +1122,8 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
         if ($deep) {
         } // if ($deep)
 
-        $this->aOrderProduct = null;
+        $this->aOrder = null;
+        $this->aCustomerFamily = null;
     }
 
     /**
@@ -1131,7 +1133,7 @@ abstract class OrderProductPurchasePrice implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(OrderProductPurchasePriceTableMap::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(CustomerFamilyOrderTableMap::DEFAULT_STRING_FORMAT);
     }
 
     /**

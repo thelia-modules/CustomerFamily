@@ -2,8 +2,8 @@
 
 namespace CustomerFamily\Model\Map;
 
-use CustomerFamily\Model\CustomerFamily;
-use CustomerFamily\Model\CustomerFamilyQuery;
+use CustomerFamily\Model\CustomerFamilyOrder;
+use CustomerFamily\Model\CustomerFamilyOrderQuery;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\InstancePoolTrait;
@@ -16,7 +16,7 @@ use Propel\Runtime\Map\TableMapTrait;
 
 
 /**
- * This class defines the structure of the 'customer_family' table.
+ * This class defines the structure of the 'customer_family_order' table.
  *
  *
  *
@@ -26,14 +26,14 @@ use Propel\Runtime\Map\TableMapTrait;
  * (i.e. if it's a text column type).
  *
  */
-class CustomerFamilyTableMap extends TableMap
+class CustomerFamilyOrderTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'CustomerFamily.Model.Map.CustomerFamilyTableMap';
+    const CLASS_NAME = 'CustomerFamily.Model.Map.CustomerFamilyOrderTableMap';
 
     /**
      * The default database name for this class
@@ -43,22 +43,22 @@ class CustomerFamilyTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'customer_family';
+    const TABLE_NAME = 'customer_family_order';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\CustomerFamily\\Model\\CustomerFamily';
+    const OM_CLASS = '\\CustomerFamily\\Model\\CustomerFamilyOrder';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'CustomerFamily.Model.CustomerFamily';
+    const CLASS_DEFAULT = 'CustomerFamily.Model.CustomerFamilyOrder';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 5;
+    const NUM_COLUMNS = 2;
 
     /**
      * The number of lazy-loaded columns
@@ -68,46 +68,22 @@ class CustomerFamilyTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 5;
+    const NUM_HYDRATE_COLUMNS = 2;
 
     /**
-     * the column name for the ID field
+     * the column name for the ORDER_ID field
      */
-    const ID = 'customer_family.ID';
+    const ORDER_ID = 'customer_family_order.ORDER_ID';
 
     /**
-     * the column name for the CODE field
+     * the column name for the CUSTOMER_FAMILY_CODE field
      */
-    const CODE = 'customer_family.CODE';
-
-    /**
-     * the column name for the IS_DEFAULT field
-     */
-    const IS_DEFAULT = 'customer_family.IS_DEFAULT';
-
-    /**
-     * the column name for the CREATED_AT field
-     */
-    const CREATED_AT = 'customer_family.CREATED_AT';
-
-    /**
-     * the column name for the UPDATED_AT field
-     */
-    const UPDATED_AT = 'customer_family.UPDATED_AT';
+    const CUSTOMER_FAMILY_CODE = 'customer_family_order.CUSTOMER_FAMILY_CODE';
 
     /**
      * The default string format for model objects of the related table
      */
     const DEFAULT_STRING_FORMAT = 'YAML';
-
-    // i18n behavior
-
-    /**
-     * The default locale to use for translations.
-     *
-     * @var string
-     */
-    const DEFAULT_LOCALE = 'en_US';
 
     /**
      * holds an array of fieldnames
@@ -116,12 +92,12 @@ class CustomerFamilyTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Code', 'IsDefault', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'code', 'isDefault', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(CustomerFamilyTableMap::ID, CustomerFamilyTableMap::CODE, CustomerFamilyTableMap::IS_DEFAULT, CustomerFamilyTableMap::CREATED_AT, CustomerFamilyTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'CODE', 'IS_DEFAULT', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'code', 'is_default', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
+        self::TYPE_PHPNAME       => array('OrderId', 'CustomerFamilyCode', ),
+        self::TYPE_STUDLYPHPNAME => array('orderId', 'customerFamilyCode', ),
+        self::TYPE_COLNAME       => array(CustomerFamilyOrderTableMap::ORDER_ID, CustomerFamilyOrderTableMap::CUSTOMER_FAMILY_CODE, ),
+        self::TYPE_RAW_COLNAME   => array('ORDER_ID', 'CUSTOMER_FAMILY_CODE', ),
+        self::TYPE_FIELDNAME     => array('order_id', 'customer_family_code', ),
+        self::TYPE_NUM           => array(0, 1, )
     );
 
     /**
@@ -131,12 +107,12 @@ class CustomerFamilyTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Code' => 1, 'IsDefault' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'code' => 1, 'isDefault' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
-        self::TYPE_COLNAME       => array(CustomerFamilyTableMap::ID => 0, CustomerFamilyTableMap::CODE => 1, CustomerFamilyTableMap::IS_DEFAULT => 2, CustomerFamilyTableMap::CREATED_AT => 3, CustomerFamilyTableMap::UPDATED_AT => 4, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CODE' => 1, 'IS_DEFAULT' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'code' => 1, 'is_default' => 2, 'created_at' => 3, 'updated_at' => 4, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
+        self::TYPE_PHPNAME       => array('OrderId' => 0, 'CustomerFamilyCode' => 1, ),
+        self::TYPE_STUDLYPHPNAME => array('orderId' => 0, 'customerFamilyCode' => 1, ),
+        self::TYPE_COLNAME       => array(CustomerFamilyOrderTableMap::ORDER_ID => 0, CustomerFamilyOrderTableMap::CUSTOMER_FAMILY_CODE => 1, ),
+        self::TYPE_RAW_COLNAME   => array('ORDER_ID' => 0, 'CUSTOMER_FAMILY_CODE' => 1, ),
+        self::TYPE_FIELDNAME     => array('order_id' => 0, 'customer_family_code' => 1, ),
+        self::TYPE_NUM           => array(0, 1, )
     );
 
     /**
@@ -149,17 +125,14 @@ class CustomerFamilyTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('customer_family');
-        $this->setPhpName('CustomerFamily');
-        $this->setClassName('\\CustomerFamily\\Model\\CustomerFamily');
+        $this->setName('customer_family_order');
+        $this->setPhpName('CustomerFamilyOrder');
+        $this->setClassName('\\CustomerFamily\\Model\\CustomerFamilyOrder');
         $this->setPackage('CustomerFamily.Model');
-        $this->setUseIdGenerator(true);
+        $this->setUseIdGenerator(false);
         // columns
-        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('CODE', 'Code', 'VARCHAR', true, 45, null);
-        $this->addColumn('IS_DEFAULT', 'IsDefault', 'TINYINT', false, null, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+        $this->addForeignPrimaryKey('ORDER_ID', 'OrderId', 'INTEGER' , 'order', 'ID', true, null, null);
+        $this->addForeignKey('CUSTOMER_FAMILY_CODE', 'CustomerFamilyCode', 'VARCHAR', 'customer_family', 'CODE', true, 45, null);
     } // initialize()
 
     /**
@@ -167,36 +140,9 @@ class CustomerFamilyTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('CustomerCustomerFamily', '\\CustomerFamily\\Model\\CustomerCustomerFamily', RelationMap::ONE_TO_MANY, array('id' => 'customer_family_id', ), 'CASCADE', null, 'CustomerCustomerFamilies');
-        $this->addRelation('CustomerFamilyPrice', '\\CustomerFamily\\Model\\CustomerFamilyPrice', RelationMap::ONE_TO_MANY, array('id' => 'customer_family_id', ), 'CASCADE', 'RESTRICT', 'CustomerFamilyPrices');
-        $this->addRelation('CustomerFamilyOrder', '\\CustomerFamily\\Model\\CustomerFamilyOrder', RelationMap::ONE_TO_MANY, array('code' => 'customer_family_code', ), null, 'CASCADE', 'CustomerFamilyOrders');
-        $this->addRelation('CustomerFamilyI18n', '\\CustomerFamily\\Model\\CustomerFamilyI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'CustomerFamilyI18ns');
+        $this->addRelation('Order', '\\CustomerFamily\\Model\\Thelia\\Model\\Order', RelationMap::MANY_TO_ONE, array('order_id' => 'id', ), 'CASCADE', null);
+        $this->addRelation('CustomerFamily', '\\CustomerFamily\\Model\\CustomerFamily', RelationMap::MANY_TO_ONE, array('customer_family_code' => 'code', ), null, 'CASCADE');
     } // buildRelations()
-
-    /**
-     *
-     * Gets the list of behaviors registered for this table
-     *
-     * @return array Associative array (name => parameters) of behaviors
-     */
-    public function getBehaviors()
-    {
-        return array(
-            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
-            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title', 'locale_column' => 'locale', 'locale_length' => '5', 'default_locale' => '', 'locale_alias' => '', ),
-        );
-    } // getBehaviors()
-    /**
-     * Method to invalidate the instance pool of all tables related to customer_family     * by a foreign key with ON DELETE CASCADE
-     */
-    public static function clearRelatedInstancePool()
-    {
-        // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-                CustomerCustomerFamilyTableMap::clearInstancePool();
-                CustomerFamilyPriceTableMap::clearInstancePool();
-                CustomerFamilyI18nTableMap::clearInstancePool();
-            }
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -212,11 +158,11 @@ class CustomerFamilyTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('OrderId', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+        return (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('OrderId', TableMap::TYPE_PHPNAME, $indexType)];
     }
 
     /**
@@ -237,7 +183,7 @@ class CustomerFamilyTableMap extends TableMap
             return (int) $row[
                             $indexType == TableMap::TYPE_NUM
                             ? 0 + $offset
-                            : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
+                            : self::translateFieldName('OrderId', TableMap::TYPE_PHPNAME, $indexType)
                         ];
     }
 
@@ -254,7 +200,7 @@ class CustomerFamilyTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? CustomerFamilyTableMap::CLASS_DEFAULT : CustomerFamilyTableMap::OM_CLASS;
+        return $withPrefix ? CustomerFamilyOrderTableMap::CLASS_DEFAULT : CustomerFamilyOrderTableMap::OM_CLASS;
     }
 
     /**
@@ -268,21 +214,21 @@ class CustomerFamilyTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *         rethrown wrapped into a PropelException.
-     * @return array (CustomerFamily object, last column rank)
+     * @return array (CustomerFamilyOrder object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = CustomerFamilyTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = CustomerFamilyTableMap::getInstanceFromPool($key))) {
+        $key = CustomerFamilyOrderTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = CustomerFamilyOrderTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + CustomerFamilyTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + CustomerFamilyOrderTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = CustomerFamilyTableMap::OM_CLASS;
+            $cls = CustomerFamilyOrderTableMap::OM_CLASS;
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            CustomerFamilyTableMap::addInstanceToPool($obj, $key);
+            CustomerFamilyOrderTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -305,8 +251,8 @@ class CustomerFamilyTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = CustomerFamilyTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = CustomerFamilyTableMap::getInstanceFromPool($key))) {
+            $key = CustomerFamilyOrderTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = CustomerFamilyOrderTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
@@ -315,7 +261,7 @@ class CustomerFamilyTableMap extends TableMap
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                CustomerFamilyTableMap::addInstanceToPool($obj, $key);
+                CustomerFamilyOrderTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -336,17 +282,11 @@ class CustomerFamilyTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(CustomerFamilyTableMap::ID);
-            $criteria->addSelectColumn(CustomerFamilyTableMap::CODE);
-            $criteria->addSelectColumn(CustomerFamilyTableMap::IS_DEFAULT);
-            $criteria->addSelectColumn(CustomerFamilyTableMap::CREATED_AT);
-            $criteria->addSelectColumn(CustomerFamilyTableMap::UPDATED_AT);
+            $criteria->addSelectColumn(CustomerFamilyOrderTableMap::ORDER_ID);
+            $criteria->addSelectColumn(CustomerFamilyOrderTableMap::CUSTOMER_FAMILY_CODE);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.CODE');
-            $criteria->addSelectColumn($alias . '.IS_DEFAULT');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.ORDER_ID');
+            $criteria->addSelectColumn($alias . '.CUSTOMER_FAMILY_CODE');
         }
     }
 
@@ -359,7 +299,7 @@ class CustomerFamilyTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(CustomerFamilyTableMap::DATABASE_NAME)->getTable(CustomerFamilyTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(CustomerFamilyOrderTableMap::DATABASE_NAME)->getTable(CustomerFamilyOrderTableMap::TABLE_NAME);
     }
 
     /**
@@ -367,16 +307,16 @@ class CustomerFamilyTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-      $dbMap = Propel::getServiceContainer()->getDatabaseMap(CustomerFamilyTableMap::DATABASE_NAME);
-      if (!$dbMap->hasTable(CustomerFamilyTableMap::TABLE_NAME)) {
-        $dbMap->addTableObject(new CustomerFamilyTableMap());
+      $dbMap = Propel::getServiceContainer()->getDatabaseMap(CustomerFamilyOrderTableMap::DATABASE_NAME);
+      if (!$dbMap->hasTable(CustomerFamilyOrderTableMap::TABLE_NAME)) {
+        $dbMap->addTableObject(new CustomerFamilyOrderTableMap());
       }
     }
 
     /**
-     * Performs a DELETE on the database, given a CustomerFamily or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a CustomerFamilyOrder or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or CustomerFamily object or primary key or array of primary keys
+     * @param mixed               $values Criteria or CustomerFamilyOrder object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -387,25 +327,25 @@ class CustomerFamilyTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(CustomerFamilyTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(CustomerFamilyOrderTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \CustomerFamily\Model\CustomerFamily) { // it's a model object
+        } elseif ($values instanceof \CustomerFamily\Model\CustomerFamilyOrder) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(CustomerFamilyTableMap::DATABASE_NAME);
-            $criteria->add(CustomerFamilyTableMap::ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(CustomerFamilyOrderTableMap::DATABASE_NAME);
+            $criteria->add(CustomerFamilyOrderTableMap::ORDER_ID, (array) $values, Criteria::IN);
         }
 
-        $query = CustomerFamilyQuery::create()->mergeWith($criteria);
+        $query = CustomerFamilyOrderQuery::create()->mergeWith($criteria);
 
-        if ($values instanceof Criteria) { CustomerFamilyTableMap::clearInstancePool();
+        if ($values instanceof Criteria) { CustomerFamilyOrderTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
-            foreach ((array) $values as $singleval) { CustomerFamilyTableMap::removeInstanceFromPool($singleval);
+            foreach ((array) $values as $singleval) { CustomerFamilyOrderTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -413,20 +353,20 @@ class CustomerFamilyTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the customer_family table.
+     * Deletes all rows from the customer_family_order table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return CustomerFamilyQuery::create()->doDeleteAll($con);
+        return CustomerFamilyOrderQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a CustomerFamily or Criteria object.
+     * Performs an INSERT on the database, given a CustomerFamilyOrder or Criteria object.
      *
-     * @param mixed               $criteria Criteria or CustomerFamily object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or CustomerFamilyOrder object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -435,22 +375,18 @@ class CustomerFamilyTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(CustomerFamilyTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(CustomerFamilyOrderTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from CustomerFamily object
-        }
-
-        if ($criteria->containsKey(CustomerFamilyTableMap::ID) && $criteria->keyContainsValue(CustomerFamilyTableMap::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.CustomerFamilyTableMap::ID.')');
+            $criteria = $criteria->buildCriteria(); // build Criteria from CustomerFamilyOrder object
         }
 
 
         // Set the correct dbName
-        $query = CustomerFamilyQuery::create()->mergeWith($criteria);
+        $query = CustomerFamilyOrderQuery::create()->mergeWith($criteria);
 
         try {
             // use transaction because $criteria could contain info
@@ -466,7 +402,7 @@ class CustomerFamilyTableMap extends TableMap
         return $pk;
     }
 
-} // CustomerFamilyTableMap
+} // CustomerFamilyOrderTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-CustomerFamilyTableMap::buildTableMap();
+CustomerFamilyOrderTableMap::buildTableMap();
