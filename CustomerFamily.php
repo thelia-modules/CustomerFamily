@@ -14,6 +14,7 @@ namespace CustomerFamily;
 
 use CustomerFamily\Model\CustomerFamilyQuery;
 use Propel\Runtime\Connection\ConnectionInterface;
+use Symfony\Component\Finder\Finder;
 use Thelia\Install\Database;
 use Thelia\Module\BaseModule;
 use CustomerFamily\Model\CustomerFamily as CustomerFamilyModel;
@@ -21,6 +22,7 @@ use CustomerFamily\Model\CustomerFamily as CustomerFamilyModel;
 /**
  * Class CustomerFamily
  * @package CustomerFamily
+ * @contributor Etienne Perriere <eperriere@openstudio.fr>
  */
 class CustomerFamily extends BaseModule
 {
@@ -42,22 +44,35 @@ class CustomerFamily extends BaseModule
     public function postActivation(ConnectionInterface $con = null)
     {
         $database = new Database($con);
-
-        try {
-            CustomerFamilyQuery::create()->findOne();
-        } catch (\Exception $e) {
-            $database->insertSql(null, array(__DIR__ . "/Config/thelia.sql"));
-        }
+        $database->insertSql(null, [__DIR__ . "/Config/create.sql"]);
 
         //Generate the 2 defaults customer_family
 
         //Customer
         self::getCustomerFamilyByCode(self::CUSTOMER_FAMILY_PARTICULAR, "Particulier", "fr_FR");
-        self::getCustomerFamilyByCode(self::CUSTOMER_FAMILY_PARTICULAR, "Particular", "en_US");
+        self::getCustomerFamilyByCode(self::CUSTOMER_FAMILY_PARTICULAR, "Private individual", "en_US");
 
         //Professional
         self::getCustomerFamilyByCode(self::CUSTOMER_FAMILY_PROFESSIONAL, "Professionnel", "fr_FR");
         self::getCustomerFamilyByCode(self::CUSTOMER_FAMILY_PROFESSIONAL, "Professional", "en_US");
+    }
+
+    public function update($currentVersion, $newVersion, ConnectionInterface $con = null)
+    {
+        $finder = Finder::create()
+            ->name('*.sql')
+            ->depth(0)
+            ->sortByName()
+            ->in(__DIR__ . DS . 'Config' . DS . 'update');
+
+        $database = new Database($con);
+
+        /** @var \SplFileInfo $file */
+        foreach ($finder as $file) {
+            if (version_compare($currentVersion, $file->getBasename('.sql'), '<')) {
+                $database->insertSql(null, [$file->getPathname()]);
+            }
+        }
     }
 
     /**
@@ -71,6 +86,13 @@ class CustomerFamily extends BaseModule
     {
         if ($title == null) {
             $title = $code;
+        }
+
+        // Set 'particular' as default family
+        if ($code == self::CUSTOMER_FAMILY_PARTICULAR) {
+            $isDefault = 1;
+        } else {
+            $isDefault = 0;
         }
 
         /** @var CustomerFamilyModel $customerFamily */
@@ -87,18 +109,16 @@ class CustomerFamily extends BaseModule
                 $customerF
                     ->setLocale($locale)
                     ->setTitle($title)
-                    ->save()
-                ;
+                    ->save();
             } else {
                 $customerFamily = new CustomerFamilyModel();
                 $customerFamily
                     ->setCode($code)
+                    ->setIsDefault($isDefault)
                     ->setLocale($locale)
                     ->setTitle($title)
-                    ->save()
-                ;
+                    ->save();
             }
-
         }
 
         return $customerFamily;

@@ -28,49 +28,7 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 class CustomerCustomerFamilyLoop extends BaseLoop implements PropelSearchLoopInterface
 {
     /**
-     * @param LoopResult $loopResult
-     *
-     * @return LoopResult
-     */
-    public function parseResults(LoopResult $loopResult)
-    {
-        foreach ($loopResult->getResultDataCollection() as $customerCustomerFamily) {
-            /** @var \CustomerFamily\Model\CustomerCustomerFamily $customerCustomerFamily */
-            $loopResultRow = new LoopResultRow($customerCustomerFamily);
-            $loopResultRow
-                ->set("CUSTOMER_FAMILY_ID", $customerCustomerFamily->getCustomerFamilyId())
-                ->set("CUSTOMER_ID", $customerCustomerFamily->getCustomerId())
-                ->set("SIRET", $customerCustomerFamily->getSiret())
-                ->set("VAT", $customerCustomerFamily->getVat())
-            ;
-
-            $loopResult->addRow($loopResultRow);
-        }
-
-        return $loopResult;
-    }
-
-    /**
      * Definition of loop arguments
-     *
-     * example :
-     *
-     * public function getArgDefinitions()
-     * {
-     *  return new ArgumentCollection(
-     *
-     *       Argument::createIntListTypeArgument('id'),
-     *           new Argument(
-     *           'ref',
-     *           new TypeCollection(
-     *               new Type\AlphaNumStringListType()
-     *           )
-     *       ),
-     *       Argument::createIntListTypeArgument('category'),
-     *       Argument::createBooleanTypeArgument('new'),
-     *       ...
-     *   );
-     * }
      *
      * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
      */
@@ -100,5 +58,28 @@ class CustomerCustomerFamilyLoop extends BaseLoop implements PropelSearchLoopInt
         }
 
         return $search;
+    }
+
+    /**
+     * @param LoopResult $loopResult
+     *
+     * @return LoopResult
+     */
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $customerCustomerFamily) {
+            /** @var \CustomerFamily\Model\CustomerCustomerFamily $customerCustomerFamily */
+            $loopResultRow = new LoopResultRow($customerCustomerFamily);
+            $loopResultRow
+                ->set("CUSTOMER_FAMILY_ID", $customerCustomerFamily->getCustomerFamilyId())
+                ->set("CUSTOMER_ID", $customerCustomerFamily->getCustomerId())
+                ->set("SIRET", $customerCustomerFamily->getSiret())
+                ->set("VAT", $customerCustomerFamily->getVat())
+            ;
+
+            $loopResult->addRow($loopResultRow);
+        }
+
+        return $loopResult;
     }
 }

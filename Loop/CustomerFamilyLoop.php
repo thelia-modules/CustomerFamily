@@ -30,48 +30,7 @@ use Thelia\Type\TypeCollection;
 class CustomerFamilyLoop extends BaseI18nLoop implements PropelSearchLoopInterface
 {
     /**
-     * @param LoopResult $loopResult
-     *
-     * @return LoopResult
-     */
-    public function parseResults(LoopResult $loopResult)
-    {
-        foreach ($loopResult->getResultDataCollection() as $customerFamily) {
-            /** @var \CustomerFamily\Model\CustomerFamily $customerFamily */
-            $loopResultRow = new LoopResultRow($customerFamily);
-            $loopResultRow
-                ->set("CUSTOMER_FAMILY_ID", $customerFamily->getId())
-                ->set("CODE", $customerFamily->getCode())
-                ->set("TITLE_CUSTOMER_FAMILY", $customerFamily->getVirtualColumn('i18n_TITLE'))
-            ;
-
-            $loopResult->addRow($loopResultRow);
-        }
-
-        return $loopResult;
-    }
-
-    /**
      * Definition of loop arguments
-     *
-     * example :
-     *
-     * public function getArgDefinitions()
-     * {
-     *  return new ArgumentCollection(
-     *
-     *       Argument::createIntListTypeArgument('id'),
-     *           new Argument(
-     *           'ref',
-     *           new TypeCollection(
-     *               new Type\AlphaNumStringListType()
-     *           )
-     *       ),
-     *       Argument::createIntListTypeArgument('category'),
-     *       Argument::createBooleanTypeArgument('new'),
-     *       ...
-     *   );
-     * }
      *
      * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
      */
@@ -85,7 +44,8 @@ class CustomerFamilyLoop extends BaseI18nLoop implements PropelSearchLoopInterfa
                     new AlphaNumStringListType()
                 )
             ),
-            Argument::createIntListTypeArgument('exclude_id')
+            Argument::createIntListTypeArgument('exclude_id'),
+            Argument::createBooleanTypeArgument('is_default')
         );
     }
 
@@ -113,6 +73,32 @@ class CustomerFamilyLoop extends BaseI18nLoop implements PropelSearchLoopInterfa
             $search->filterById($excludeId, Criteria::NOT_IN);
         }
 
+        if (null !== $isDefault = $this->getIsDefault()) {
+            $search->filterByIsDefault($isDefault);
+        }
+
         return $search;
+    }
+
+    /**
+     * @param LoopResult $loopResult
+     *
+     * @return LoopResult
+     */
+    public function parseResults(LoopResult $loopResult)
+    {
+        foreach ($loopResult->getResultDataCollection() as $customerFamily) {
+            /** @var \CustomerFamily\Model\CustomerFamily $customerFamily */
+            $loopResultRow = new LoopResultRow($customerFamily);
+            $loopResultRow
+                ->set("CUSTOMER_FAMILY_ID", $customerFamily->getId())
+                ->set("CODE", $customerFamily->getCode())
+                ->set("TITLE_CUSTOMER_FAMILY", $customerFamily->getVirtualColumn('i18n_TITLE'))
+                ->set("IS_DEFAULT", $customerFamily->getIsDefault());
+
+            $loopResult->addRow($loopResultRow);
+        }
+
+        return $loopResult;
     }
 }

@@ -23,11 +23,14 @@ use CustomerFamily\Form\CustomerFamilyUpdateForm;
 use CustomerFamily\Model\CustomerFamilyQuery;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Thelia\Controller\Admin\BaseAdminController;
+use Thelia\Core\HttpFoundation\JsonResponse;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
 use Thelia\Form\CustomerUpdateForm;
+use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\Base\CustomerQuery;
 use Thelia\Model\Customer;
 use Thelia\Tools\URL;
@@ -38,15 +41,18 @@ use Thelia\Tools\URL;
  */
 class CustomerFamilyAdminController extends BaseAdminController
 {
-
-    public function createAction()
+    /**
+     * @param Request $request
+     * @return mixed|\Thelia\Core\HttpFoundation\Response
+     */
+    public function createAction(Request $request)
     {
         if (null !== $response = $this->checkAuth(array(AdminResources::MODULE), array('CustomerFamily'), AccessManager::CREATE)) {
             return $response;
         }
 
         $error = "";
-        $form = new CustomerFamilyCreateForm($this->getRequest());
+        $form = new CustomerFamilyCreateForm($request);
 
         try {
             $formValidate = $this->validateForm($form);
@@ -69,14 +75,19 @@ class CustomerFamilyAdminController extends BaseAdminController
         return self::renderAdminConfig($form, $message, $error);
     }
 
-    public function updateAction($id)
+    /**
+     * @param Request $request
+     * @param $id
+     * @return mixed|\Thelia\Core\HttpFoundation\Response
+     */
+    public function updateAction(Request $request, $id)
     {
         if (null !== $response = $this->checkAuth(array(AdminResources::MODULE), array('CustomerFamily'), AccessManager::UPDATE)) {
             return $response;
         }
 
         $error = "";
-        $form = new CustomerFamilyUpdateForm($this->getRequest());
+        $form = new CustomerFamilyUpdateForm($request);
 
         try {
             $formValidate = $this->validateForm($form);
@@ -105,14 +116,81 @@ class CustomerFamilyAdminController extends BaseAdminController
         return self::renderAdminConfig($form, $message, $error);
     }
 
-    public function deleteAction($id)
+    /**
+     * Update default family
+     * There must be at least one default family
+     *
+     * @return mixed|\Symfony\Component\HttpFoundation\Response|static
+     */
+    public function updateDefaultAction()
+    {
+        if (null !== $response = $this->checkAuth([AdminResources::MODULE], ['CustomerFamily'], AccessManager::UPDATE)) {
+            return $response;
+        }
+
+        $error = null;
+        $ex = null;
+        $form = $this->createForm('customer_family_update_default_form');
+
+        try {
+            $vForm = $this->validateForm($form);
+
+            // Get customer_family to update
+            $customerFamily = CustomerFamilyQuery::create()->findOneById($vForm->get('customer_family_id')->getData());
+
+            // If the customer_family exists
+            if (null !== $customerFamily) {
+                // If the family to update is not already the default one
+                if (!$customerFamily->getIsDefault()) {
+                    // Remove old default family
+                    if (null !== $defaultCustomerFamilies = CustomerFamilyQuery::create()->findByIsDefault(1)) {
+                        /** @var \CustomerFamily\Model\CustomerFamily $defaultCustomerFamily */
+                        foreach ($defaultCustomerFamilies as $defaultCustomerFamily) {
+                            $defaultCustomerFamily
+                                ->setIsDefault(0)
+                                ->save();
+                        }
+                    }
+                    // Save new default family
+                    $customerFamily
+                        ->setIsDefault(1)
+                        ->save();
+                }
+            }
+
+        } catch (FormValidationException $ex) {
+            $error = $this->createStandardFormValidationErrorMessage($ex);
+        } catch (\Exception $ex) {
+            $error = $ex->getMessage();
+        }
+
+        if ($error !== null) {
+            $this->setupFormErrorContext(
+                $this->getTranslator()->trans("Error updating default family", [], CustomerFamily::MODULE_DOMAIN),
+                $error,
+                $form,
+                $ex
+            );
+            return JsonResponse::create(['error'=>$error], 500);
+        }
+
+        return RedirectResponse::create(URL::getInstance()->absoluteUrl("/admin/module/CustomerFamily"));
+
+    }
+
+    /**
+     * @param Request $request
+     * @param $id
+     * @return mixed|\Thelia\Core\HttpFoundation\Response
+     */
+    public function deleteAction(Request $request, $id)
     {
         if (null !== $response = $this->checkAuth(array(AdminResources::MODULE), array('CustomerFamily'), AccessManager::DELETE)) {
             return $response;
         }
 
         $error = "";
-        $form = new CustomerFamilyDeleteForm($this->getRequest());
+        $form = new CustomerFamilyDeleteForm($request);
 
         try {
             $formValidate = $this->validateForm($form);
@@ -144,7 +222,7 @@ class CustomerFamilyAdminController extends BaseAdminController
      * @param BaseForm $form
      * @param string $successMessage
      * @param string $errorMessage
-     * @return \Thelia\Core\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\Response|static
      */
     protected function renderAdminConfig($form, $successMessage, $errorMessage)
     {
@@ -171,16 +249,17 @@ class CustomerFamilyAdminController extends BaseAdminController
     }
 
     /**
+     * @param Request $request
      * @return mixed|\Thelia\Core\HttpFoundation\Response
      */
-    public function customerUpdateAction()
+    public function customerUpdateAction(Request $request)
     {
         if (null !== $response = $this->checkAuth(array(AdminResources::MODULE), array('CustomerFamily'), AccessManager::UPDATE)) {
             return $response;
         }
 
         $error = "";
-        $form = new CustomerCustomerFamilyForm($this->getRequest());
+        $form = new CustomerCustomerFamilyForm($request);
         try {
             $formValidate = $this->validateForm($form);
             $event = new CustomerCustomerFamilyEvent($formValidate->get('customer_id')->getData());
@@ -192,7 +271,7 @@ class CustomerFamilyAdminController extends BaseAdminController
 
             $this->dispatch(CustomerFamilyEvents::CUSTOMER_CUSTOMER_FAMILY_UPDATE, $event);
 
-            $this->redirect(URL::getInstance()->absoluteUrl(
+            $this->generateRedirect(URL::getInstance()->absoluteUrl(
                 '/admin/customer/update?customer_id='.$formValidate->get('customer_id')->getData()
             ));
 
@@ -207,14 +286,14 @@ class CustomerFamilyAdminController extends BaseAdminController
             ->setGeneralError($error);
 
         //Don't forget to fill the Customer form
-        $customerId = $this->getRequest()->request->get('customer_customer_family_form')['customer_id'];
+        $customerId = $request->get('customer_customer_family_form')['customer_id'];
         if (null != $customer = CustomerQuery::create()->findPk($customerId)) {
             $customerForm = $this->hydrateCustomerForm($customer);
             $this->getParserContext()->addForm($customerForm);
         }
 
         return $this->render('customer-edit', array(
-                'customer_id' => $this->getRequest()->request->get('customer_customer_family_form')['customer_id'],
+                'customer_id' => $request->get('customer_customer_family_form')['customer_id'],
                 "order_creation_error" => Translator::getInstance()->trans($error, array(), CustomerFamily::MESSAGE_DOMAIN)
             ));
     }

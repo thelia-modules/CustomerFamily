@@ -58,7 +58,7 @@ class CustomerFamilyTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 4;
+    const NUM_COLUMNS = 5;
 
     /**
      * The number of lazy-loaded columns
@@ -68,7 +68,7 @@ class CustomerFamilyTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 4;
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /**
      * the column name for the ID field
@@ -79,6 +79,11 @@ class CustomerFamilyTableMap extends TableMap
      * the column name for the CODE field
      */
     const CODE = 'customer_family.CODE';
+
+    /**
+     * the column name for the IS_DEFAULT field
+     */
+    const IS_DEFAULT = 'customer_family.IS_DEFAULT';
 
     /**
      * the column name for the CREATED_AT field
@@ -111,12 +116,12 @@ class CustomerFamilyTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Code', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'code', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(CustomerFamilyTableMap::ID, CustomerFamilyTableMap::CODE, CustomerFamilyTableMap::CREATED_AT, CustomerFamilyTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'CODE', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'code', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id', 'Code', 'IsDefault', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'code', 'isDefault', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(CustomerFamilyTableMap::ID, CustomerFamilyTableMap::CODE, CustomerFamilyTableMap::IS_DEFAULT, CustomerFamilyTableMap::CREATED_AT, CustomerFamilyTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'CODE', 'IS_DEFAULT', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'code', 'is_default', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -126,12 +131,12 @@ class CustomerFamilyTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Code' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'code' => 1, 'createdAt' => 2, 'updatedAt' => 3, ),
-        self::TYPE_COLNAME       => array(CustomerFamilyTableMap::ID => 0, CustomerFamilyTableMap::CODE => 1, CustomerFamilyTableMap::CREATED_AT => 2, CustomerFamilyTableMap::UPDATED_AT => 3, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CODE' => 1, 'CREATED_AT' => 2, 'UPDATED_AT' => 3, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'code' => 1, 'created_at' => 2, 'updated_at' => 3, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Code' => 1, 'IsDefault' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'code' => 1, 'isDefault' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
+        self::TYPE_COLNAME       => array(CustomerFamilyTableMap::ID => 0, CustomerFamilyTableMap::CODE => 1, CustomerFamilyTableMap::IS_DEFAULT => 2, CustomerFamilyTableMap::CREATED_AT => 3, CustomerFamilyTableMap::UPDATED_AT => 4, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CODE' => 1, 'IS_DEFAULT' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'code' => 1, 'is_default' => 2, 'created_at' => 3, 'updated_at' => 4, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -152,6 +157,7 @@ class CustomerFamilyTableMap extends TableMap
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('CODE', 'Code', 'VARCHAR', true, 45, null);
+        $this->addColumn('IS_DEFAULT', 'IsDefault', 'TINYINT', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -162,6 +168,8 @@ class CustomerFamilyTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('CustomerCustomerFamily', '\\CustomerFamily\\Model\\CustomerCustomerFamily', RelationMap::ONE_TO_MANY, array('id' => 'customer_family_id', ), 'CASCADE', null, 'CustomerCustomerFamilies');
+        $this->addRelation('CustomerFamilyPrice', '\\CustomerFamily\\Model\\CustomerFamilyPrice', RelationMap::ONE_TO_MANY, array('id' => 'customer_family_id', ), 'CASCADE', 'RESTRICT', 'CustomerFamilyPrices');
+        $this->addRelation('CustomerFamilyOrder', '\\CustomerFamily\\Model\\CustomerFamilyOrder', RelationMap::ONE_TO_MANY, array('code' => 'customer_family_code', ), null, 'CASCADE', 'CustomerFamilyOrders');
         $this->addRelation('CustomerFamilyI18n', '\\CustomerFamily\\Model\\CustomerFamilyI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'CustomerFamilyI18ns');
     } // buildRelations()
 
@@ -186,6 +194,7 @@ class CustomerFamilyTableMap extends TableMap
         // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
                 CustomerCustomerFamilyTableMap::clearInstancePool();
+                CustomerFamilyPriceTableMap::clearInstancePool();
                 CustomerFamilyI18nTableMap::clearInstancePool();
             }
 
@@ -329,11 +338,13 @@ class CustomerFamilyTableMap extends TableMap
         if (null === $alias) {
             $criteria->addSelectColumn(CustomerFamilyTableMap::ID);
             $criteria->addSelectColumn(CustomerFamilyTableMap::CODE);
+            $criteria->addSelectColumn(CustomerFamilyTableMap::IS_DEFAULT);
             $criteria->addSelectColumn(CustomerFamilyTableMap::CREATED_AT);
             $criteria->addSelectColumn(CustomerFamilyTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.CODE');
+            $criteria->addSelectColumn($alias . '.IS_DEFAULT');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }

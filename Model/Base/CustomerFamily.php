@@ -10,6 +10,10 @@ use CustomerFamily\Model\CustomerCustomerFamilyQuery as ChildCustomerCustomerFam
 use CustomerFamily\Model\CustomerFamily as ChildCustomerFamily;
 use CustomerFamily\Model\CustomerFamilyI18n as ChildCustomerFamilyI18n;
 use CustomerFamily\Model\CustomerFamilyI18nQuery as ChildCustomerFamilyI18nQuery;
+use CustomerFamily\Model\CustomerFamilyOrder as ChildCustomerFamilyOrder;
+use CustomerFamily\Model\CustomerFamilyOrderQuery as ChildCustomerFamilyOrderQuery;
+use CustomerFamily\Model\CustomerFamilyPrice as ChildCustomerFamilyPrice;
+use CustomerFamily\Model\CustomerFamilyPriceQuery as ChildCustomerFamilyPriceQuery;
 use CustomerFamily\Model\CustomerFamilyQuery as ChildCustomerFamilyQuery;
 use CustomerFamily\Model\Map\CustomerFamilyTableMap;
 use Propel\Runtime\Propel;
@@ -72,6 +76,12 @@ abstract class CustomerFamily implements ActiveRecordInterface
     protected $code;
 
     /**
+     * The value for the is_default field.
+     * @var        int
+     */
+    protected $is_default;
+
+    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -88,6 +98,18 @@ abstract class CustomerFamily implements ActiveRecordInterface
      */
     protected $collCustomerCustomerFamilies;
     protected $collCustomerCustomerFamiliesPartial;
+
+    /**
+     * @var        ObjectCollection|ChildCustomerFamilyPrice[] Collection to store aggregation of ChildCustomerFamilyPrice objects.
+     */
+    protected $collCustomerFamilyPrices;
+    protected $collCustomerFamilyPricesPartial;
+
+    /**
+     * @var        ObjectCollection|ChildCustomerFamilyOrder[] Collection to store aggregation of ChildCustomerFamilyOrder objects.
+     */
+    protected $collCustomerFamilyOrders;
+    protected $collCustomerFamilyOrdersPartial;
 
     /**
      * @var        ObjectCollection|ChildCustomerFamilyI18n[] Collection to store aggregation of ChildCustomerFamilyI18n objects.
@@ -122,6 +144,18 @@ abstract class CustomerFamily implements ActiveRecordInterface
      * @var ObjectCollection
      */
     protected $customerCustomerFamiliesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $customerFamilyPricesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $customerFamilyOrdersScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -410,6 +444,17 @@ abstract class CustomerFamily implements ActiveRecordInterface
     }
 
     /**
+     * Get the [is_default] column value.
+     *
+     * @return   int
+     */
+    public function getIsDefault()
+    {
+
+        return $this->is_default;
+    }
+
+    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -490,6 +535,27 @@ abstract class CustomerFamily implements ActiveRecordInterface
 
         return $this;
     } // setCode()
+
+    /**
+     * Set the value of [is_default] column.
+     *
+     * @param      int $v new value
+     * @return   \CustomerFamily\Model\CustomerFamily The current object (for fluent API support)
+     */
+    public function setIsDefault($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->is_default !== $v) {
+            $this->is_default = $v;
+            $this->modifiedColumns[CustomerFamilyTableMap::IS_DEFAULT] = true;
+        }
+
+
+        return $this;
+    } // setIsDefault()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -576,13 +642,16 @@ abstract class CustomerFamily implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : CustomerFamilyTableMap::translateFieldName('Code', TableMap::TYPE_PHPNAME, $indexType)];
             $this->code = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : CustomerFamilyTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : CustomerFamilyTableMap::translateFieldName('IsDefault', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->is_default = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CustomerFamilyTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CustomerFamilyTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : CustomerFamilyTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -595,7 +664,7 @@ abstract class CustomerFamily implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 4; // 4 = CustomerFamilyTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 5; // 5 = CustomerFamilyTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \CustomerFamily\Model\CustomerFamily object", 0, $e);
@@ -657,6 +726,10 @@ abstract class CustomerFamily implements ActiveRecordInterface
         if ($deep) {  // also de-associate any related objects?
 
             $this->collCustomerCustomerFamilies = null;
+
+            $this->collCustomerFamilyPrices = null;
+
+            $this->collCustomerFamilyOrders = null;
 
             $this->collCustomerFamilyI18ns = null;
 
@@ -810,6 +883,40 @@ abstract class CustomerFamily implements ActiveRecordInterface
                 }
             }
 
+            if ($this->customerFamilyPricesScheduledForDeletion !== null) {
+                if (!$this->customerFamilyPricesScheduledForDeletion->isEmpty()) {
+                    \CustomerFamily\Model\CustomerFamilyPriceQuery::create()
+                        ->filterByPrimaryKeys($this->customerFamilyPricesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->customerFamilyPricesScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collCustomerFamilyPrices !== null) {
+            foreach ($this->collCustomerFamilyPrices as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->customerFamilyOrdersScheduledForDeletion !== null) {
+                if (!$this->customerFamilyOrdersScheduledForDeletion->isEmpty()) {
+                    \CustomerFamily\Model\CustomerFamilyOrderQuery::create()
+                        ->filterByPrimaryKeys($this->customerFamilyOrdersScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->customerFamilyOrdersScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collCustomerFamilyOrders !== null) {
+            foreach ($this->collCustomerFamilyOrders as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             if ($this->customerFamilyI18nsScheduledForDeletion !== null) {
                 if (!$this->customerFamilyI18nsScheduledForDeletion->isEmpty()) {
                     \CustomerFamily\Model\CustomerFamilyI18nQuery::create()
@@ -859,6 +966,9 @@ abstract class CustomerFamily implements ActiveRecordInterface
         if ($this->isColumnModified(CustomerFamilyTableMap::CODE)) {
             $modifiedColumns[':p' . $index++]  = 'CODE';
         }
+        if ($this->isColumnModified(CustomerFamilyTableMap::IS_DEFAULT)) {
+            $modifiedColumns[':p' . $index++]  = 'IS_DEFAULT';
+        }
         if ($this->isColumnModified(CustomerFamilyTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
@@ -881,6 +991,9 @@ abstract class CustomerFamily implements ActiveRecordInterface
                         break;
                     case 'CODE':
                         $stmt->bindValue($identifier, $this->code, PDO::PARAM_STR);
+                        break;
+                    case 'IS_DEFAULT':
+                        $stmt->bindValue($identifier, $this->is_default, PDO::PARAM_INT);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -957,9 +1070,12 @@ abstract class CustomerFamily implements ActiveRecordInterface
                 return $this->getCode();
                 break;
             case 2:
-                return $this->getCreatedAt();
+                return $this->getIsDefault();
                 break;
             case 3:
+                return $this->getCreatedAt();
+                break;
+            case 4:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -993,8 +1109,9 @@ abstract class CustomerFamily implements ActiveRecordInterface
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getCode(),
-            $keys[2] => $this->getCreatedAt(),
-            $keys[3] => $this->getUpdatedAt(),
+            $keys[2] => $this->getIsDefault(),
+            $keys[3] => $this->getCreatedAt(),
+            $keys[4] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1004,6 +1121,12 @@ abstract class CustomerFamily implements ActiveRecordInterface
         if ($includeForeignObjects) {
             if (null !== $this->collCustomerCustomerFamilies) {
                 $result['CustomerCustomerFamilies'] = $this->collCustomerCustomerFamilies->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collCustomerFamilyPrices) {
+                $result['CustomerFamilyPrices'] = $this->collCustomerFamilyPrices->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collCustomerFamilyOrders) {
+                $result['CustomerFamilyOrders'] = $this->collCustomerFamilyOrders->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collCustomerFamilyI18ns) {
                 $result['CustomerFamilyI18ns'] = $this->collCustomerFamilyI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1049,9 +1172,12 @@ abstract class CustomerFamily implements ActiveRecordInterface
                 $this->setCode($value);
                 break;
             case 2:
-                $this->setCreatedAt($value);
+                $this->setIsDefault($value);
                 break;
             case 3:
+                $this->setCreatedAt($value);
+                break;
+            case 4:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1080,8 +1206,9 @@ abstract class CustomerFamily implements ActiveRecordInterface
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setCode($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setCreatedAt($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setUpdatedAt($arr[$keys[3]]);
+        if (array_key_exists($keys[2], $arr)) $this->setIsDefault($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setUpdatedAt($arr[$keys[4]]);
     }
 
     /**
@@ -1095,6 +1222,7 @@ abstract class CustomerFamily implements ActiveRecordInterface
 
         if ($this->isColumnModified(CustomerFamilyTableMap::ID)) $criteria->add(CustomerFamilyTableMap::ID, $this->id);
         if ($this->isColumnModified(CustomerFamilyTableMap::CODE)) $criteria->add(CustomerFamilyTableMap::CODE, $this->code);
+        if ($this->isColumnModified(CustomerFamilyTableMap::IS_DEFAULT)) $criteria->add(CustomerFamilyTableMap::IS_DEFAULT, $this->is_default);
         if ($this->isColumnModified(CustomerFamilyTableMap::CREATED_AT)) $criteria->add(CustomerFamilyTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(CustomerFamilyTableMap::UPDATED_AT)) $criteria->add(CustomerFamilyTableMap::UPDATED_AT, $this->updated_at);
 
@@ -1161,6 +1289,7 @@ abstract class CustomerFamily implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setCode($this->getCode());
+        $copyObj->setIsDefault($this->getIsDefault());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
 
@@ -1172,6 +1301,18 @@ abstract class CustomerFamily implements ActiveRecordInterface
             foreach ($this->getCustomerCustomerFamilies() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addCustomerCustomerFamily($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getCustomerFamilyPrices() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addCustomerFamilyPrice($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getCustomerFamilyOrders() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addCustomerFamilyOrder($relObj->copy($deepCopy));
                 }
             }
 
@@ -1224,6 +1365,12 @@ abstract class CustomerFamily implements ActiveRecordInterface
     {
         if ('CustomerCustomerFamily' == $relationName) {
             return $this->initCustomerCustomerFamilies();
+        }
+        if ('CustomerFamilyPrice' == $relationName) {
+            return $this->initCustomerFamilyPrices();
+        }
+        if ('CustomerFamilyOrder' == $relationName) {
+            return $this->initCustomerFamilyOrders();
         }
         if ('CustomerFamilyI18n' == $relationName) {
             return $this->initCustomerFamilyI18ns();
@@ -1474,6 +1621,470 @@ abstract class CustomerFamily implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collCustomerFamilyPrices collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addCustomerFamilyPrices()
+     */
+    public function clearCustomerFamilyPrices()
+    {
+        $this->collCustomerFamilyPrices = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collCustomerFamilyPrices collection loaded partially.
+     */
+    public function resetPartialCustomerFamilyPrices($v = true)
+    {
+        $this->collCustomerFamilyPricesPartial = $v;
+    }
+
+    /**
+     * Initializes the collCustomerFamilyPrices collection.
+     *
+     * By default this just sets the collCustomerFamilyPrices collection to an empty array (like clearcollCustomerFamilyPrices());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initCustomerFamilyPrices($overrideExisting = true)
+    {
+        if (null !== $this->collCustomerFamilyPrices && !$overrideExisting) {
+            return;
+        }
+        $this->collCustomerFamilyPrices = new ObjectCollection();
+        $this->collCustomerFamilyPrices->setModel('\CustomerFamily\Model\CustomerFamilyPrice');
+    }
+
+    /**
+     * Gets an array of ChildCustomerFamilyPrice objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildCustomerFamily is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildCustomerFamilyPrice[] List of ChildCustomerFamilyPrice objects
+     * @throws PropelException
+     */
+    public function getCustomerFamilyPrices($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collCustomerFamilyPricesPartial && !$this->isNew();
+        if (null === $this->collCustomerFamilyPrices || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collCustomerFamilyPrices) {
+                // return empty collection
+                $this->initCustomerFamilyPrices();
+            } else {
+                $collCustomerFamilyPrices = ChildCustomerFamilyPriceQuery::create(null, $criteria)
+                    ->filterByCustomerFamily($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collCustomerFamilyPricesPartial && count($collCustomerFamilyPrices)) {
+                        $this->initCustomerFamilyPrices(false);
+
+                        foreach ($collCustomerFamilyPrices as $obj) {
+                            if (false == $this->collCustomerFamilyPrices->contains($obj)) {
+                                $this->collCustomerFamilyPrices->append($obj);
+                            }
+                        }
+
+                        $this->collCustomerFamilyPricesPartial = true;
+                    }
+
+                    reset($collCustomerFamilyPrices);
+
+                    return $collCustomerFamilyPrices;
+                }
+
+                if ($partial && $this->collCustomerFamilyPrices) {
+                    foreach ($this->collCustomerFamilyPrices as $obj) {
+                        if ($obj->isNew()) {
+                            $collCustomerFamilyPrices[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collCustomerFamilyPrices = $collCustomerFamilyPrices;
+                $this->collCustomerFamilyPricesPartial = false;
+            }
+        }
+
+        return $this->collCustomerFamilyPrices;
+    }
+
+    /**
+     * Sets a collection of CustomerFamilyPrice objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $customerFamilyPrices A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildCustomerFamily The current object (for fluent API support)
+     */
+    public function setCustomerFamilyPrices(Collection $customerFamilyPrices, ConnectionInterface $con = null)
+    {
+        $customerFamilyPricesToDelete = $this->getCustomerFamilyPrices(new Criteria(), $con)->diff($customerFamilyPrices);
+
+
+        //since at least one column in the foreign key is at the same time a PK
+        //we can not just set a PK to NULL in the lines below. We have to store
+        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
+        $this->customerFamilyPricesScheduledForDeletion = clone $customerFamilyPricesToDelete;
+
+        foreach ($customerFamilyPricesToDelete as $customerFamilyPriceRemoved) {
+            $customerFamilyPriceRemoved->setCustomerFamily(null);
+        }
+
+        $this->collCustomerFamilyPrices = null;
+        foreach ($customerFamilyPrices as $customerFamilyPrice) {
+            $this->addCustomerFamilyPrice($customerFamilyPrice);
+        }
+
+        $this->collCustomerFamilyPrices = $customerFamilyPrices;
+        $this->collCustomerFamilyPricesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related CustomerFamilyPrice objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related CustomerFamilyPrice objects.
+     * @throws PropelException
+     */
+    public function countCustomerFamilyPrices(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collCustomerFamilyPricesPartial && !$this->isNew();
+        if (null === $this->collCustomerFamilyPrices || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collCustomerFamilyPrices) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getCustomerFamilyPrices());
+            }
+
+            $query = ChildCustomerFamilyPriceQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByCustomerFamily($this)
+                ->count($con);
+        }
+
+        return count($this->collCustomerFamilyPrices);
+    }
+
+    /**
+     * Method called to associate a ChildCustomerFamilyPrice object to this object
+     * through the ChildCustomerFamilyPrice foreign key attribute.
+     *
+     * @param    ChildCustomerFamilyPrice $l ChildCustomerFamilyPrice
+     * @return   \CustomerFamily\Model\CustomerFamily The current object (for fluent API support)
+     */
+    public function addCustomerFamilyPrice(ChildCustomerFamilyPrice $l)
+    {
+        if ($this->collCustomerFamilyPrices === null) {
+            $this->initCustomerFamilyPrices();
+            $this->collCustomerFamilyPricesPartial = true;
+        }
+
+        if (!in_array($l, $this->collCustomerFamilyPrices->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddCustomerFamilyPrice($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param CustomerFamilyPrice $customerFamilyPrice The customerFamilyPrice object to add.
+     */
+    protected function doAddCustomerFamilyPrice($customerFamilyPrice)
+    {
+        $this->collCustomerFamilyPrices[]= $customerFamilyPrice;
+        $customerFamilyPrice->setCustomerFamily($this);
+    }
+
+    /**
+     * @param  CustomerFamilyPrice $customerFamilyPrice The customerFamilyPrice object to remove.
+     * @return ChildCustomerFamily The current object (for fluent API support)
+     */
+    public function removeCustomerFamilyPrice($customerFamilyPrice)
+    {
+        if ($this->getCustomerFamilyPrices()->contains($customerFamilyPrice)) {
+            $this->collCustomerFamilyPrices->remove($this->collCustomerFamilyPrices->search($customerFamilyPrice));
+            if (null === $this->customerFamilyPricesScheduledForDeletion) {
+                $this->customerFamilyPricesScheduledForDeletion = clone $this->collCustomerFamilyPrices;
+                $this->customerFamilyPricesScheduledForDeletion->clear();
+            }
+            $this->customerFamilyPricesScheduledForDeletion[]= clone $customerFamilyPrice;
+            $customerFamilyPrice->setCustomerFamily(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Clears out the collCustomerFamilyOrders collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addCustomerFamilyOrders()
+     */
+    public function clearCustomerFamilyOrders()
+    {
+        $this->collCustomerFamilyOrders = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collCustomerFamilyOrders collection loaded partially.
+     */
+    public function resetPartialCustomerFamilyOrders($v = true)
+    {
+        $this->collCustomerFamilyOrdersPartial = $v;
+    }
+
+    /**
+     * Initializes the collCustomerFamilyOrders collection.
+     *
+     * By default this just sets the collCustomerFamilyOrders collection to an empty array (like clearcollCustomerFamilyOrders());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initCustomerFamilyOrders($overrideExisting = true)
+    {
+        if (null !== $this->collCustomerFamilyOrders && !$overrideExisting) {
+            return;
+        }
+        $this->collCustomerFamilyOrders = new ObjectCollection();
+        $this->collCustomerFamilyOrders->setModel('\CustomerFamily\Model\CustomerFamilyOrder');
+    }
+
+    /**
+     * Gets an array of ChildCustomerFamilyOrder objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildCustomerFamily is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildCustomerFamilyOrder[] List of ChildCustomerFamilyOrder objects
+     * @throws PropelException
+     */
+    public function getCustomerFamilyOrders($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collCustomerFamilyOrdersPartial && !$this->isNew();
+        if (null === $this->collCustomerFamilyOrders || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collCustomerFamilyOrders) {
+                // return empty collection
+                $this->initCustomerFamilyOrders();
+            } else {
+                $collCustomerFamilyOrders = ChildCustomerFamilyOrderQuery::create(null, $criteria)
+                    ->filterByCustomerFamily($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collCustomerFamilyOrdersPartial && count($collCustomerFamilyOrders)) {
+                        $this->initCustomerFamilyOrders(false);
+
+                        foreach ($collCustomerFamilyOrders as $obj) {
+                            if (false == $this->collCustomerFamilyOrders->contains($obj)) {
+                                $this->collCustomerFamilyOrders->append($obj);
+                            }
+                        }
+
+                        $this->collCustomerFamilyOrdersPartial = true;
+                    }
+
+                    reset($collCustomerFamilyOrders);
+
+                    return $collCustomerFamilyOrders;
+                }
+
+                if ($partial && $this->collCustomerFamilyOrders) {
+                    foreach ($this->collCustomerFamilyOrders as $obj) {
+                        if ($obj->isNew()) {
+                            $collCustomerFamilyOrders[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collCustomerFamilyOrders = $collCustomerFamilyOrders;
+                $this->collCustomerFamilyOrdersPartial = false;
+            }
+        }
+
+        return $this->collCustomerFamilyOrders;
+    }
+
+    /**
+     * Sets a collection of CustomerFamilyOrder objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $customerFamilyOrders A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildCustomerFamily The current object (for fluent API support)
+     */
+    public function setCustomerFamilyOrders(Collection $customerFamilyOrders, ConnectionInterface $con = null)
+    {
+        $customerFamilyOrdersToDelete = $this->getCustomerFamilyOrders(new Criteria(), $con)->diff($customerFamilyOrders);
+
+
+        $this->customerFamilyOrdersScheduledForDeletion = $customerFamilyOrdersToDelete;
+
+        foreach ($customerFamilyOrdersToDelete as $customerFamilyOrderRemoved) {
+            $customerFamilyOrderRemoved->setCustomerFamily(null);
+        }
+
+        $this->collCustomerFamilyOrders = null;
+        foreach ($customerFamilyOrders as $customerFamilyOrder) {
+            $this->addCustomerFamilyOrder($customerFamilyOrder);
+        }
+
+        $this->collCustomerFamilyOrders = $customerFamilyOrders;
+        $this->collCustomerFamilyOrdersPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related CustomerFamilyOrder objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related CustomerFamilyOrder objects.
+     * @throws PropelException
+     */
+    public function countCustomerFamilyOrders(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collCustomerFamilyOrdersPartial && !$this->isNew();
+        if (null === $this->collCustomerFamilyOrders || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collCustomerFamilyOrders) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getCustomerFamilyOrders());
+            }
+
+            $query = ChildCustomerFamilyOrderQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByCustomerFamily($this)
+                ->count($con);
+        }
+
+        return count($this->collCustomerFamilyOrders);
+    }
+
+    /**
+     * Method called to associate a ChildCustomerFamilyOrder object to this object
+     * through the ChildCustomerFamilyOrder foreign key attribute.
+     *
+     * @param    ChildCustomerFamilyOrder $l ChildCustomerFamilyOrder
+     * @return   \CustomerFamily\Model\CustomerFamily The current object (for fluent API support)
+     */
+    public function addCustomerFamilyOrder(ChildCustomerFamilyOrder $l)
+    {
+        if ($this->collCustomerFamilyOrders === null) {
+            $this->initCustomerFamilyOrders();
+            $this->collCustomerFamilyOrdersPartial = true;
+        }
+
+        if (!in_array($l, $this->collCustomerFamilyOrders->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddCustomerFamilyOrder($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param CustomerFamilyOrder $customerFamilyOrder The customerFamilyOrder object to add.
+     */
+    protected function doAddCustomerFamilyOrder($customerFamilyOrder)
+    {
+        $this->collCustomerFamilyOrders[]= $customerFamilyOrder;
+        $customerFamilyOrder->setCustomerFamily($this);
+    }
+
+    /**
+     * @param  CustomerFamilyOrder $customerFamilyOrder The customerFamilyOrder object to remove.
+     * @return ChildCustomerFamily The current object (for fluent API support)
+     */
+    public function removeCustomerFamilyOrder($customerFamilyOrder)
+    {
+        if ($this->getCustomerFamilyOrders()->contains($customerFamilyOrder)) {
+            $this->collCustomerFamilyOrders->remove($this->collCustomerFamilyOrders->search($customerFamilyOrder));
+            if (null === $this->customerFamilyOrdersScheduledForDeletion) {
+                $this->customerFamilyOrdersScheduledForDeletion = clone $this->collCustomerFamilyOrders;
+                $this->customerFamilyOrdersScheduledForDeletion->clear();
+            }
+            $this->customerFamilyOrdersScheduledForDeletion[]= clone $customerFamilyOrder;
+            $customerFamilyOrder->setCustomerFamily(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this CustomerFamily is new, it will return
+     * an empty collection; or if this CustomerFamily has previously
+     * been saved, it will retrieve related CustomerFamilyOrders from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in CustomerFamily.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildCustomerFamilyOrder[] List of ChildCustomerFamilyOrder objects
+     */
+    public function getCustomerFamilyOrdersJoinOrder($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildCustomerFamilyOrderQuery::create(null, $criteria);
+        $query->joinWith('Order', $joinBehavior);
+
+        return $this->getCustomerFamilyOrders($query, $con);
+    }
+
+    /**
      * Clears out the collCustomerFamilyI18ns collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -1705,6 +2316,7 @@ abstract class CustomerFamily implements ActiveRecordInterface
     {
         $this->id = null;
         $this->code = null;
+        $this->is_default = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
@@ -1731,6 +2343,16 @@ abstract class CustomerFamily implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collCustomerFamilyPrices) {
+                foreach ($this->collCustomerFamilyPrices as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collCustomerFamilyOrders) {
+                foreach ($this->collCustomerFamilyOrders as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collCustomerFamilyI18ns) {
                 foreach ($this->collCustomerFamilyI18ns as $o) {
                     $o->clearAllReferences($deep);
@@ -1743,6 +2365,8 @@ abstract class CustomerFamily implements ActiveRecordInterface
         $this->currentTranslations = null;
 
         $this->collCustomerCustomerFamilies = null;
+        $this->collCustomerFamilyPrices = null;
+        $this->collCustomerFamilyOrders = null;
         $this->collCustomerFamilyI18ns = null;
     }
 

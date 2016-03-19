@@ -7,24 +7,31 @@
 	<loops>
 		<loop name="customer_family" class="CustomerFamily\Loop\CustomerFamilyLoop" />
 		<loop name="customer_customer_family" class="CustomerFamily\Loop\CustomerCustomerFamilyLoop" />
+		<loop name="customer_family_price" class="CustomerFamily\Loop\CustomerFamilyPriceLoop" />
+		<loop name="product_purchase_price" class="CustomerFamily\Loop\ProductPurchasePriceLoop" />
+		<loop name="customer_family_pse_calculated_prices" class="CustomerFamily\Loop\CustomerFamilyProductPriceLoop" />
 	</loops>
 
 	<forms>
 		<form name="customer.family.create.form" class="CustomerFamily\Form\CustomerFamilyCreateForm" />
 		<form name="customer.family.update.form" class="CustomerFamily\Form\CustomerFamilyUpdateForm" />
+		<form name="customer_family_update_default_form" class="CustomerFamily\Form\CustomerFamilyUpdateDefaultForm" />
 		<form name="customer.family.delete.form" class="CustomerFamily\Form\CustomerFamilyDeleteForm" />
 
 		<form name="customer.customer.family.form" class="CustomerFamily\Form\CustomerCustomerFamilyForm" />
+
+		<form name="customer_family_price_update" class="CustomerFamily\Form\CustomerFamilyPriceForm" />
 	</forms>
 
-	<commands>
-		<!--
-		<command class="MyModule\Command\MySuperCommand" />
-		-->
-	</commands>
-
 	<services>
-		<service id="customer.family.action" class="CustomerFamily\EventListeners\CustomerFamilyListener" scope="request">
+		<!-- Service class -->
+		<service id="customer.family.service" class="CustomerFamily\Service\CustomerFamilyService">
+			<argument type="service" id="thelia.securityContext"/>
+			<argument type="service" id="thelia.taxEngine"/>
+		</service>
+
+		<!-- Main listener -->
+		<service id="customer.family.action" class="CustomerFamily\EventListeners\CustomerFamilyListener">
 			<argument type="service" id="request" />
 			<argument type="service" id="thelia.parser" />
 			<argument type="service" id="mailer"/>
@@ -32,40 +39,90 @@
 		</service>
 
 		<!-- Listening to create and update customer form actions -->
-		<service id="customer.family.form.action" class="CustomerFamily\EventListeners\CustomerFamilyFormListener" scope="request">
+		<service id="customer.family.form.action" class="CustomerFamily\EventListeners\CustomerFamilyFormListener">
 			<argument type="service" id="request" />
 			<tag name="kernel.event_subscriber"/>
+		</service>
+
+		<!-- Listening produt price edition -->
+		<service id="customer.family.product.purchase.price" class="CustomerFamily\EventListeners\PseExtendPriceFormListener">
+			<tag name="kernel.event_subscriber"/>
+		</service>
+
+		<!-- Listening PSE price edition -->
+		<service id="customer.family.pse.purchase.price" class="CustomerFamily\EventListeners\ProductExtendPriceFormListener">
+			<tag name="kernel.event_subscriber"/>
+		</service>
+
+		<!-- Listening product loop creation -->
+		<service id="customer.family.price" class="CustomerFamily\EventListeners\CustomerFamilyPriceListener">
+			<argument type="service" id="thelia.securityContext"/>
+			<argument type="service" id="thelia.taxEngine"/>
+			<argument type="service" id="customer.family.service"/>
+			<tag name="kernel.event_subscriber"/>
+		</service>
+
+		<!-- Listening cart product adding & loop creation -->
+		<service id="customer.family.cart" class="CustomerFamily\EventListeners\CustomerFamilyCartListener">
+			<argument type="service" id="customer.family.service"/>
+			<tag name="kernel.event_subscriber"/>
+		</service>
+
+		<!-- Listening order creation -->
+		<service id="customer.family.order" class="CustomerFamily\EventListeners\CustomerFamilyOrderListener">
+            <argument type="service" id="customer.family.service"/>
+			<tag name="kernel.event_subscriber"/>
+		</service>
+
+		<!-- Listening customer login / logout tu update cart items prices -->
+		<service id="customer.family.customer.connection" class="CustomerFamily\EventListeners\CustomerFamilyCustomerConnectionListener">
+            <argument type="service" id="request" />
+            <argument type="service" id="customer.family.service"/>
+            <tag name="kernel.event_subscriber"/>
 		</service>
 	</services>
 
 	<hooks>
+		<!-- Global hook class -->
+		<hook id="customer.family.hook" class="CustomerFamily\Hook\CustomerFamilyHook">
+			<tag name="hook.event_listener" event="main.head-css" type="back" method="onAddCss"/>
+		</hook>
+
+		<!-- Admin configuration templates -->
+		<hook id="customer.family.config">
+			<tag name="hook.event_listener" event="module.configuration" type="back" templates="render:module_configuration.html" />
+			<tag name="hook.event_listener" event="module.config-js" type="back" templates="render:assets/js/module-config-js.html" />
+		</hook>
+
+		<!-- Admin customer edit -->
+		<hook id="customer.family.customer.edit">
+			<tag name="hook.event_listener" event="customer.edit" type="back" templates="render:customer-edit.html" />
+		</hook>
+
+		<!-- Admin product edit purchase price -->
+		<hook id="customer.family.product.price.edit" class="CustomerFamily\Hook\CustomerFamilyProductPriceHook">
+			<tag name="hook.event_listener" event="product.combinations-row" type="back" method="onPsePriceEdit" />
+			<tag name="hook.event_listener" event="product.details-pricing-form" type="back" templates="render:product-details-pricing.html" />
+			<tag name="hook.event_listener" event="product.details-promotion-form" type="back" templates="render:product-details-promo.html" />
+			<tag name="hook.event_listener" event="product.edit-js" type="back" templates="render:assets/js/product-edit-js.html" />
+		</hook>
+
 		<!-- Additional fields for the register form -->
-		<hook id="customer.family.register.form" class="CustomerFamily\Hook\CustomerFamilyRegisterFormHook" scope="request">
+		<hook id="customer.family.register.form" class="CustomerFamily\Hook\CustomerFamilyRegisterFormHook">
 			<tag name="hook.event_listener" event="register.form-bottom" type="front" method="onRegisterFormBottom"/>
 			<tag name="hook.event_listener" event="register.after-javascript-include" type="front" method="onRegisterAfterJSInclude"/>
 		</hook>
 
-		<!-- Showing customer family informations -->
-		<hook id="customer.family.account.display" class="CustomerFamily\Hook\CustomerFamilyAccountDisplayHook" scope="request">
+		<!-- Showing customer family information -->
+		<hook id="customer.family.account.display" class="CustomerFamily\Hook\CustomerFamilyAccountDisplayHook">
 			<tag name="hook.event_listener" event="account.additional" type="front" method="onAccountAdditional"/>
 		</hook>
 
 		<!-- Additional fields for the account update form -->
-		<hook id="customer.family.update.form" class="CustomerFamily\Hook\CustomerFamilyUpdateFormHook" scope="request">
+		<hook id="customer.family.update.form" class="CustomerFamily\Hook\CustomerFamilyUpdateFormHook">
 			<tag name="hook.event_listener" event="account-update.form-bottom" type="front" method="onAccountUpdateFormBottom"/>
 			<tag name="hook.event_listener" event="account-update.after-javascript-include" type="front" method="onAccountUpdateAfterJSInclude"/>
 		</hook>
 	</hooks>
 
-	<!--
-	<exports>
-
-	</exports>
-	-->
-
-	<!--
-	<imports>
-
-	</imports>
-	-->
 </config>

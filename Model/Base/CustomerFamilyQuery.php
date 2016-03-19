@@ -24,11 +24,13 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildCustomerFamilyQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildCustomerFamilyQuery orderByCode($order = Criteria::ASC) Order by the code column
+ * @method     ChildCustomerFamilyQuery orderByIsDefault($order = Criteria::ASC) Order by the is_default column
  * @method     ChildCustomerFamilyQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildCustomerFamilyQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildCustomerFamilyQuery groupById() Group by the id column
  * @method     ChildCustomerFamilyQuery groupByCode() Group by the code column
+ * @method     ChildCustomerFamilyQuery groupByIsDefault() Group by the is_default column
  * @method     ChildCustomerFamilyQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildCustomerFamilyQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -40,6 +42,14 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildCustomerFamilyQuery rightJoinCustomerCustomerFamily($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CustomerCustomerFamily relation
  * @method     ChildCustomerFamilyQuery innerJoinCustomerCustomerFamily($relationAlias = null) Adds a INNER JOIN clause to the query using the CustomerCustomerFamily relation
  *
+ * @method     ChildCustomerFamilyQuery leftJoinCustomerFamilyPrice($relationAlias = null) Adds a LEFT JOIN clause to the query using the CustomerFamilyPrice relation
+ * @method     ChildCustomerFamilyQuery rightJoinCustomerFamilyPrice($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CustomerFamilyPrice relation
+ * @method     ChildCustomerFamilyQuery innerJoinCustomerFamilyPrice($relationAlias = null) Adds a INNER JOIN clause to the query using the CustomerFamilyPrice relation
+ *
+ * @method     ChildCustomerFamilyQuery leftJoinCustomerFamilyOrder($relationAlias = null) Adds a LEFT JOIN clause to the query using the CustomerFamilyOrder relation
+ * @method     ChildCustomerFamilyQuery rightJoinCustomerFamilyOrder($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CustomerFamilyOrder relation
+ * @method     ChildCustomerFamilyQuery innerJoinCustomerFamilyOrder($relationAlias = null) Adds a INNER JOIN clause to the query using the CustomerFamilyOrder relation
+ *
  * @method     ChildCustomerFamilyQuery leftJoinCustomerFamilyI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the CustomerFamilyI18n relation
  * @method     ChildCustomerFamilyQuery rightJoinCustomerFamilyI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CustomerFamilyI18n relation
  * @method     ChildCustomerFamilyQuery innerJoinCustomerFamilyI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the CustomerFamilyI18n relation
@@ -49,11 +59,13 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildCustomerFamily findOneById(int $id) Return the first ChildCustomerFamily filtered by the id column
  * @method     ChildCustomerFamily findOneByCode(string $code) Return the first ChildCustomerFamily filtered by the code column
+ * @method     ChildCustomerFamily findOneByIsDefault(int $is_default) Return the first ChildCustomerFamily filtered by the is_default column
  * @method     ChildCustomerFamily findOneByCreatedAt(string $created_at) Return the first ChildCustomerFamily filtered by the created_at column
  * @method     ChildCustomerFamily findOneByUpdatedAt(string $updated_at) Return the first ChildCustomerFamily filtered by the updated_at column
  *
  * @method     array findById(int $id) Return ChildCustomerFamily objects filtered by the id column
  * @method     array findByCode(string $code) Return ChildCustomerFamily objects filtered by the code column
+ * @method     array findByIsDefault(int $is_default) Return ChildCustomerFamily objects filtered by the is_default column
  * @method     array findByCreatedAt(string $created_at) Return ChildCustomerFamily objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildCustomerFamily objects filtered by the updated_at column
  *
@@ -144,7 +156,7 @@ abstract class CustomerFamilyQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, CODE, CREATED_AT, UPDATED_AT FROM customer_family WHERE ID = :p0';
+        $sql = 'SELECT ID, CODE, IS_DEFAULT, CREATED_AT, UPDATED_AT FROM customer_family WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -304,6 +316,47 @@ abstract class CustomerFamilyQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the is_default column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByIsDefault(1234); // WHERE is_default = 1234
+     * $query->filterByIsDefault(array(12, 34)); // WHERE is_default IN (12, 34)
+     * $query->filterByIsDefault(array('min' => 12)); // WHERE is_default > 12
+     * </code>
+     *
+     * @param     mixed $isDefault The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCustomerFamilyQuery The current query, for fluid interface
+     */
+    public function filterByIsDefault($isDefault = null, $comparison = null)
+    {
+        if (is_array($isDefault)) {
+            $useMinMax = false;
+            if (isset($isDefault['min'])) {
+                $this->addUsingAlias(CustomerFamilyTableMap::IS_DEFAULT, $isDefault['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($isDefault['max'])) {
+                $this->addUsingAlias(CustomerFamilyTableMap::IS_DEFAULT, $isDefault['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(CustomerFamilyTableMap::IS_DEFAULT, $isDefault, $comparison);
+    }
+
+    /**
      * Filter the query on the created_at column
      *
      * Example usage:
@@ -460,6 +513,152 @@ abstract class CustomerFamilyQuery extends ModelCriteria
         return $this
             ->joinCustomerCustomerFamily($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'CustomerCustomerFamily', '\CustomerFamily\Model\CustomerCustomerFamilyQuery');
+    }
+
+    /**
+     * Filter the query by a related \CustomerFamily\Model\CustomerFamilyPrice object
+     *
+     * @param \CustomerFamily\Model\CustomerFamilyPrice|ObjectCollection $customerFamilyPrice  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCustomerFamilyQuery The current query, for fluid interface
+     */
+    public function filterByCustomerFamilyPrice($customerFamilyPrice, $comparison = null)
+    {
+        if ($customerFamilyPrice instanceof \CustomerFamily\Model\CustomerFamilyPrice) {
+            return $this
+                ->addUsingAlias(CustomerFamilyTableMap::ID, $customerFamilyPrice->getCustomerFamilyId(), $comparison);
+        } elseif ($customerFamilyPrice instanceof ObjectCollection) {
+            return $this
+                ->useCustomerFamilyPriceQuery()
+                ->filterByPrimaryKeys($customerFamilyPrice->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByCustomerFamilyPrice() only accepts arguments of type \CustomerFamily\Model\CustomerFamilyPrice or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the CustomerFamilyPrice relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildCustomerFamilyQuery The current query, for fluid interface
+     */
+    public function joinCustomerFamilyPrice($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('CustomerFamilyPrice');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'CustomerFamilyPrice');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the CustomerFamilyPrice relation CustomerFamilyPrice object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \CustomerFamily\Model\CustomerFamilyPriceQuery A secondary query class using the current class as primary query
+     */
+    public function useCustomerFamilyPriceQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinCustomerFamilyPrice($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CustomerFamilyPrice', '\CustomerFamily\Model\CustomerFamilyPriceQuery');
+    }
+
+    /**
+     * Filter the query by a related \CustomerFamily\Model\CustomerFamilyOrder object
+     *
+     * @param \CustomerFamily\Model\CustomerFamilyOrder|ObjectCollection $customerFamilyOrder  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCustomerFamilyQuery The current query, for fluid interface
+     */
+    public function filterByCustomerFamilyOrder($customerFamilyOrder, $comparison = null)
+    {
+        if ($customerFamilyOrder instanceof \CustomerFamily\Model\CustomerFamilyOrder) {
+            return $this
+                ->addUsingAlias(CustomerFamilyTableMap::CODE, $customerFamilyOrder->getCustomerFamilyCode(), $comparison);
+        } elseif ($customerFamilyOrder instanceof ObjectCollection) {
+            return $this
+                ->useCustomerFamilyOrderQuery()
+                ->filterByPrimaryKeys($customerFamilyOrder->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByCustomerFamilyOrder() only accepts arguments of type \CustomerFamily\Model\CustomerFamilyOrder or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the CustomerFamilyOrder relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildCustomerFamilyQuery The current query, for fluid interface
+     */
+    public function joinCustomerFamilyOrder($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('CustomerFamilyOrder');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'CustomerFamilyOrder');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the CustomerFamilyOrder relation CustomerFamilyOrder object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \CustomerFamily\Model\CustomerFamilyOrderQuery A secondary query class using the current class as primary query
+     */
+    public function useCustomerFamilyOrderQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinCustomerFamilyOrder($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CustomerFamilyOrder', '\CustomerFamily\Model\CustomerFamilyOrderQuery');
     }
 
     /**
