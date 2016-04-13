@@ -122,9 +122,10 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
                     /** @var \Thelia\Model\Product | \Thelia\Model\ProductSaleElements $product */
                     $product = $loopResultRow->model;
 
-                    if (!empty($product->getVirtualColumn('CUSTOMER_FAMILY_PRICE')) ||
-                        !empty($product->getVirtualColumn('CUSTOMER_FAMILY_PROMO_PRICE'))
-                    ) {
+                    $customerFamilyPriceVirtualColumn = $product->getVirtualColumn('CUSTOMER_FAMILY_PRICE');
+                    $customerFamilyPromoPriceVirtualColumn = $product->getVirtualColumn('CUSTOMER_FAMILY_PROMO_PRICE');
+
+                    if (!empty($customerFamilyPriceVirtualColumn) || !empty($customerFamilyPromoPriceVirtualColumn)) {
                         $this->changeProductPrice(
                             $product,
                             $loopResultRow,
@@ -211,7 +212,8 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
         $taxedPromoPrice = $loopResultRow->get('TAXED_PROMO_PRICE');
 
         // Replace price
-        if (!empty($product->getVirtualColumn('CUSTOMER_FAMILY_PRICE'))) {
+        $customerFamilyPriceVirtualColumn = $product->getVirtualColumn('CUSTOMER_FAMILY_PRICE');
+        if (!empty($customerFamilyPriceVirtualColumn)) {
             $price = round($product->getVirtualColumn('CUSTOMER_FAMILY_PRICE'), 2);
 
             // If the customer has permanent discount, apply it
@@ -242,7 +244,8 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
         }
 
         // Replace promo price
-        if (!empty($product->getVirtualColumn('CUSTOMER_FAMILY_PROMO_PRICE'))) {
+        $customerFamilyPromoPriceVirtualColumn = $product->getVirtualColumn('CUSTOMER_FAMILY_PROMO_PRICE');
+        if (!empty($customerFamilyPromoPriceVirtualColumn)) {
             $promoPrice = round($product->getVirtualColumn('CUSTOMER_FAMILY_PROMO_PRICE'), 2);
 
             // If the customer has permanent discount, apply it
