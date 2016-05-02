@@ -50,7 +50,6 @@ class PseExtendPriceFormListener implements EventSubscriberInterface
                     'allow_delete' => true,
                     'options' => [
                         'constraints' => [
-                            new Constraints\NotBlank,
                             new Constraints\GreaterThanOrEqual(['value' => 0])
                         ]
                     ]
