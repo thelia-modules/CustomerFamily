@@ -16,35 +16,38 @@
         <td colspan="7"></td>
     {/form_field}
 </tr>
-{loop type='customer_family' name='customer_family_loop_prices'}
-    {loop type='customer_family_pse_calculated_prices' name='calculated_prices' pse_id=$pseId customer_family_id=$CUSTOMER_FAMILY_ID}
-        <tr></tr>
-        <tr class="purchase-price">
-            <!-- Customer family title -->
-            <td>
-                {intl l='Price for:' d='customerfamily.bo.default'} <a href="{url path="/admin/module/CustomerFamily"}">{$TITLE_CUSTOMER_FAMILY}</a>
-            </td>
-            <!-- Calculated standard price -->
-            <td colspan="2" class="text-right">
-                <span class="glyphicon glyphicon-arrow-right pull-left" aria-hidden="true"></span>
-                <b>{intl l='Calculated price' d='customerfamily.bo.default'}</b>
-            </td>
-            <td>
-                <input class="input-sm text-right form-control" type="text" value="{$CALCULATED_PRICE}" disabled />
-            </td>
-            <td>
-                <input class="input-sm text-right form-control" type="text" value="{$CALCULATED_TAXED_PRICE}" disabled />
-            </td>
-            <!-- Calculated promo price -->
-            <td colspan="4" class="text-right">
-                <b>{intl l='Calculated promo price' d='customerfamily.bo.default'}</b>
-            </td>
-            <td>
-                <input class="input-sm text-right form-control" type="text" value="{$CALCULATED_PROMO_PRICE}" disabled />
-            </td>
-            <td>
-                <input class="input-sm text-right form-control" type="text" value="{$CALCULATED_TAXED_PROMO_PRICE}" disabled />
-            </td>
-        </tr>
+
+{if $purchasePrice !== ''}
+    {loop type='customer_family' name='customer_family_loop_prices'}
+        {loop type='customer_family_pse_calculated_prices' name='calculated_prices' pse_id=$pseId customer_family_id=$CUSTOMER_FAMILY_ID}
+            <tr></tr>
+            <tr class="purchase-price">
+                <!-- Customer family title -->
+                <td>
+                    {intl l='Price for:' d='customerfamily.bo.default'} <a href="{url path="/admin/module/CustomerFamily"}">{$TITLE_CUSTOMER_FAMILY}</a>
+                </td>
+                <!-- Calculated standard price -->
+                <td colspan="2" class="text-right">
+                    <span class="glyphicon glyphicon-arrow-right pull-left" aria-hidden="true"></span>
+                    <b>{intl l='Calculated price' d='customerfamily.bo.default'}</b>
+                </td>
+                <td>
+                    <input class="input-sm text-right form-control" type="text" value="{$CALCULATED_PRICE}" disabled />
+                </td>
+                <td>
+                    <input class="input-sm text-right form-control" type="text" value="{$CALCULATED_TAXED_PRICE}" disabled />
+                </td>
+                <!-- Calculated promo price -->
+                <td colspan="4" class="text-right">
+                    <b>{intl l='Calculated promo price' d='customerfamily.bo.default'}</b>
+                </td>
+                <td>
+                    <input class="input-sm text-right form-control" type="text" value="{$CALCULATED_PROMO_PRICE}" disabled />
+                </td>
+                <td>
+                    <input class="input-sm text-right form-control" type="text" value="{$CALCULATED_TAXED_PROMO_PRICE}" disabled />
+                </td>
+            </tr>
+        {/loop}
     {/loop}
-{/loop}
+{/if}
