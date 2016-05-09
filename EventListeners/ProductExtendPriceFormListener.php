@@ -47,7 +47,6 @@ class ProductExtendPriceFormListener implements EventSubscriberInterface
                 'number',
                 [
                     'constraints' => [
-                        new Constraints\NotBlank,
                         new Constraints\GreaterThanOrEqual(['value' => 0])
                     ]
                 ]

@@ -13,6 +13,7 @@
         </div>
     {/form_field}
 
+{if $purchasePrice !== ''}
     {loop type='customer_family' name='customer_family_loop_prices'}
         {loop type='customer_family_pse_calculated_prices' name='calculated_prices' pse_id=$PRODUCT_SALE_ELEMENT customer_family_id=$CUSTOMER_FAMILY_ID currency_id=$edit_currency_id}
             <div class="form-group">
@@ -47,4 +48,5 @@
             </div>
         {/loop}
     {/loop}
+{/if}
 {/loop}
