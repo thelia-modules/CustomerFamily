@@ -1,6 +1,7 @@
 <?php
 
 return array(
+    '(need specific integration)' => '(nécessite une intégration spécifique)',
     'Action' => 'Action',
     'Add' => 'Ajouter',
     'An error occured' => 'Une erreur est survenue',
@@ -17,6 +18,7 @@ return array(
     'Do you really want to delete this customer family ?' => 'Voulez-vous vraiment supprimer cette famille de clients ?',
     'Edit' => 'Éditer',
     'Edit information in %lng' => 'Information d\'édition en %lng',
+    'Enter here the product purchase price in %title' => 'Indiquez ici le prix d\'achat HT en %title',
     'Equation: ( ( product_purchase_price + fix_amount_1 ) x factor ) + fix_amount_2' => 'Equation : ( ( prix_d_achat + montant_fixe_1 ) x facteur ) + montant_fixe_2',
     'Factor' => 'Facteur',
     'Families' => 'Familles',
@@ -32,6 +34,7 @@ return array(
     'Price for:' => 'Prix pour :',
     'Prices definition' => 'Définition des prix',
     'Promo' => 'Promo',
+    'Purchase price' => 'Prix d\'achat',
     'Purchase price (w/o taxes)' => 'Prix d\'achat HT',
     'Save' => 'Enregistrer',
     'Show taxes' => 'Afficher le prix taxé',
@@ -39,5 +42,4 @@ return array(
     'Update' => 'Mettre à jour',
     'Use equation' => 'Utiliser l\'équation',
     'Yes' => 'Oui',
-    '(need specific integration)' => '(nécessite une intégration spécifique)'
 );

@@ -63,7 +63,7 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
     {
         return array(
             TheliaEvents::FORM_AFTER_BUILD.'.'.self::THELIA_CUSTOMER_CREATE_FORM_NAME => array('addCustomerFamilyFieldsForRegister', 128),
-            TheliaEvents::FORM_AFTER_BUILD.'.'.self::THELIA_ACCOUNT_UPDATE_FORM_NAME  => array('addCustomerFamilyFieldsForUpdate',   128),
+            TheliaEvents::FORM_AFTER_BUILD.'.'.self::THELIA_ACCOUNT_UPDATE_FORM_NAME  => array('addCustomerFamilyFieldsForUpdate', 128),
         );
     }
 
@@ -231,6 +231,7 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
             $context->addViolation(self::trans('The customer family is not valid'));
         }
     }
+
 
     /**
      * Utility for translations

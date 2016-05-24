@@ -7,10 +7,10 @@
     <descriptive locale="fr_FR">
         <title>Famille de clients</title>
     </descriptive>
-    <version>1.3.4</version>
+    <version>1.3.5</version>
     <author>
-        <name>Guillaume Barral</name>
-        <email>gbarral@openstudio.fr</email>
+        <name>Guillaume Barral / Etienne Perriere</name>
+        <email>gbarral@openstudio.fr / eperriere@openstudio.fr</email>
     </author>
     <type>classic</type>
     <thelia>2.3.0</thelia>

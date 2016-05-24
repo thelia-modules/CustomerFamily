@@ -44,7 +44,13 @@
 			<tag name="kernel.event_subscriber"/>
 		</service>
 
-		<!-- Listening produt price edition -->
+		<!-- Listening product creation -->
+		<service id="customer.family.product.creation" class="CustomerFamily\EventListeners\ProductCreationFormListener">
+			<argument type="service" id="request" />
+			<tag name="kernel.event_subscriber"/>
+		</service>
+
+		<!-- Listening product price edition -->
 		<service id="customer.family.product.purchase.price" class="CustomerFamily\EventListeners\PseExtendPriceFormListener">
 			<tag name="kernel.event_subscriber"/>
 		</service>
@@ -92,11 +98,17 @@
 		<hook id="customer.family.config">
 			<tag name="hook.event_listener" event="module.configuration" type="back" templates="render:module_configuration.html" />
 			<tag name="hook.event_listener" event="module.config-js" type="back" templates="render:assets/js/module-config-js.html" />
+			<tag name="hook.event_listener" event="categories.js" type="back" templates="js:assets/js/product-creation-price.js" />
 		</hook>
 
 		<!-- Admin customer edit -->
 		<hook id="customer.family.customer.edit">
 			<tag name="hook.event_listener" event="customer.edit" type="back" templates="render:customer-edit.html" />
+		</hook>
+
+		<!-- Admin product creation -->
+		<hook id="customer.family.product.create">
+			<tag name="hook.event_listener" event="product.create-form" type="back" templates="render:product-create-form.html"/>
 		</hook>
 
 		<!-- Admin product edit purchase price -->

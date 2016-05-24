@@ -12,6 +12,7 @@ return array(
     'Invalid locale' => 'Langue invalide',
     'Locale' => 'Langue',
     'My customer family' => 'Ma famille de clients',
+    'Purchase price' => 'Prix d\'achat',
     'Siret number' => 'Numéro de SIRET',
     'This field can\'t be empty' => 'Ce champs ne peut pas être vide',
     'Title' => 'Nom',
