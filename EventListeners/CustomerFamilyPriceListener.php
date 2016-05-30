@@ -278,9 +278,9 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
         // If current row is a product
         if ($product instanceof Product) {
             $loopResultRow
-                ->set("BEST_PRICE", $promoPrice < $price ? $promoPrice : $price)
-                ->set("BEST_PRICE_TAX", $promoPriceTax < $priceTax ? $promoPriceTax : $priceTax)
-                ->set("BEST_TAXED_PRICE", $taxedPromoPrice < $taxedPrice ? $taxedPromoPrice : $taxedPrice);
+                ->set("BEST_PRICE", $product->getVirtualColumn('is_promo') ? $promoPrice : $price)
+                ->set("BEST_PRICE_TAX", $product->getVirtualColumn('is_promo') ? $promoPriceTax : $priceTax)
+                ->set("BEST_TAXED_PRICE", $product->getVirtualColumn('is_promo') ? $taxedPromoPrice : $taxedPrice);
         }
     }
 }
