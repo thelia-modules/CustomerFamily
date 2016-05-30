@@ -108,7 +108,7 @@ class CustomerFamilyService
             $currencyId = Currency::getDefaultCurrency()->getId();
         }
 
-        if (null !== $productPurchasePrice = $this->getPseProductPurchasePrice($pse->getId(), $currencyId)) {
+        if (null !== $productPurchasePrice = $this->getPseProductPurchasePrice($pse->getId(), $currencyId)->getPurchasePrice()) {
             // Initialize prices
             $price = $taxedPrice = $promoPrice = $taxedPromoPrice = null;
 
@@ -116,7 +116,7 @@ class CustomerFamilyService
             if (null !== $customerFamilyPrice = $this->getCustomerFamilyPrice($customerFamilyId, 0, 1)) {
                 // Calculate price
                 $price = round(
-                    ($productPurchasePrice->getPurchasePrice() + $customerFamilyPrice->getAmountAddedBefore())
+                    ($productPurchasePrice + $customerFamilyPrice->getAmountAddedBefore())
                     * $customerFamilyPrice->getMultiplicationCoefficient()
                     + $customerFamilyPrice->getAmountAddedAfter(),
                     2
@@ -136,7 +136,7 @@ class CustomerFamilyService
             if (null !== $customerFamilyPromoPrice = $this->getCustomerFamilyPrice($customerFamilyId, 1, 1)) {
                 // Calculate promo price
                 $promoPrice = round(
-                    ($productPurchasePrice->getPurchasePrice() + $customerFamilyPromoPrice->getAmountAddedBefore())
+                    ($productPurchasePrice + $customerFamilyPromoPrice->getAmountAddedBefore())
                     * $customerFamilyPromoPrice->getMultiplicationCoefficient()
                     + $customerFamilyPromoPrice->getAmountAddedAfter(),
                     2
