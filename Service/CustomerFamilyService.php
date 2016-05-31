@@ -108,56 +108,59 @@ class CustomerFamilyService
             $currencyId = Currency::getDefaultCurrency()->getId();
         }
 
-        if (null !== $productPurchasePrice = $this->getPseProductPurchasePrice($pse->getId(), $currencyId)->getPurchasePrice()) {
-            // Initialize prices
-            $price = $taxedPrice = $promoPrice = $taxedPromoPrice = null;
+        // If the purchase price & its price exist
+        if (null !== $productPurchasePrice = $this->getPseProductPurchasePrice($pse->getId(), $currencyId)) {
+            if (null !== $productPurchasePricePrice = $productPurchasePrice->getPurchasePrice()) {
+                // Initialize prices
+                $price = $taxedPrice = $promoPrice = $taxedPromoPrice = null;
 
-            // Standard price
-            if (null !== $customerFamilyPrice = $this->getCustomerFamilyPrice($customerFamilyId, 0, 1)) {
-                // Calculate price
-                $price = round(
-                    ($productPurchasePrice + $customerFamilyPrice->getAmountAddedBefore())
-                    * $customerFamilyPrice->getMultiplicationCoefficient()
-                    + $customerFamilyPrice->getAmountAddedAfter(),
-                    2
-                );
+                // Standard price
+                if (null !== $customerFamilyPrice = $this->getCustomerFamilyPrice($customerFamilyId, 0, 1)) {
+                    // Calculate price
+                    $price = round(
+                        ($productPurchasePrice->getPurchasePrice() + $customerFamilyPrice->getAmountAddedBefore())
+                        * $customerFamilyPrice->getMultiplicationCoefficient()
+                        + $customerFamilyPrice->getAmountAddedAfter(),
+                        2
+                    );
 
-                $pse->setVirtualColumn('CUSTOMER_FAMILY_PRICE', $price);
+                    $pse->setVirtualColumn('CUSTOMER_FAMILY_PRICE', $price);
 
-                // Tax
-                try {
-                    $taxedPrice = $pse->getTaxedPrice($taxCountry, 'CUSTOMER_FAMILY_PRICE');
-                } catch (TaxEngineException $e) {
-                    $taxedPrice = null;
+                    // Tax
+                    try {
+                        $taxedPrice = $pse->getTaxedPrice($taxCountry, 'CUSTOMER_FAMILY_PRICE');
+                    } catch (TaxEngineException $e) {
+                        $taxedPrice = null;
+                    }
                 }
-            }
 
-            // Promo price
-            if (null !== $customerFamilyPromoPrice = $this->getCustomerFamilyPrice($customerFamilyId, 1, 1)) {
-                // Calculate promo price
-                $promoPrice = round(
-                    ($productPurchasePrice + $customerFamilyPromoPrice->getAmountAddedBefore())
-                    * $customerFamilyPromoPrice->getMultiplicationCoefficient()
-                    + $customerFamilyPromoPrice->getAmountAddedAfter(),
-                    2
-                );
+                // Promo price
+                if (null !== $customerFamilyPromoPrice = $this->getCustomerFamilyPrice($customerFamilyId, 1, 1)) {
+                    // Calculate promo price
+                    $promoPrice = round(
+                        ($productPurchasePrice->getPurchasePrice() + $customerFamilyPromoPrice->getAmountAddedBefore())
+                        * $customerFamilyPromoPrice->getMultiplicationCoefficient()
+                        + $customerFamilyPromoPrice->getAmountAddedAfter(),
+                        2
+                    );
 
-                $pse->setVirtualColumn('CUSTOMER_FAMILY_PROMO_PRICE', $promoPrice);
+                    $pse->setVirtualColumn('CUSTOMER_FAMILY_PROMO_PRICE', $promoPrice);
 
-                // Tax
-                try {
-                    $taxedPromoPrice = $pse->getTaxedPrice($taxCountry, 'CUSTOMER_FAMILY_PROMO_PRICE');
-                } catch (TaxEngineException $e) {
-                    $taxedPromoPrice = null;
+                    // Tax
+                    try {
+                        $taxedPromoPrice = $pse->getTaxedPrice($taxCountry, 'CUSTOMER_FAMILY_PROMO_PRICE');
+                    } catch (TaxEngineException $e) {
+                        $taxedPromoPrice = null;
+                    }
                 }
-            }
 
-            return [
-                'price' => $price,
-                'taxedPrice' => $taxedPrice,
-                'promoPrice' => $promoPrice,
-                'taxedPromoPrice' => $taxedPromoPrice
-            ];
+                return [
+                    'price' => $price,
+                    'taxedPrice' => $taxedPrice,
+                    'promoPrice' => $promoPrice,
+                    'taxedPromoPrice' => $taxedPromoPrice
+                ];
+            }
         }
 
         return null;
