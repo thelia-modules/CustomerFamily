@@ -2,12 +2,12 @@
 <module>
     <fullnamespace>CustomerFamily\CustomerFamily</fullnamespace>
     <descriptive locale="en_US">
-        <title>Customer Family & Purchase Price</title>
+        <title>Customer Family and Purchase Price</title>
     </descriptive>
     <descriptive locale="fr_FR">
         <title>Famille de clients et prix d'achat</title>
     </descriptive>
-    <version>1.3.7</version>
+    <version>1.3.8</version>
     <author>
         <name>Guillaume Barral / Etienne Perriere</name>
         <email>gbarral@openstudio.fr / eperriere@openstudio.fr</email>

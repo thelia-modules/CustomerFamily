@@ -28,6 +28,7 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
 {
     /** 'thelia_customer_create' is the name of the form used to create Customers (Thelia\Form\CustomerCreateForm). */
     const THELIA_CUSTOMER_CREATE_FORM_NAME = 'thelia_customer_create';
+    const THELIA_ADMIN_CUSTOMER_CREATE_FORM_NAME = 'thelia_customer_create';
 
     /**
      * 'thelia_customer_profile_update' is the name of the form used to update accounts
@@ -63,6 +64,7 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
     {
         return array(
             TheliaEvents::FORM_AFTER_BUILD.'.'.self::THELIA_CUSTOMER_CREATE_FORM_NAME => array('addCustomerFamilyFieldsForRegister', 128),
+            TheliaEvents::FORM_AFTER_BUILD.'.'.self::THELIA_ADMIN_CUSTOMER_CREATE_FORM_NAME => array('addCustomerFamilyFieldsForRegister', 128),
             TheliaEvents::FORM_AFTER_BUILD.'.'.self::THELIA_ACCOUNT_UPDATE_FORM_NAME  => array('addCustomerFamilyFieldsForUpdate', 128),
         );
     }
@@ -89,9 +91,15 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
                 'choice',
                 array(
                     'constraints' => array(
-                        new Constraints\Callback(array('methods' => array(
-                            array($this, 'checkCustomerFamily')
-                        ))),
+                        new Constraints\Callback(
+                            array(
+                                'methods' => array(
+                                    array(
+                                        $this, 'checkCustomerFamily'
+                                    )
+                                )
+                            )
+                        ),
                         new Constraints\NotBlank(),
                     ),
                     'choices' => $customerFamilyChoices,
