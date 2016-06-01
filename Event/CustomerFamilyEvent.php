@@ -36,10 +36,13 @@ class CustomerFamilyEvent extends ActionEvent
 
     /**
      * @param CustomerFamily $customerFamily
+     * @return $this
      */
     public function setCustomerFamily(CustomerFamily $customerFamily)
     {
         $this->customerFamily = $customerFamily;
+
+        return $this;
     }
 
     /**
@@ -68,10 +71,13 @@ class CustomerFamilyEvent extends ActionEvent
 
     /**
      * @param string $code
+     * @return $this
      */
     public function setCode($code)
     {
         $this->customerFamily->setCode($code);
+
+        return $this;
     }
 
     /**
@@ -92,6 +98,7 @@ class CustomerFamilyEvent extends ActionEvent
     /**
      * @param $title
      * @param null $locale
+     * @return $this
      */
     public function setTitle($title, $locale = null)
     {
@@ -101,6 +108,8 @@ class CustomerFamilyEvent extends ActionEvent
 
         $this->customerFamily->setLocale($locale);
         $this->customerFamily->setTitle($title);
+
+        return $this;
     }
 
     /**

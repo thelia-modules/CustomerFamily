@@ -13,7 +13,10 @@
 namespace CustomerFamily\Loop;
 
 use CustomerFamily\Model\CustomerCustomerFamilyQuery;
+use CustomerFamily\Model\Map\CustomerCustomerFamilyTableMap;
+use CustomerFamily\Model\Map\CustomerFamilyTableMap;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -36,7 +39,8 @@ class CustomerCustomerFamilyLoop extends BaseLoop implements PropelSearchLoopInt
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('customer_id'),
-            Argument::createIntListTypeArgument('customer_family_id')
+            Argument::createIntListTypeArgument('customer_family_id'),
+            Argument::createAnyTypeArgument('customer_family_code')
         );
     }
 
@@ -55,6 +59,17 @@ class CustomerCustomerFamilyLoop extends BaseLoop implements PropelSearchLoopInt
 
         if (null !== $customerFamilyId = $this->getCustomerFamilyId()) {
             $search->filterByCustomerFamilyId($customerFamilyId, Criteria::IN);
+        }
+
+        if (null !== $customerFamilyCode = $this->getCustomerFamilyCode()) {
+            $join =  new Join(
+                CustomerCustomerFamilyTableMap::CUSTOMER_FAMILY_ID,
+                CustomerFamilyTableMap::ID,
+                Criteria::INNER_JOIN
+            );
+
+            $search->addJoinObject($join, "customer_family_join")
+                ->addJoinCondition("customer_family_join", CustomerFamilyTableMap::CODE." = '$customerFamilyCode'");
         }
 
         return $search;
