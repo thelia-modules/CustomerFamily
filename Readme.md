@@ -69,7 +69,7 @@ This loop returns client families
 
 ### customer_customer_family
 
-This loop returns customer family for specific customer
+This loop returns customer family for specific customer or inverse
 
 #### Input arguments
 
@@ -77,6 +77,7 @@ This loop returns customer family for specific customer
 |---      |---         |--- |
 |**customer_id** | customer id | 1.0
 |**customer_family_id** | family id | 1.0
+|**customer_family_code** | family code | 1.3.10
 
 #### Output values
 
