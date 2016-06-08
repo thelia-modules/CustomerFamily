@@ -1,4 +1,4 @@
-{loop type='product' name='product_default_pse_promo_loop' id=$product_id}
+{loop type='product' name='product_default_pse_promo_loop' id=$product_id visible='*' backend_context=1}
     {loop type="product_purchase_price" name="product_purchase_price_loop" pse_id=$PRODUCT_SALE_ELEMENT currency_id=$edit_currency_id}
         {assign var="purchasePrice" value=$PURCHASE_PRICE}
     {/loop}
