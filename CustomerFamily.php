@@ -43,8 +43,13 @@ class CustomerFamily extends BaseModule
      */
     public function postActivation(ConnectionInterface $con = null)
     {
-        $database = new Database($con);
-        $database->insertSql(null, [__DIR__ . "/Config/create.sql"]);
+
+        try {
+            CustomerFamilyQuery::create()->findOne();
+        } catch (\Exception $e) {
+            $database = new Database($con);
+            $database->insertSql(null, [__DIR__ . "/Config/thelia.sql"]);
+        }
 
         //Generate the 2 defaults customer_family
 
@@ -98,7 +103,7 @@ class CustomerFamily extends BaseModule
         /** @var CustomerFamilyModel $customerFamily */
         if (null == $customerFamily = CustomerFamilyQuery::create()
                 ->useCustomerFamilyI18nQuery()
-                    ->filterByLocale($locale)
+                ->filterByLocale($locale)
                 ->endUse()
                 ->filterByCode($code)
                 ->findOne()

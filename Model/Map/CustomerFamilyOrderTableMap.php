@@ -76,9 +76,9 @@ class CustomerFamilyOrderTableMap extends TableMap
     const ORDER_ID = 'customer_family_order.ORDER_ID';
 
     /**
-     * the column name for the CUSTOMER_FAMILY_CODE field
+     * the column name for the CUSTOMER_FAMILY_ID field
      */
-    const CUSTOMER_FAMILY_CODE = 'customer_family_order.CUSTOMER_FAMILY_CODE';
+    const CUSTOMER_FAMILY_ID = 'customer_family_order.CUSTOMER_FAMILY_ID';
 
     /**
      * The default string format for model objects of the related table
@@ -92,11 +92,11 @@ class CustomerFamilyOrderTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('OrderId', 'CustomerFamilyCode', ),
-        self::TYPE_STUDLYPHPNAME => array('orderId', 'customerFamilyCode', ),
-        self::TYPE_COLNAME       => array(CustomerFamilyOrderTableMap::ORDER_ID, CustomerFamilyOrderTableMap::CUSTOMER_FAMILY_CODE, ),
-        self::TYPE_RAW_COLNAME   => array('ORDER_ID', 'CUSTOMER_FAMILY_CODE', ),
-        self::TYPE_FIELDNAME     => array('order_id', 'customer_family_code', ),
+        self::TYPE_PHPNAME       => array('OrderId', 'CustomerFamilyId', ),
+        self::TYPE_STUDLYPHPNAME => array('orderId', 'customerFamilyId', ),
+        self::TYPE_COLNAME       => array(CustomerFamilyOrderTableMap::ORDER_ID, CustomerFamilyOrderTableMap::CUSTOMER_FAMILY_ID, ),
+        self::TYPE_RAW_COLNAME   => array('ORDER_ID', 'CUSTOMER_FAMILY_ID', ),
+        self::TYPE_FIELDNAME     => array('order_id', 'customer_family_id', ),
         self::TYPE_NUM           => array(0, 1, )
     );
 
@@ -107,11 +107,11 @@ class CustomerFamilyOrderTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('OrderId' => 0, 'CustomerFamilyCode' => 1, ),
-        self::TYPE_STUDLYPHPNAME => array('orderId' => 0, 'customerFamilyCode' => 1, ),
-        self::TYPE_COLNAME       => array(CustomerFamilyOrderTableMap::ORDER_ID => 0, CustomerFamilyOrderTableMap::CUSTOMER_FAMILY_CODE => 1, ),
-        self::TYPE_RAW_COLNAME   => array('ORDER_ID' => 0, 'CUSTOMER_FAMILY_CODE' => 1, ),
-        self::TYPE_FIELDNAME     => array('order_id' => 0, 'customer_family_code' => 1, ),
+        self::TYPE_PHPNAME       => array('OrderId' => 0, 'CustomerFamilyId' => 1, ),
+        self::TYPE_STUDLYPHPNAME => array('orderId' => 0, 'customerFamilyId' => 1, ),
+        self::TYPE_COLNAME       => array(CustomerFamilyOrderTableMap::ORDER_ID => 0, CustomerFamilyOrderTableMap::CUSTOMER_FAMILY_ID => 1, ),
+        self::TYPE_RAW_COLNAME   => array('ORDER_ID' => 0, 'CUSTOMER_FAMILY_ID' => 1, ),
+        self::TYPE_FIELDNAME     => array('order_id' => 0, 'customer_family_id' => 1, ),
         self::TYPE_NUM           => array(0, 1, )
     );
 
@@ -132,7 +132,7 @@ class CustomerFamilyOrderTableMap extends TableMap
         $this->setUseIdGenerator(false);
         // columns
         $this->addForeignPrimaryKey('ORDER_ID', 'OrderId', 'INTEGER' , 'order', 'ID', true, null, null);
-        $this->addForeignKey('CUSTOMER_FAMILY_CODE', 'CustomerFamilyCode', 'VARCHAR', 'customer_family', 'CODE', true, 45, null);
+        $this->addForeignKey('CUSTOMER_FAMILY_ID', 'CustomerFamilyId', 'INTEGER', 'customer_family', 'ID', true, null, null);
     } // initialize()
 
     /**
@@ -141,7 +141,7 @@ class CustomerFamilyOrderTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('Order', '\\CustomerFamily\\Model\\Thelia\\Model\\Order', RelationMap::MANY_TO_ONE, array('order_id' => 'id', ), 'CASCADE', null);
-        $this->addRelation('CustomerFamily', '\\CustomerFamily\\Model\\CustomerFamily', RelationMap::MANY_TO_ONE, array('customer_family_code' => 'code', ), null, 'CASCADE');
+        $this->addRelation('CustomerFamily', '\\CustomerFamily\\Model\\CustomerFamily', RelationMap::MANY_TO_ONE, array('customer_family_id' => 'id', ), null, 'CASCADE');
     } // buildRelations()
 
     /**
@@ -283,10 +283,10 @@ class CustomerFamilyOrderTableMap extends TableMap
     {
         if (null === $alias) {
             $criteria->addSelectColumn(CustomerFamilyOrderTableMap::ORDER_ID);
-            $criteria->addSelectColumn(CustomerFamilyOrderTableMap::CUSTOMER_FAMILY_CODE);
+            $criteria->addSelectColumn(CustomerFamilyOrderTableMap::CUSTOMER_FAMILY_ID);
         } else {
             $criteria->addSelectColumn($alias . '.ORDER_ID');
-            $criteria->addSelectColumn($alias . '.CUSTOMER_FAMILY_CODE');
+            $criteria->addSelectColumn($alias . '.CUSTOMER_FAMILY_ID');
         }
     }
 

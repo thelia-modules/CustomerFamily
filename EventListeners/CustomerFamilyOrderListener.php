@@ -92,7 +92,7 @@ class CustomerFamilyOrderListener implements EventSubscriberInterface
 
         (new CustomerFamilyOrder())
             ->setOrderId($orderEvent->getOrder()->getId())
-            ->setCustomerFamilyCode($customerFamily->getCode())
+            ->setCustomerFamilyId($customerFamily->getId())
             ->save();
     }
 }

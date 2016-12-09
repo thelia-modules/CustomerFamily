@@ -169,7 +169,7 @@ class CustomerFamilyTableMap extends TableMap
     {
         $this->addRelation('CustomerCustomerFamily', '\\CustomerFamily\\Model\\CustomerCustomerFamily', RelationMap::ONE_TO_MANY, array('id' => 'customer_family_id', ), 'CASCADE', null, 'CustomerCustomerFamilies');
         $this->addRelation('CustomerFamilyPrice', '\\CustomerFamily\\Model\\CustomerFamilyPrice', RelationMap::ONE_TO_MANY, array('id' => 'customer_family_id', ), 'CASCADE', 'RESTRICT', 'CustomerFamilyPrices');
-        $this->addRelation('CustomerFamilyOrder', '\\CustomerFamily\\Model\\CustomerFamilyOrder', RelationMap::ONE_TO_MANY, array('code' => 'customer_family_code', ), null, 'CASCADE', 'CustomerFamilyOrders');
+        $this->addRelation('CustomerFamilyOrder', '\\CustomerFamily\\Model\\CustomerFamilyOrder', RelationMap::ONE_TO_MANY, array('id' => 'customer_family_id', ), null, 'CASCADE', 'CustomerFamilyOrders');
         $this->addRelation('CustomerFamilyI18n', '\\CustomerFamily\\Model\\CustomerFamilyI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'CustomerFamilyI18ns');
     } // buildRelations()
 

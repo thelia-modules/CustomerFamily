@@ -600,7 +600,7 @@ abstract class CustomerFamilyQuery extends ModelCriteria
     {
         if ($customerFamilyOrder instanceof \CustomerFamily\Model\CustomerFamilyOrder) {
             return $this
-                ->addUsingAlias(CustomerFamilyTableMap::CODE, $customerFamilyOrder->getCustomerFamilyCode(), $comparison);
+                ->addUsingAlias(CustomerFamilyTableMap::ID, $customerFamilyOrder->getCustomerFamilyId(), $comparison);
         } elseif ($customerFamilyOrder instanceof ObjectCollection) {
             return $this
                 ->useCustomerFamilyOrderQuery()

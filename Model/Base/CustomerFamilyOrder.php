@@ -62,10 +62,10 @@ abstract class CustomerFamilyOrder implements ActiveRecordInterface
     protected $order_id;
 
     /**
-     * The value for the customer_family_code field.
-     * @var        string
+     * The value for the customer_family_id field.
+     * @var        int
      */
-    protected $customer_family_code;
+    protected $customer_family_id;
 
     /**
      * @var        Order
@@ -355,14 +355,14 @@ abstract class CustomerFamilyOrder implements ActiveRecordInterface
     }
 
     /**
-     * Get the [customer_family_code] column value.
+     * Get the [customer_family_id] column value.
      *
-     * @return   string
+     * @return   int
      */
-    public function getCustomerFamilyCode()
+    public function getCustomerFamilyId()
     {
 
-        return $this->customer_family_code;
+        return $this->customer_family_id;
     }
 
     /**
@@ -391,29 +391,29 @@ abstract class CustomerFamilyOrder implements ActiveRecordInterface
     } // setOrderId()
 
     /**
-     * Set the value of [customer_family_code] column.
+     * Set the value of [customer_family_id] column.
      *
-     * @param      string $v new value
+     * @param      int $v new value
      * @return   \CustomerFamily\Model\CustomerFamilyOrder The current object (for fluent API support)
      */
-    public function setCustomerFamilyCode($v)
+    public function setCustomerFamilyId($v)
     {
         if ($v !== null) {
-            $v = (string) $v;
+            $v = (int) $v;
         }
 
-        if ($this->customer_family_code !== $v) {
-            $this->customer_family_code = $v;
-            $this->modifiedColumns[CustomerFamilyOrderTableMap::CUSTOMER_FAMILY_CODE] = true;
+        if ($this->customer_family_id !== $v) {
+            $this->customer_family_id = $v;
+            $this->modifiedColumns[CustomerFamilyOrderTableMap::CUSTOMER_FAMILY_ID] = true;
         }
 
-        if ($this->aCustomerFamily !== null && $this->aCustomerFamily->getCode() !== $v) {
+        if ($this->aCustomerFamily !== null && $this->aCustomerFamily->getId() !== $v) {
             $this->aCustomerFamily = null;
         }
 
 
         return $this;
-    } // setCustomerFamilyCode()
+    } // setCustomerFamilyId()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -455,8 +455,8 @@ abstract class CustomerFamilyOrder implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : CustomerFamilyOrderTableMap::translateFieldName('OrderId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->order_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : CustomerFamilyOrderTableMap::translateFieldName('CustomerFamilyCode', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->customer_family_code = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : CustomerFamilyOrderTableMap::translateFieldName('CustomerFamilyId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->customer_family_id = (null !== $col) ? (int) $col : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -490,7 +490,7 @@ abstract class CustomerFamilyOrder implements ActiveRecordInterface
         if ($this->aOrder !== null && $this->order_id !== $this->aOrder->getId()) {
             $this->aOrder = null;
         }
-        if ($this->aCustomerFamily !== null && $this->customer_family_code !== $this->aCustomerFamily->getCode()) {
+        if ($this->aCustomerFamily !== null && $this->customer_family_id !== $this->aCustomerFamily->getId()) {
             $this->aCustomerFamily = null;
         }
     } // ensureConsistency
@@ -700,8 +700,8 @@ abstract class CustomerFamilyOrder implements ActiveRecordInterface
         if ($this->isColumnModified(CustomerFamilyOrderTableMap::ORDER_ID)) {
             $modifiedColumns[':p' . $index++]  = 'ORDER_ID';
         }
-        if ($this->isColumnModified(CustomerFamilyOrderTableMap::CUSTOMER_FAMILY_CODE)) {
-            $modifiedColumns[':p' . $index++]  = 'CUSTOMER_FAMILY_CODE';
+        if ($this->isColumnModified(CustomerFamilyOrderTableMap::CUSTOMER_FAMILY_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'CUSTOMER_FAMILY_ID';
         }
 
         $sql = sprintf(
@@ -717,8 +717,8 @@ abstract class CustomerFamilyOrder implements ActiveRecordInterface
                     case 'ORDER_ID':
                         $stmt->bindValue($identifier, $this->order_id, PDO::PARAM_INT);
                         break;
-                    case 'CUSTOMER_FAMILY_CODE':
-                        $stmt->bindValue($identifier, $this->customer_family_code, PDO::PARAM_STR);
+                    case 'CUSTOMER_FAMILY_ID':
+                        $stmt->bindValue($identifier, $this->customer_family_id, PDO::PARAM_INT);
                         break;
                 }
             }
@@ -779,7 +779,7 @@ abstract class CustomerFamilyOrder implements ActiveRecordInterface
                 return $this->getOrderId();
                 break;
             case 1:
-                return $this->getCustomerFamilyCode();
+                return $this->getCustomerFamilyId();
                 break;
             default:
                 return null;
@@ -811,7 +811,7 @@ abstract class CustomerFamilyOrder implements ActiveRecordInterface
         $keys = CustomerFamilyOrderTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getOrderId(),
-            $keys[1] => $this->getCustomerFamilyCode(),
+            $keys[1] => $this->getCustomerFamilyId(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -863,7 +863,7 @@ abstract class CustomerFamilyOrder implements ActiveRecordInterface
                 $this->setOrderId($value);
                 break;
             case 1:
-                $this->setCustomerFamilyCode($value);
+                $this->setCustomerFamilyId($value);
                 break;
         } // switch()
     }
@@ -890,7 +890,7 @@ abstract class CustomerFamilyOrder implements ActiveRecordInterface
         $keys = CustomerFamilyOrderTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setOrderId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setCustomerFamilyCode($arr[$keys[1]]);
+        if (array_key_exists($keys[1], $arr)) $this->setCustomerFamilyId($arr[$keys[1]]);
     }
 
     /**
@@ -903,7 +903,7 @@ abstract class CustomerFamilyOrder implements ActiveRecordInterface
         $criteria = new Criteria(CustomerFamilyOrderTableMap::DATABASE_NAME);
 
         if ($this->isColumnModified(CustomerFamilyOrderTableMap::ORDER_ID)) $criteria->add(CustomerFamilyOrderTableMap::ORDER_ID, $this->order_id);
-        if ($this->isColumnModified(CustomerFamilyOrderTableMap::CUSTOMER_FAMILY_CODE)) $criteria->add(CustomerFamilyOrderTableMap::CUSTOMER_FAMILY_CODE, $this->customer_family_code);
+        if ($this->isColumnModified(CustomerFamilyOrderTableMap::CUSTOMER_FAMILY_ID)) $criteria->add(CustomerFamilyOrderTableMap::CUSTOMER_FAMILY_ID, $this->customer_family_id);
 
         return $criteria;
     }
@@ -968,7 +968,7 @@ abstract class CustomerFamilyOrder implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setOrderId($this->getOrderId());
-        $copyObj->setCustomerFamilyCode($this->getCustomerFamilyCode());
+        $copyObj->setCustomerFamilyId($this->getCustomerFamilyId());
         if ($makeNew) {
             $copyObj->setNew(true);
         }
@@ -1051,9 +1051,9 @@ abstract class CustomerFamilyOrder implements ActiveRecordInterface
     public function setCustomerFamily(ChildCustomerFamily $v = null)
     {
         if ($v === null) {
-            $this->setCustomerFamilyCode(NULL);
+            $this->setCustomerFamilyId(NULL);
         } else {
-            $this->setCustomerFamilyCode($v->getCode());
+            $this->setCustomerFamilyId($v->getId());
         }
 
         $this->aCustomerFamily = $v;
@@ -1078,10 +1078,8 @@ abstract class CustomerFamilyOrder implements ActiveRecordInterface
      */
     public function getCustomerFamily(ConnectionInterface $con = null)
     {
-        if ($this->aCustomerFamily === null && (($this->customer_family_code !== "" && $this->customer_family_code !== null))) {
-            $this->aCustomerFamily = ChildCustomerFamilyQuery::create()
-                ->filterByCustomerFamilyOrder($this) // here
-                ->findOne($con);
+        if ($this->aCustomerFamily === null && ($this->customer_family_id !== null)) {
+            $this->aCustomerFamily = ChildCustomerFamilyQuery::create()->findPk($this->customer_family_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
@@ -1100,7 +1098,7 @@ abstract class CustomerFamilyOrder implements ActiveRecordInterface
     public function clear()
     {
         $this->order_id = null;
-        $this->customer_family_code = null;
+        $this->customer_family_id = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
         $this->resetModified();

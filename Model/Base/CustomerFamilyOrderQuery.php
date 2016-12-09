@@ -23,10 +23,10 @@ use Propel\Runtime\Exception\PropelException;
  *
  *
  * @method     ChildCustomerFamilyOrderQuery orderByOrderId($order = Criteria::ASC) Order by the order_id column
- * @method     ChildCustomerFamilyOrderQuery orderByCustomerFamilyCode($order = Criteria::ASC) Order by the customer_family_code column
+ * @method     ChildCustomerFamilyOrderQuery orderByCustomerFamilyId($order = Criteria::ASC) Order by the customer_family_id column
  *
  * @method     ChildCustomerFamilyOrderQuery groupByOrderId() Group by the order_id column
- * @method     ChildCustomerFamilyOrderQuery groupByCustomerFamilyCode() Group by the customer_family_code column
+ * @method     ChildCustomerFamilyOrderQuery groupByCustomerFamilyId() Group by the customer_family_id column
  *
  * @method     ChildCustomerFamilyOrderQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildCustomerFamilyOrderQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -44,10 +44,10 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildCustomerFamilyOrder findOneOrCreate(ConnectionInterface $con = null) Return the first ChildCustomerFamilyOrder matching the query, or a new ChildCustomerFamilyOrder object populated from the query conditions when no match is found
  *
  * @method     ChildCustomerFamilyOrder findOneByOrderId(int $order_id) Return the first ChildCustomerFamilyOrder filtered by the order_id column
- * @method     ChildCustomerFamilyOrder findOneByCustomerFamilyCode(string $customer_family_code) Return the first ChildCustomerFamilyOrder filtered by the customer_family_code column
+ * @method     ChildCustomerFamilyOrder findOneByCustomerFamilyId(int $customer_family_id) Return the first ChildCustomerFamilyOrder filtered by the customer_family_id column
  *
  * @method     array findByOrderId(int $order_id) Return ChildCustomerFamilyOrder objects filtered by the order_id column
- * @method     array findByCustomerFamilyCode(string $customer_family_code) Return ChildCustomerFamilyOrder objects filtered by the customer_family_code column
+ * @method     array findByCustomerFamilyId(int $customer_family_id) Return ChildCustomerFamilyOrder objects filtered by the customer_family_id column
  *
  */
 abstract class CustomerFamilyOrderQuery extends ModelCriteria
@@ -136,7 +136,7 @@ abstract class CustomerFamilyOrderQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ORDER_ID, CUSTOMER_FAMILY_CODE FROM customer_family_order WHERE ORDER_ID = :p0';
+        $sql = 'SELECT ORDER_ID, CUSTOMER_FAMILY_ID FROM customer_family_order WHERE ORDER_ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -269,32 +269,46 @@ abstract class CustomerFamilyOrderQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the customer_family_code column
+     * Filter the query on the customer_family_id column
      *
      * Example usage:
      * <code>
-     * $query->filterByCustomerFamilyCode('fooValue');   // WHERE customer_family_code = 'fooValue'
-     * $query->filterByCustomerFamilyCode('%fooValue%'); // WHERE customer_family_code LIKE '%fooValue%'
+     * $query->filterByCustomerFamilyId(1234); // WHERE customer_family_id = 1234
+     * $query->filterByCustomerFamilyId(array(12, 34)); // WHERE customer_family_id IN (12, 34)
+     * $query->filterByCustomerFamilyId(array('min' => 12)); // WHERE customer_family_id > 12
      * </code>
      *
-     * @param     string $customerFamilyCode The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
+     * @see       filterByCustomerFamily()
+     *
+     * @param     mixed $customerFamilyId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCustomerFamilyOrderQuery The current query, for fluid interface
      */
-    public function filterByCustomerFamilyCode($customerFamilyCode = null, $comparison = null)
+    public function filterByCustomerFamilyId($customerFamilyId = null, $comparison = null)
     {
-        if (null === $comparison) {
-            if (is_array($customerFamilyCode)) {
+        if (is_array($customerFamilyId)) {
+            $useMinMax = false;
+            if (isset($customerFamilyId['min'])) {
+                $this->addUsingAlias(CustomerFamilyOrderTableMap::CUSTOMER_FAMILY_ID, $customerFamilyId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($customerFamilyId['max'])) {
+                $this->addUsingAlias(CustomerFamilyOrderTableMap::CUSTOMER_FAMILY_ID, $customerFamilyId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
                 $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $customerFamilyCode)) {
-                $customerFamilyCode = str_replace('*', '%', $customerFamilyCode);
-                $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(CustomerFamilyOrderTableMap::CUSTOMER_FAMILY_CODE, $customerFamilyCode, $comparison);
+        return $this->addUsingAlias(CustomerFamilyOrderTableMap::CUSTOMER_FAMILY_ID, $customerFamilyId, $comparison);
     }
 
     /**
@@ -384,14 +398,14 @@ abstract class CustomerFamilyOrderQuery extends ModelCriteria
     {
         if ($customerFamily instanceof \CustomerFamily\Model\CustomerFamily) {
             return $this
-                ->addUsingAlias(CustomerFamilyOrderTableMap::CUSTOMER_FAMILY_CODE, $customerFamily->getCode(), $comparison);
+                ->addUsingAlias(CustomerFamilyOrderTableMap::CUSTOMER_FAMILY_ID, $customerFamily->getId(), $comparison);
         } elseif ($customerFamily instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(CustomerFamilyOrderTableMap::CUSTOMER_FAMILY_CODE, $customerFamily->toKeyValue('PrimaryKey', 'Code'), $comparison);
+                ->addUsingAlias(CustomerFamilyOrderTableMap::CUSTOMER_FAMILY_ID, $customerFamily->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByCustomerFamily() only accepts arguments of type \CustomerFamily\Model\CustomerFamily or Collection');
         }
