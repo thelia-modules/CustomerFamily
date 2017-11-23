@@ -274,12 +274,15 @@ class CustomerFamilyAdminController extends BaseAdminController
             $this->generateRedirect(URL::getInstance()->absoluteUrl(
                 '/admin/customer/update?customer_id='.$formValidate->get('customer_id')->getData()
             ));
-
+        } catch (FormValidationException $ex) {
+            $error = $this->createStandardFormValidationErrorMessage($ex);
         } catch (\Exception $e) {
             $error = $e->getMessage();
         }
 
-        $form->setErrorMessage($error);
+        if (!empty($error)) {
+            $form->setErrorMessage($error);
+        }
 
         $this->getParserContext()
             ->addForm($form)
