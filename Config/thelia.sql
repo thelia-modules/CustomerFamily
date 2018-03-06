@@ -30,6 +30,7 @@ CREATE TABLE `customer_customer_family`
 (
     `customer_id` INTEGER NOT NULL,
     `customer_family_id` INTEGER NOT NULL,
+    `company_name` VARCHAR(250),
     `siret` VARCHAR(50),
     `vat` VARCHAR(50),
     PRIMARY KEY (`customer_id`),

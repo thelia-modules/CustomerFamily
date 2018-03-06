@@ -2,6 +2,7 @@
 
 return array(
     'Code' => 'Code',
+    'Company name' => 'Nom entreprise',
     'Customer' => 'Client',
     'Customer family' => 'Famille clients',
     'Customer family was created successfully' => 'La famille a été créée avec succès',

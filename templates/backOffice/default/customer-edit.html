@@ -1,5 +1,6 @@
 {loop name="customer_customer_family" type="customer_customer_family" customer_id=$customer_id}
     {assign var="_customer_family_id_" value=$CUSTOMER_FAMILY_ID}
+    {assign var="_company_name_" value=$COMPANY_NAME}
     {assign var="_siret_" value=$SIRET}
     {assign var="_vat_" value=$VAT}
 {/loop}
@@ -30,6 +31,19 @@
                                 <option data-code="{$CODE}" value="{$CUSTOMER_FAMILY_ID}" {if {$_customer_family_id_} == $CUSTOMER_FAMILY_ID}selected{/if}>{$TITLE_CUSTOMER_FAMILY}</option>
                                 {/loop}
                             </select>
+                        </div>
+                    </div>
+                    {/form_field}
+
+                    {form_field form=$form field="company_name"}
+                    <div class="form-group">
+                        <label class="control-label" for="{$label_attr.for}">{$label} <span class="required">*</span></label>
+                        <div class="control-input">
+                            <input type="text" name="{$name}" id="{$label_attr.for}" class="form-control" placeholder="{intl l="Placeholder Company name"}" value="{$_company_name_}" {if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
+                            {if $error }
+                            <span class="help-block">{$message}</span>
+                            {assign var="error_focus" value="true"}
+                            {/if}
                         </div>
                     </div>
                     {/form_field}

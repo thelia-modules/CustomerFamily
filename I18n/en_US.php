@@ -2,6 +2,7 @@
 return array(
     //C
     "Customer family" => "Customer family",
+    "Company name" => "Company name",
 
     //F
     "Family of this customer" => "Customer family",
