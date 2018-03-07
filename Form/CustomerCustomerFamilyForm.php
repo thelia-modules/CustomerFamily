@@ -87,7 +87,9 @@ class CustomerCustomerFamilyForm extends BaseForm
                 ))
             ->add('company_name','text', array(
                     'constraints' => array(
-                        new Constraints\NotBlank()
+                        new Constraints\Callback(array("methods" => array(
+                            array($this, "checkProfessionalInformation")
+                        )))
                     ),
                     'label' => Translator::getInstance()->trans(
                         'Company name',
@@ -99,9 +101,7 @@ class CustomerCustomerFamilyForm extends BaseForm
                     )
                 ))
             ->add(
-                'siret',
-                'text',
-                array(
+                'siret','text', array(
                     'constraints' => array(
                         new Constraints\Callback(array("methods" => array(
                             array($this, "checkProfessionalInformation")

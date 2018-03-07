@@ -222,6 +222,7 @@ class CustomerFamilyListener implements EventSubscriberInterface
 
         $customerCustomerFamily
             ->setCustomerFamilyId($event->getCustomerFamilyId())
+            ->setCompanyName($event->getCompanyName())
             ->setSiret($event->getSiret())
             ->setVat($event->getVat())
             ->save()

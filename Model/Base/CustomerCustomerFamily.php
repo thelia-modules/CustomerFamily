@@ -68,6 +68,12 @@ abstract class CustomerCustomerFamily implements ActiveRecordInterface
     protected $customer_family_id;
 
     /**
+     * The value for the company_name field.
+     * @var        int
+     */
+    protected $company_name;
+
+    /**
      * The value for the siret field.
      * @var        string
      */
@@ -378,6 +384,17 @@ abstract class CustomerCustomerFamily implements ActiveRecordInterface
     }
 
     /**
+     * Get the [company_name] column value.
+     *
+     * @return   string
+     */
+    public function getCompanyName()
+    {
+
+        return $this->company_name;
+    }
+
+    /**
      * Get the [siret] column value.
      *
      * @return   string
@@ -448,6 +465,27 @@ abstract class CustomerCustomerFamily implements ActiveRecordInterface
 
         return $this;
     } // setCustomerFamilyId()
+
+    /**
+     * Set the value of [company_name] column.
+     *
+     * @param      string $v new value
+     * @return   \CustomerFamily\Model\CustomerCustomerFamily The current object (for fluent API support)
+     */
+    public function setCompanyName($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->company_name !== $v) {
+            $this->company_name = $v;
+            $this->modifiedColumns[CustomerCustomerFamilyTableMap::COMPANY_NAME] = true;
+        }
+
+
+        return $this;
+    } // setCompanyName()
 
     /**
      * Set the value of [siret] column.
@@ -533,6 +571,9 @@ abstract class CustomerCustomerFamily implements ActiveRecordInterface
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : CustomerCustomerFamilyTableMap::translateFieldName('CustomerFamilyId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->customer_family_id = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : CustomerCustomerFamilyTableMap::translateFieldName('CompanyName', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->company_name = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : CustomerCustomerFamilyTableMap::translateFieldName('Siret', TableMap::TYPE_PHPNAME, $indexType)];
             $this->siret = (null !== $col) ? (string) $col : null;
@@ -785,6 +826,9 @@ abstract class CustomerCustomerFamily implements ActiveRecordInterface
         if ($this->isColumnModified(CustomerCustomerFamilyTableMap::CUSTOMER_FAMILY_ID)) {
             $modifiedColumns[':p' . $index++]  = 'CUSTOMER_FAMILY_ID';
         }
+        if ($this->isColumnModified(CustomerCustomerFamilyTableMap::COMPANY_NAME)) {
+            $modifiedColumns[':p']  = 'COMPANY_NAME';
+        }
         if ($this->isColumnModified(CustomerCustomerFamilyTableMap::SIRET)) {
             $modifiedColumns[':p' . $index++]  = 'SIRET';
         }
@@ -807,6 +851,9 @@ abstract class CustomerCustomerFamily implements ActiveRecordInterface
                         break;
                     case 'CUSTOMER_FAMILY_ID':
                         $stmt->bindValue($identifier, $this->customer_family_id, PDO::PARAM_INT);
+                        break;
+                    case 'COMPANY_NAME':
+                        $stmt->bindValue($identifier, $this->company_name, PDO::PARAM_INT);
                         break;
                     case 'SIRET':
                         $stmt->bindValue($identifier, $this->siret, PDO::PARAM_STR);
@@ -876,9 +923,12 @@ abstract class CustomerCustomerFamily implements ActiveRecordInterface
                 return $this->getCustomerFamilyId();
                 break;
             case 2:
-                return $this->getSiret();
+                return $this->getCompanyName();
                 break;
             case 3:
+                return $this->getSiret();
+                break;
+            case 4:
                 return $this->getVat();
                 break;
             default:
@@ -912,8 +962,9 @@ abstract class CustomerCustomerFamily implements ActiveRecordInterface
         $result = array(
             $keys[0] => $this->getCustomerId(),
             $keys[1] => $this->getCustomerFamilyId(),
-            $keys[2] => $this->getSiret(),
-            $keys[3] => $this->getVat(),
+            $keys[2] => $this->getCompanyName(),
+            $keys[3] => $this->getSiret(),
+            $keys[4] => $this->getVat(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -968,9 +1019,12 @@ abstract class CustomerCustomerFamily implements ActiveRecordInterface
                 $this->setCustomerFamilyId($value);
                 break;
             case 2:
-                $this->setSiret($value);
+                $this->setCompanyName($value);
                 break;
             case 3:
+                $this->setSiret($value);
+                break;
+            case 4:
                 $this->setVat($value);
                 break;
         } // switch()
@@ -999,8 +1053,9 @@ abstract class CustomerCustomerFamily implements ActiveRecordInterface
 
         if (array_key_exists($keys[0], $arr)) $this->setCustomerId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setCustomerFamilyId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setSiret($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setVat($arr[$keys[3]]);
+        if (array_key_exists($keys[2], $arr)) $this->setCompanyName($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setSiret($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setVat($arr[$keys[4]]);
     }
 
     /**
@@ -1014,6 +1069,7 @@ abstract class CustomerCustomerFamily implements ActiveRecordInterface
 
         if ($this->isColumnModified(CustomerCustomerFamilyTableMap::CUSTOMER_ID)) $criteria->add(CustomerCustomerFamilyTableMap::CUSTOMER_ID, $this->customer_id);
         if ($this->isColumnModified(CustomerCustomerFamilyTableMap::CUSTOMER_FAMILY_ID)) $criteria->add(CustomerCustomerFamilyTableMap::CUSTOMER_FAMILY_ID, $this->customer_family_id);
+        if ($this->isColumnModified(CustomerCustomerFamilyTableMap::COMPANY_NAME)) $criteria->add(CustomerCustomerFamilyTableMap::COMPANY_NAME, $this->company_name);
         if ($this->isColumnModified(CustomerCustomerFamilyTableMap::SIRET)) $criteria->add(CustomerCustomerFamilyTableMap::SIRET, $this->siret);
         if ($this->isColumnModified(CustomerCustomerFamilyTableMap::VAT)) $criteria->add(CustomerCustomerFamilyTableMap::VAT, $this->vat);
 
@@ -1081,6 +1137,7 @@ abstract class CustomerCustomerFamily implements ActiveRecordInterface
     {
         $copyObj->setCustomerId($this->getCustomerId());
         $copyObj->setCustomerFamilyId($this->getCustomerFamilyId());
+        $copyObj->setCompanyName($this->getCompanyName());
         $copyObj->setSiret($this->getSiret());
         $copyObj->setVat($this->getVat());
         if ($makeNew) {
@@ -1213,6 +1270,7 @@ abstract class CustomerCustomerFamily implements ActiveRecordInterface
     {
         $this->customer_id = null;
         $this->customer_family_id = null;
+        $this->company_name = null;
         $this->siret = null;
         $this->vat = null;
         $this->alreadyInSave = false;

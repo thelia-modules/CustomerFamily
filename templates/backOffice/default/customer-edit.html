@@ -36,10 +36,10 @@
                     {/form_field}
 
                     {form_field form=$form field="company_name"}
-                    <div class="form-group">
+                    <div class="form-group {if $error}has-error{/if}">
                         <label class="control-label" for="{$label_attr.for}">{$label} <span class="required">*</span></label>
                         <div class="control-input">
-                            <input type="text" name="{$name}" id="{$label_attr.for}" class="form-control" placeholder="{intl l="Placeholder Company name"}" value="{$_company_name_}" {if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
+                            <input type="text" name="{$name}" id="{$label_attr.for}" class="form-control" maxlength="250" placeholder="{intl l="Placeholder Company name"}" value="{$_company_name_}" {if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
                             {if $error }
                             <span class="help-block">{$message}</span>
                             {assign var="error_focus" value="true"}

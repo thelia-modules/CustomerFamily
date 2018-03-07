@@ -28,6 +28,9 @@ class CustomerCustomerFamilyEvent extends ActionEvent
     protected $customerFamilyId;
 
     /** @var string */
+    protected $companyName;
+
+    /** @var string */
     protected $siret;
 
     /** @var string */
@@ -79,6 +82,25 @@ class CustomerCustomerFamilyEvent extends ActionEvent
     public function getCustomerId()
     {
         return $this->customerId;
+    }
+
+    /**
+     * @param string $companyName
+     * @return CustomerCustomerFamily
+     */
+    public function setCompanyName($companyName)
+    {
+        $this->companyName = $companyName;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCompanyName()
+    {
+        return $this->companyName;
     }
 
     /**

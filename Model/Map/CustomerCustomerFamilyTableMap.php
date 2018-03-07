@@ -81,6 +81,11 @@ class CustomerCustomerFamilyTableMap extends TableMap
     const CUSTOMER_FAMILY_ID = 'customer_customer_family.CUSTOMER_FAMILY_ID';
 
     /**
+     * the column name for the COMPANY_NAME field
+     */
+    const COMPANY_NAME = 'customer_customer_family.COMPANY_NAME';
+
+    /**
      * the column name for the SIRET field
      */
     const SIRET = 'customer_customer_family.SIRET';
@@ -102,12 +107,12 @@ class CustomerCustomerFamilyTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('CustomerId', 'CustomerFamilyId', 'Siret', 'Vat', ),
-        self::TYPE_STUDLYPHPNAME => array('customerId', 'customerFamilyId', 'siret', 'vat', ),
-        self::TYPE_COLNAME       => array(CustomerCustomerFamilyTableMap::CUSTOMER_ID, CustomerCustomerFamilyTableMap::CUSTOMER_FAMILY_ID, CustomerCustomerFamilyTableMap::SIRET, CustomerCustomerFamilyTableMap::VAT, ),
-        self::TYPE_RAW_COLNAME   => array('CUSTOMER_ID', 'CUSTOMER_FAMILY_ID', 'SIRET', 'VAT', ),
-        self::TYPE_FIELDNAME     => array('customer_id', 'customer_family_id', 'siret', 'vat', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('CustomerId', 'CustomerFamilyId','CompanyName', 'Siret', 'Vat', ),
+        self::TYPE_STUDLYPHPNAME => array('customerId', 'customerFamilyId', 'companyName', 'siret', 'vat', ),
+        self::TYPE_COLNAME       => array(CustomerCustomerFamilyTableMap::CUSTOMER_ID, CustomerCustomerFamilyTableMap::CUSTOMER_FAMILY_ID, CustomerCustomerFamilyTableMap::COMPANY_NAME, CustomerCustomerFamilyTableMap::SIRET, CustomerCustomerFamilyTableMap::VAT, ),
+        self::TYPE_RAW_COLNAME   => array('CUSTOMER_ID', 'CUSTOMER_FAMILY_ID','COMPANY_NAME', 'SIRET', 'VAT', ),
+        self::TYPE_FIELDNAME     => array('customer_id', 'customer_family_id', 'company_name', 'siret', 'vat', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -117,11 +122,11 @@ class CustomerCustomerFamilyTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('CustomerId' => 0, 'CustomerFamilyId' => 1, 'Siret' => 2, 'Vat' => 3, ),
+        self::TYPE_PHPNAME       => array('CustomerId' => 0, 'CustomerFamilyId' => 1, 'CompanyName' => 2, 'Siret' => 3, 'Vat' => 4, ),
         self::TYPE_STUDLYPHPNAME => array('customerId' => 0, 'customerFamilyId' => 1, 'siret' => 2, 'vat' => 3, ),
-        self::TYPE_COLNAME       => array(CustomerCustomerFamilyTableMap::CUSTOMER_ID => 0, CustomerCustomerFamilyTableMap::CUSTOMER_FAMILY_ID => 1, CustomerCustomerFamilyTableMap::SIRET => 2, CustomerCustomerFamilyTableMap::VAT => 3, ),
-        self::TYPE_RAW_COLNAME   => array('CUSTOMER_ID' => 0, 'CUSTOMER_FAMILY_ID' => 1, 'SIRET' => 2, 'VAT' => 3, ),
-        self::TYPE_FIELDNAME     => array('customer_id' => 0, 'customer_family_id' => 1, 'siret' => 2, 'vat' => 3, ),
+        self::TYPE_COLNAME       => array(CustomerCustomerFamilyTableMap::CUSTOMER_ID => 0, CustomerCustomerFamilyTableMap::CUSTOMER_FAMILY_ID => 1, CustomerCustomerFamilyTableMap::COMPANY_NAME => 2, CustomerCustomerFamilyTableMap::SIRET => 3, CustomerCustomerFamilyTableMap::VAT => 4, ),
+        self::TYPE_RAW_COLNAME   => array('CUSTOMER_ID' => 0, 'CUSTOMER_FAMILY_ID' => 1, 'COMPANY_NAME' => 2, 'SIRET' => 3, 'VAT' => 4, ),
+        self::TYPE_FIELDNAME     => array('customer_id' => 0, 'customer_family_id' => 1, 'company_name' => 2, 'siret' => 3, 'vat' => 4, ),
         self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
@@ -143,6 +148,7 @@ class CustomerCustomerFamilyTableMap extends TableMap
         // columns
         $this->addForeignPrimaryKey('CUSTOMER_ID', 'CustomerId', 'INTEGER' , 'customer', 'ID', true, null, null);
         $this->addForeignKey('CUSTOMER_FAMILY_ID', 'CustomerFamilyId', 'INTEGER', 'customer_family', 'ID', true, null, null);
+        $this->addColumn('COMPANY_NAME', 'CompanyName', 'VARCHAR', false, 250, null);
         $this->addColumn('SIRET', 'Siret', 'VARCHAR', false, 50, null);
         $this->addColumn('VAT', 'Vat', 'VARCHAR', false, 50, null);
     } // initialize()
@@ -296,11 +302,13 @@ class CustomerCustomerFamilyTableMap extends TableMap
         if (null === $alias) {
             $criteria->addSelectColumn(CustomerCustomerFamilyTableMap::CUSTOMER_ID);
             $criteria->addSelectColumn(CustomerCustomerFamilyTableMap::CUSTOMER_FAMILY_ID);
+            $criteria->addSelectColumn(CustomerCustomerFamilyTableMap::COMPANY_NAME);
             $criteria->addSelectColumn(CustomerCustomerFamilyTableMap::SIRET);
             $criteria->addSelectColumn(CustomerCustomerFamilyTableMap::VAT);
         } else {
             $criteria->addSelectColumn($alias . '.CUSTOMER_ID');
             $criteria->addSelectColumn($alias . '.CUSTOMER_FAMILY_ID');
+            $criteria->addSelectColumn($alias . '.COMPANY_NAME');
             $criteria->addSelectColumn($alias . '.SIRET');
             $criteria->addSelectColumn($alias . '.VAT');
         }
