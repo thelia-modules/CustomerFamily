@@ -85,10 +85,23 @@ class CustomerCustomerFamilyForm extends BaseForm
                         'for' => 'customer_id'
                     )
                 ))
+            ->add('company_name','text', array(
+                    'constraints' => array(
+                        new Constraints\Callback(array("methods" => array(
+                            array($this, "checkProfessionalInformation")
+                        )))
+                    ),
+                    'label' => Translator::getInstance()->trans(
+                        'Company name',
+                        array(),
+                        CustomerFamily::MESSAGE_DOMAIN
+                    ),
+                    'label_attr' => array(
+                        'for' => 'company_name'
+                    )
+                ))
             ->add(
-                'siret',
-                'text',
-                array(
+                'siret','text', array(
                     'constraints' => array(
                         new Constraints\Callback(array("methods" => array(
                             array($this, "checkProfessionalInformation")

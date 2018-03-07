@@ -18,6 +18,7 @@
 	<table name="customer_customer_family">
 		<column name="customer_id" primaryKey="true" required="true" type="INTEGER" />
 		<column name="customer_family_id" required="true" type="INTEGER" />
+		<column name="company_name" size="250" type="VARCHAR" />
 		<column name="siret" size="50" type="VARCHAR" />
 		<column name="vat" size="50" type="VARCHAR" />
 		<foreign-key foreignTable="customer" onDelete="CASCADE">
