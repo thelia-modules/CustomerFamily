@@ -31,7 +31,6 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
 use Thelia\Form\CustomerUpdateForm;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Model\Base\CustomerQuery;
 use Thelia\Model\Customer;
 use Thelia\Tools\URL;
 
@@ -249,17 +248,17 @@ class CustomerFamilyAdminController extends BaseAdminController
     }
 
     /**
-     * @param Request $request
-     * @return mixed|\Thelia\Core\HttpFoundation\Response
+     * @param $customerId
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function customerUpdateAction(Request $request)
+    public function customerUpdateAction($customerId)
     {
         if (null !== $response = $this->checkAuth(array(AdminResources::MODULE), array('CustomerFamily'), AccessManager::UPDATE)) {
             return $response;
         }
 
         $error = "";
-        $form = new CustomerCustomerFamilyForm($request);
+        $form = new CustomerCustomerFamilyForm($this->getRequest());
         try {
             $formValidate = $this->validateForm($form);
             $event = new CustomerCustomerFamilyEvent($formValidate->get('customer_id')->getData());
@@ -270,10 +269,6 @@ class CustomerFamilyAdminController extends BaseAdminController
             ;
 
             $this->dispatch(CustomerFamilyEvents::CUSTOMER_CUSTOMER_FAMILY_UPDATE, $event);
-
-            $this->generateRedirect(URL::getInstance()->absoluteUrl(
-                '/admin/customer/update?customer_id='.$formValidate->get('customer_id')->getData()
-            ));
         } catch (FormValidationException $ex) {
             $error = $this->createStandardFormValidationErrorMessage($ex);
         } catch (\Exception $e) {
@@ -288,17 +283,11 @@ class CustomerFamilyAdminController extends BaseAdminController
             ->addForm($form)
             ->setGeneralError($error);
 
-        //Don't forget to fill the Customer form
-        $customerId = $request->get('customer_customer_family_form')['customer_id'];
-        if (null != $customer = CustomerQuery::create()->findPk($customerId)) {
-            $customerForm = $this->hydrateCustomerForm($customer);
-            $this->getParserContext()->addForm($customerForm);
-        }
-
-        return $this->render('customer-edit', array(
-                'customer_id' => $request->get('customer_customer_family_form')['customer_id'],
-                "order_creation_error" => Translator::getInstance()->trans($error, array(), CustomerFamily::MESSAGE_DOMAIN)
-            ));
+        return $this->generateRedirect(
+            URL::getInstance()->absoluteUrl(
+                '/admin/customer/update', ['customer_id' => $customerId ]
+            ) . '#customer-family'
+        );
     }
 
     /**

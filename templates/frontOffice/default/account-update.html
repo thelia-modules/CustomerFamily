@@ -2,7 +2,7 @@
 <fieldset id="register-customer-family" class="panel">
 	<div class="panel-heading">{intl l='Customer family'}</div>
 	<div class="panel-body">
-		{form_field form=$form field='customer_family_code'}
+		{form_field field='customer_family_code'}
 		<div class="form-group {if $error} has-error{/if}">
 			<label class="control-label" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
 			<div class="control-input">
@@ -21,7 +21,7 @@
 		{/form_field}
 		{* Additional fields for CustomerCustomerFamily update. Should not be displayed if the customer is a particular one. *}
 		<div id="customer-family-extra-fields">
-			{form_field form=$form field='siret' }
+			{form_field field='siret' }
 			<div class="form-group{if $error} has-error{/if}">
 				<label class="control-label" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
 				<div class="control-input">
@@ -33,7 +33,7 @@
 				</div>
 			</div><!--/.form-group-->
 			{/form_field}
-			{form_field form=$form field='vat' }
+			{form_field field='vat' }
 			<div class="form-group{if $error} has-error{/if}">
 				<label class="control-label" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
 				<div class="control-input">
