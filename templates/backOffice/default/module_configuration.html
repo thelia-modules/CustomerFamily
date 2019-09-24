@@ -140,7 +140,6 @@
                                     </tr>
                                 </tfoot>
                             </table>
-
                         </div>
                     </div>
 
@@ -195,6 +194,20 @@
                             </div>
                         </div>
                     {/form}
+                    <div>
+                        {form name="customer_family_price_mode"}
+                            <form action="{url path="/admin/CustomerFamily/selectPriceMode"}" method="post">
+                                {form_hidden_fields form=$form}
+                                {form_field form=$form field="price_mode"}
+                                    <input type="checkbox" name="{$name}" id="{$name}" value="{$value}" {if $checked}checked{/if} onchange="this.form.submit()">
+                                    <label for="{$name}">{$label}</label>
+                                {/form_field}
+                                <div class="help-block">
+                                    <span>{$label_attr.help}</span>
+                                </div>
+                            </form>
+                        {/form}
+                    </div>
                 </div>
 
                 <!-- Prices definition tab -->

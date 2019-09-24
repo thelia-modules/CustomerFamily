@@ -89,11 +89,6 @@ class CustomerCustomerFamilyForm extends BaseForm
                 'siret',
                 'text',
                 array(
-                    'constraints' => array(
-                        new Constraints\Callback(array("methods" => array(
-                            array($this, "checkProfessionalInformation")
-                        )))
-                    ),
                     'required' => false,
                     'empty_data' => false,
                     'label' => Translator::getInstance()->trans(
@@ -110,11 +105,6 @@ class CustomerCustomerFamilyForm extends BaseForm
                 'vat',
                 'text',
                 array(
-                    'constraints' => array(
-                        new Constraints\Callback(array("methods" => array(
-                            array($this, "checkProfessionalInformation")
-                        )))
-                    ),
                     'required' => false,
                     'empty_data' => false,
                     'label' => Translator::getInstance()->trans(

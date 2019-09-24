@@ -39,7 +39,7 @@
                         <label class="control-label" for="{$label_attr.for}">{$label} <span class="required">*</span></label>
 
                         <div class="control-input">
-                            <input type="text" name="{$name}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder siret"}" value="{$_siret_}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
+                            <input type="text" name="{$name}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder siret"}" value="{$_siret_}"{if $required} aria-required="true"{/if}{if !isset($error_focus) && $error} autofocus{/if}>
                             {if $error }
                             <span class="help-block">{$message}</span>
                             {assign var="error_focus" value="true"}
@@ -53,7 +53,7 @@
                         <label class="control-label" for="{$label_attr.for}">{$label} <span class="required">*</span></label>
 
                         <div class="control-input">
-                            <input type="text" name="{$name}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder vat"}" value="{$_vat_}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
+                            <input type="text" name="{$name}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder vat"}" value="{$_vat_}"{if $required} aria-required="true"{/if}{if !isset($error_focus) && $error} autofocus{/if}>
                             {if $error }
                             <span class="help-block">{$message}</span>
                             {assign var="error_focus" value="true"}

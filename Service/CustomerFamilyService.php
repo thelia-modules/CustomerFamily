@@ -2,6 +2,7 @@
 
 namespace CustomerFamily\Service;
 
+use CustomerFamily\CustomerFamily;
 use CustomerFamily\Model\CustomerCustomerFamilyQuery;
 use CustomerFamily\Model\CustomerFamilyPriceQuery;
 use CustomerFamily\Model\CustomerFamilyQuery;
@@ -11,6 +12,7 @@ use CustomerFamily\Model\ProductPurchasePriceQuery;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Exception\TaxEngineException;
 use Thelia\Model\Currency;
+use Thelia\Model\ProductPriceQuery;
 use Thelia\TaxEngine\TaxEngine;
 
 /**
@@ -65,13 +67,41 @@ class CustomerFamilyService
     /**
      * @param $pseId
      * @param $currencyId
-     * @return \CustomerFamily\Model\ProductPurchasePrice
+     * @return \CustomerFamily\Model\ProductPurchasePrice|\Thelia\Model\ProductPrice
      */
     public function getPseProductPurchasePrice($pseId, $currencyId)
     {
         return ProductPurchasePriceQuery::create()
             ->filterByCurrencyId($currencyId)
             ->findOneByProductSaleElementsId($pseId);
+    }
+
+    /**
+     * @param $pseId
+     * @param $currencyId
+     * @return \Thelia\Model\ProductPrice
+     */
+    public function getPseProductPrice($pseId, $currencyId)
+    {
+        return ProductPriceQuery::create()
+            ->filterByCurrencyId($currencyId)
+            ->findOneByProductSaleElementsId($pseId);
+    }
+
+    /**
+     * @param $pseId
+     * @param $currencyId
+     * @return string
+     */
+    public function getPurchasePrice($pseId, $currencyId)
+    {
+        $mode = CustomerFamily::getConfigValue('customer_family_price_mode', 0);
+        if($mode == 1){
+            $pseProductPrice = $this->getPseProductPrice($pseId, $currencyId);
+            return $pseProductPrice->getPrice();
+        }
+        $pseProductPurchasePrice = $this->getPseProductPurchasePrice($pseId, $currencyId);
+        return $pseProductPurchasePrice->getPurchasePrice();
     }
 
     /**
@@ -94,10 +124,10 @@ class CustomerFamilyService
     }
 
     /**
-     * @param \Thelia\Model\ProductSaleElements $pse
+     * @param $pse
      * @param $customerFamilyId
      * @param null $currencyId
-     * @return array
+     * @return array|null
      */
     public function calculateCustomerFamilyPsePrice($pse, $customerFamilyId, $currencyId = null)
     {
@@ -109,68 +139,66 @@ class CustomerFamilyService
         }
 
         // If the purchase price & its price exist
-        if (null !== $productPurchasePrice = $this->getPseProductPurchasePrice($pse->getId(), $currencyId)) {
-            if (null !== $productPurchasePricePrice = $productPurchasePrice->getPurchasePrice()) {
-                // Initialize prices
-                $price = $taxedPrice = $promoPrice = $taxedPromoPrice = null;
+        if (null !== $productPurchasePrice = $this->getPurchasePrice($pse->getId(), $currencyId)) {
+            // Initialize prices
+            $price = $taxedPrice = $promoPrice = $taxedPromoPrice = null;
 
-                // Standard price
-                if (null !== $customerFamilyPrice = $this->getCustomerFamilyPrice($customerFamilyId, 0, 1)) {
-                    // Calculate price
-                    $price = round(
-                        ($productPurchasePrice->getPurchasePrice() + $customerFamilyPrice->getAmountAddedBefore())
-                        * $customerFamilyPrice->getMultiplicationCoefficient()
-                        + $customerFamilyPrice->getAmountAddedAfter(),
-                        2
-                    );
+            // Standard price
+            if (null !== $customerFamilyPrice = $this->getCustomerFamilyPrice($customerFamilyId, 0, 1)) {
+                // Calculate price
+                $price = round(
+                    ($productPurchasePrice + $customerFamilyPrice->getAmountAddedBefore())
+                    * $customerFamilyPrice->getMultiplicationCoefficient()
+                    + $customerFamilyPrice->getAmountAddedAfter(),
+                    2
+                );
 
-                    $pse->setVirtualColumn('CUSTOMER_FAMILY_PRICE', $price);
+                $pse->setVirtualColumn('CUSTOMER_FAMILY_PRICE', $price);
 
-                    // Tax
-                    try {
-                        $taxedPrice = $pse->getTaxedPrice($taxCountry, 'CUSTOMER_FAMILY_PRICE');
-                    } catch (TaxEngineException $e) {
-                        $taxedPrice = null;
-                    }
+                // Tax
+                try {
+                    $taxedPrice = $pse->getTaxedPrice($taxCountry, 'CUSTOMER_FAMILY_PRICE');
+                } catch (TaxEngineException $e) {
+                    $taxedPrice = null;
                 }
-
-                // Promo price
-                if (null !== $customerFamilyPromoPrice = $this->getCustomerFamilyPrice($customerFamilyId, 1, 1)) {
-                    // Calculate promo price
-                    $promoPrice = round(
-                        ($productPurchasePrice->getPurchasePrice() + $customerFamilyPromoPrice->getAmountAddedBefore())
-                        * $customerFamilyPromoPrice->getMultiplicationCoefficient()
-                        + $customerFamilyPromoPrice->getAmountAddedAfter(),
-                        2
-                    );
-
-                    $pse->setVirtualColumn('CUSTOMER_FAMILY_PROMO_PRICE', $promoPrice);
-
-                    // Tax
-                    try {
-                        $taxedPromoPrice = $pse->getTaxedPrice($taxCountry, 'CUSTOMER_FAMILY_PROMO_PRICE');
-                    } catch (TaxEngineException $e) {
-                        $taxedPromoPrice = null;
-                    }
-                }
-
-                return [
-                    'price' => $price,
-                    'taxedPrice' => $taxedPrice,
-                    'promoPrice' => $promoPrice,
-                    'taxedPromoPrice' => $taxedPromoPrice
-                ];
             }
-        }
 
+            // Promo price
+            if (null !== $customerFamilyPromoPrice = $this->getCustomerFamilyPrice($customerFamilyId, 1, 1)) {
+                // Calculate promo price
+                $promoPrice = round(
+                    ($productPurchasePrice + $customerFamilyPromoPrice->getAmountAddedBefore())
+                    * $customerFamilyPromoPrice->getMultiplicationCoefficient()
+                    + $customerFamilyPromoPrice->getAmountAddedAfter(),
+                    2
+                );
+
+                $pse->setVirtualColumn('CUSTOMER_FAMILY_PROMO_PRICE', $promoPrice);
+
+                // Tax
+                try {
+                    $taxedPromoPrice = $pse->getTaxedPrice($taxCountry, 'CUSTOMER_FAMILY_PROMO_PRICE');
+                } catch (TaxEngineException $e) {
+                    $taxedPromoPrice = null;
+                }
+            }
+
+            return [
+                'price' => $price,
+                'taxedPrice' => $taxedPrice,
+                'promoPrice' => $promoPrice,
+                'taxedPromoPrice' => $taxedPromoPrice
+            ];
+        }
         return null;
     }
 
     /**
-     * @param \Thelia\Model\ProductSaleElements $pse
+     * @param $pse
      * @param null $customerId
      * @param null $currencyId
-     * @return array
+     * @return array|null
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function calculateCustomerPsePrice($pse, $customerId = null, $currencyId = null)
     {

@@ -3,6 +3,7 @@
 namespace CustomerFamily\Controller\Admin;
 
 use CustomerFamily\CustomerFamily;
+use CustomerFamily\Form\CustomerFamilyPriceModeForm;
 use CustomerFamily\Model\CustomerFamilyPrice;
 use CustomerFamily\Model\CustomerFamilyPriceQuery;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -76,6 +77,18 @@ class CustomerFamilyPriceController extends BaseAdminController
             );
             return $this->render('module-configure', ['module_code' => 'CustomerFamily']);
         }
+
+        return RedirectResponse::create(URL::getInstance()->absoluteUrl("/admin/module/CustomerFamily"));
+    }
+
+    public function updatePriceModeAction()
+    {
+        $form = new CustomerFamilyPriceModeForm($this->getRequest());
+        $vForm = $this->validateForm($form);
+
+        $mode = $vForm->get('price_mode')->getData();
+
+        CustomerFamily::setConfigValue('customer_family_price_mode', $mode);
 
         return RedirectResponse::create(URL::getInstance()->absoluteUrl("/admin/module/CustomerFamily"));
     }
