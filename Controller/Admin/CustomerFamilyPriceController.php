@@ -74,9 +74,13 @@ class CustomerFamilyPriceController extends BaseAdminController
                 $form,
                 $ex
             );
-            return $this->render('module-configure', ['module_code' => 'CustomerFamily']);
         }
 
-        return RedirectResponse::create(URL::getInstance()->absoluteUrl("/admin/module/CustomerFamily"));
+        return RedirectResponse::create(
+            URL::getInstance()->absoluteUrl(
+                "/admin/module/CustomerFamily",
+                [ 'tab' => 'prices_definition']
+            )
+        );
     }
 }

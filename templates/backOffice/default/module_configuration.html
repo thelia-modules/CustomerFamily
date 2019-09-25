@@ -1,3 +1,4 @@
+{$current_tab = $smarty.get.tab|default:'families'}
 <div class="general-block-decorator" id="CustomerFamily">
     <div class="title">
         {intl l="Customer Family" d='customerfamily.bo.default'}
@@ -7,14 +8,13 @@
         <div class="col-md-12">
             <!-- Tab menu -->
             <ul id="tabbed-menu" class="nav nav-tabs">
-                <li class="active"><a data-toggle="tab" href="#families">{intl l="Families" d='customerfamily.bo.default'}</a> </li>
-                <li><a data-toggle="tab" href="#prices_definition">{intl l="Prices definition" d='customerfamily.bo.default'}</a></li>
+                <li{if $current_tab == 'families'} class="active"{/if}><a data-toggle="tab" href="#families">{intl l="Families" d='customerfamily.bo.default'}</a> </li>
+                <li{if $current_tab == 'prices_definition'} class="active"{/if}><a data-toggle="tab" href="#prices_definition">{intl l="Prices definition" d='customerfamily.bo.default'}</a></li>
             </ul>
 
             <div class="tab-content">
-
                 <!-- Families managing tab -->
-                <div id="families" class="tab-pane active form-container">
+                <div id="families" class="tab-pane{if $current_tab == 'families'} active{/if} form-container">
                     <div class="row">
                         <div class="col-md-6">
                             {if $hide_flags != true}
@@ -69,9 +69,9 @@
                                         {form name='customer_family_update_default_form'}
                                             <form action="{url path='/admin/module/CustomerFamily/update-default'}" method="post" id="update-default-family-form">
 
-                                                {form_hidden_fields form=$form}
+                                                {form_hidden_fields}
 
-                                                {form_field form=$form field="customer_family_id"}
+                                                {form_field field="customer_family_id"}
                                                     <input type="hidden" name="{$name}" id="default_family_id">
                                                 {/form_field}
                                             </form>
@@ -117,16 +117,16 @@
                                                     {if $form_error}
                                                         <div class="alert alert-danger">{$form_error_message}</div
                                                     {/if}
-                                                    {form_hidden_fields form=$form}
-                                                    {form_field form=$form field="locale"}
+                                                    {form_hidden_fields}
+                                                    {form_field field="locale"}
                                                         <input type="hidden" name="{$name}" value="{$edit_language_locale}" />
                                                     {/form_field}
-                                                    {form_field form=$form field="code"}
+                                                    {form_field field="code"}
                                                         <div class="form-group{if $error} has-error{/if}">
                                                             <input class="form-control" type="text" required placeholder="{$label}" name="{$name}" value="{$value}" />
                                                         </div>
                                                     {/form_field}
-                                                    {form_field form=$form field="title"}
+                                                    {form_field field="title"}
                                                         <div class="form-group{if $error} has-error{/if}">
                                                             <input class="form-control" type="text" required placeholder="{$label}" name="{$name}" value="{$value}" />
                                                         </div>
@@ -148,7 +148,7 @@
                         <div class="modal js-modal-delete" tabindex="-1" role="dialog" aria-labelledby="Delete family" aria-hidden="true">
                             <div class="modal-dialog">
                                 <form action="" method="POST">
-                                    {form_hidden_fields form=$form}
+                                    {form_hidden_fields}
                                     <div class="modal-content">
                                         <div class="modal-body">
                                             {intl l="Do you really want to delete this customer family ?" d='customerfamily.bo.default'}
@@ -167,19 +167,19 @@
                         <div class="modal js-modal-update" tabindex="-1" role="dialog" aria-labelledby="Update family" aria-hidden="true">
                             <div class="modal-dialog">
                                 <form action="" method="POST">
-                                    {form_hidden_fields form=$form}
+                                    {form_hidden_fields}
                                     <div class="modal-content">
                                         <div class="modal-body">
-                                            {form_field form=$form field="locale"}
+                                            {form_field field="locale"}
                                                 <input type="hidden" name="{$name}" value="{$edit_language_locale}" />
                                             {/form_field}
-                                            {form_field form=$form field="code"}
+                                            {form_field field="code"}
                                                 <div class="form-group{if $error} has-error{/if}">
                                                     <label>{$label}</label>
                                                     <input class="form-control js-field-code" type="text" required placeholder="{$label}" name="{$name}" value="{$value}" />
                                                 </div>
                                             {/form_field}
-                                            {form_field form=$form field="title"}
+                                            {form_field field="title"}
                                                 <div class="form-group{if $error} has-error{/if}">
                                                     <label>{$label}</label>
                                                     <input class="form-control js-field-title" type="text" required placeholder="{$label}" name="{$name}" value="{$value}" />
@@ -198,23 +198,21 @@
                 </div>
 
                 <!-- Prices definition tab -->
-                <div id="prices_definition" class="tab-pane form-container">
+                <div id="prices_definition" class="tab-pane{if $current_tab == 'prices_definition'} active{/if} form-container">
                     <br>
 
                     <!-- Configure prices equation -->
                     <div class="row">
                         <div class="col-md-12">
 
-                            <h4 class="text-center">
-                                {intl l="Define if your prices are the products' ones or if they are calculated by the equation with your parameters." d='customerfamily.bo.default'}
-                            </h4>
-                            <h4 class="text-center">
-                                {intl l="Not using the equation will display the fix product price to customers." d='customerfamily.bo.default'}
-                            </h4>
-                            <h3 class="text-center">
-                                {intl l='Equation: ( ( product_purchase_price + fix_amount_1 ) x factor ) + fix_amount_2' d='customerfamily.bo.default'}
-                            </h3>
-                            <br>
+                            <div class="alert alert-info">
+                                <p>{intl l="Define if your prices are the products' ones or if they are calculated by the equation with your parameters." d='customerfamily.bo.default'}</p>
+                                <p>{intl l='Equation: ( ( product_purchase_price + fix_amount_1 ) x factor ) + fix_amount_2' d='customerfamily.bo.default'}</p>
+                                <p>{intl l="Not using the equation will display the fix product price to customers." d='customerfamily.bo.default'}</p>
+                                <p>{intl l="Don't forget to define a purchase price in the \"price\" tab of your products." d='customerfamily.bo.default'}</p>
+
+                            </div>
+
                             <table class="table table-striped">
                                 <thead>
                                     <tr>
@@ -241,9 +239,9 @@
                                             {form name='customer_family_price_update'}
                                                 <form action="{url path='/admin/module/CustomerFamily/update-price-calculation'}" method="post">
 
-                                                    {form_hidden_fields form=$form}
+                                                    {form_hidden_fields}
 
-                                                    {form_field form=$form field='promo'}
+                                                    {form_field field='promo'}
                                                         <input type="hidden" name="{$name}" value="0">
                                                     {/form_field}
 
@@ -257,32 +255,32 @@
 
                                                     <td>
                                                         {$TITLE_CUSTOMER_FAMILY}
-                                                        {form_field form=$form field="customer_family_id"}
+                                                        {form_field field="customer_family_id"}
                                                             <input type="hidden" name="{$name}" value="{$CUSTOMER_FAMILY_ID}">
                                                         {/form_field}
                                                     </td>
                                                     <td>
-                                                        {form_field form=$form field="use_equation"}
+                                                        {form_field field="use_equation"}
                                                             <input type="checkbox" name="{$name}" {if $use_equation}checked{/if}>
                                                         {/form_field}
                                                     </td>
                                                     <td>
-                                                        {form_field form=$form field="amount_added_before"}
+                                                        {form_field field="amount_added_before"}
                                                             <input type="number" name="{$name}" maxlength="16" step="any" value="{$amount_added_before}" class="form-control">
                                                         {/form_field}
                                                     </td>
                                                     <td>
-                                                        {form_field form=$form field="coefficient"}
+                                                        {form_field field="coefficient"}
                                                             <input type="number" name="{$name}" maxlength="16" step="any" value="{$coefficient}" class="form-control">
                                                         {/form_field}
                                                     </td>
                                                     <td>
-                                                        {form_field form=$form field="amount_added_after"}
+                                                        {form_field field="amount_added_after"}
                                                             <input type="number" name="{$name}" maxlength="16" step="any" value="{$amount_added_after}" class="form-control">
                                                         {/form_field}
                                                     </td>
                                                     <td>
-                                                        {form_field form=$form field="is_taxed"}
+                                                        {form_field field="is_taxed"}
                                                             <input type="checkbox" name="{$name}" {if $is_taxed}checked{/if}>
                                                         {/form_field}
                                                     </td>
@@ -304,9 +302,9 @@
                                             {form name='customer_family_price_update'}
                                                 <form action="{url path='/admin/module/CustomerFamily/update-price-calculation'}" method="post">
 
-                                                    {form_hidden_fields form=$form}
+                                                    {form_hidden_fields}
 
-                                                    {form_field form=$form field='promo'}
+                                                    {form_field field='promo'}
                                                         <input type="hidden" name="{$name}" value="1">
                                                     {/form_field}
 
@@ -320,32 +318,32 @@
 
                                                     <td>
                                                         {$TITLE_CUSTOMER_FAMILY} - {intl l='Promo' d='customerfamily.bo.default'}
-                                                        {form_field form=$form field="customer_family_id"}
+                                                        {form_field field="customer_family_id"}
                                                             <input type="hidden" name="{$name}" value="{$CUSTOMER_FAMILY_ID}">
                                                         {/form_field}
                                                     </td>
                                                     <td>
-                                                        {form_field form=$form field="use_equation"}
+                                                        {form_field field="use_equation"}
                                                             <input type="checkbox" name="{$name}" {if $use_equation}checked{/if}>
                                                         {/form_field}
                                                     </td>
                                                     <td>
-                                                        {form_field form=$form field="amount_added_before"}
+                                                        {form_field field="amount_added_before"}
                                                             <input type="number" name="{$name}" maxlength="16" step="any" value="{$amount_added_before}" class="form-control">
                                                         {/form_field}
                                                     </td>
                                                     <td>
-                                                        {form_field form=$form field="coefficient"}
+                                                        {form_field field="coefficient"}
                                                             <input type="number" name="{$name}" maxlength="16" step="any" value="{$coefficient}" class="form-control">
                                                         {/form_field}
                                                     </td>
                                                     <td>
-                                                        {form_field form=$form field="amount_added_after"}
+                                                        {form_field field="amount_added_after"}
                                                             <input type="number" name="{$name}" maxlength="16" step="any" value="{$amount_added_after}" class="form-control">
                                                         {/form_field}
                                                     </td>
                                                     <td>
-                                                        {form_field form=$form field="is_taxed"}
+                                                        {form_field field="is_taxed"}
                                                             <input type="checkbox" name="{$name}" {if $is_taxed}checked{/if}>
                                                         {/form_field}
                                                     </td>

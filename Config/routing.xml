@@ -23,8 +23,9 @@
         <requirement key="id">\d+</requirement>
     </route>
 
-    <route id="customer.family.customer.update" path="/admin/module/CustomerFamily/customer/update" methods="post">
+    <route id="customer.family.customer.update" path="/admin/module/CustomerFamily/customer/update/{customerId}" methods="post">
         <default key="_controller">CustomerFamily\Controller\Admin\CustomerFamilyAdminController::customerUpdateAction</default>
+        <requirement key="customerId">\d+</requirement>
     </route>
 
     <!-- Prices management -->

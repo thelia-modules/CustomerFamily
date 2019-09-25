@@ -3,7 +3,7 @@
 return array(
     'Code' => 'Code',
     'Customer' => 'Client',
-    'Customer family' => 'Famille clients',
+    'Customer family' => 'Famille de clients',
     'Customer family was created successfully' => 'La famille a été créée avec succès',
     'Customer family was deleted successfully' => 'La famille a été supprimée avec succès',
     'Customer family was updated successfully' => 'La famille a été modifiée avec succès',
@@ -13,8 +13,8 @@ return array(
     'Locale' => 'Langue',
     'My customer family' => 'Ma famille de clients',
     'Purchase price' => 'Prix d\'achat',
-    'Siret number' => 'Numéro de SIRET',
+    'Siret number' => 'Numéro SIRET',
     'This field can\'t be empty' => 'Ce champs ne peut pas être vide',
     'Title' => 'Nom',
-    'Vat' => 'TVA intracommunautaire',
+    'Vat' => 'N° de TVA intracommunautaire',
 );
