@@ -161,7 +161,7 @@ This form extend customer_create_form
 
 ### Fields
 
-|Name |Type |Required |Version |
+|Name |Type |Required |
 |--- |--- |--- |--- |
 |**customer_family_id** | integer | true |
 |**siret** | string | false |
