@@ -21,6 +21,7 @@
 		<form name="customer.customer.family.form" class="CustomerFamily\Form\CustomerCustomerFamilyForm" />
 
 		<form name="customer_family_price_update" class="CustomerFamily\Form\CustomerFamilyPriceForm" />
+		<form name="customer_family_price_mode" class="CustomerFamily\Form\CustomerFamilyPriceModeForm" />
 	</forms>
 
 	<services>
@@ -101,6 +102,10 @@
 			<tag name="hook.event_listener" event="categories.js" type="back" templates="js:assets/js/product-creation-price.js" />
 		</hook>
 
+		<hook id="customer.family.menutools.hook" class="CustomerFamily\Hook\CustomerFamilyToolsHook" scope="request">
+			<tag name="hook.event_listener" event="main.top-menu-tools" type="back" method="onMainTopMenuTools" />
+		</hook>
+
 		<!-- Admin customer create -->
 		<hook id="customer.family.customer.create">
 			<tag name="hook.event_listener" event="customer.create-form" type="back" templates="render:customer-create.html" />
@@ -126,10 +131,10 @@
 		</hook>
 
 		<!-- Additional fields for the register form -->
-		<hook id="customer.family.register.form" class="CustomerFamily\Hook\CustomerFamilyRegisterFormHook">
+		<!--<hook id="customer.family.register.form" class="CustomerFamily\Hook\CustomerFamilyRegisterFormHook">
 			<tag name="hook.event_listener" event="register.form-bottom" type="front" method="onRegisterFormBottom"/>
 			<tag name="hook.event_listener" event="register.after-javascript-include" type="front" method="onRegisterAfterJSInclude"/>
-		</hook>
+		</hook>-->
 
 		<!-- Showing customer family information -->
 		<hook id="customer.family.account.display" class="CustomerFamily\Hook\CustomerFamilyAccountDisplayHook">
@@ -137,10 +142,11 @@
 		</hook>
 
 		<!-- Additional fields for the account update form -->
-		<hook id="customer.family.update.form" class="CustomerFamily\Hook\CustomerFamilyUpdateFormHook">
+		<!--<hook id="customer.family.update.form" class="CustomerFamily\Hook\CustomerFamilyUpdateFormHook">
 			<tag name="hook.event_listener" event="account-update.form-bottom" type="front" method="onAccountUpdateFormBottom"/>
 			<tag name="hook.event_listener" event="account-update.after-javascript-include" type="front" method="onAccountUpdateAfterJSInclude"/>
-		</hook>
+		</hook>-->
+
 	</hooks>
 
 </config>

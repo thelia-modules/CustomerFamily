@@ -7,6 +7,7 @@ use CustomerFamily\Model\CustomerFamilyPriceQuery;
 use CustomerFamily\Model\CustomerFamilyQuery;
 use CustomerFamily\Model\Map\ProductPurchasePriceTableMap;
 use CustomerFamily\Model\OrderProductPurchasePrice;
+use CustomerFamily\Model\ProductPurchasePrice;
 use CustomerFamily\Model\ProductPurchasePriceQuery;
 use CustomerFamily\Service\CustomerFamilyService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -56,11 +57,10 @@ class CustomerFamilyOrderListener implements EventSubscriberInterface
         /** @var \Thelia\Model\OrderProduct $orderProduct */
         foreach ($orderProducts as $orderProduct) {
             // If a ProductPurchasePrice exists for the PSE & currency
-            if (null !== $purchasePrice = ProductPurchasePriceQuery::create()
-                    ->filterByProductSaleElementsId($orderProduct->getProductSaleElementsId())
-                    ->filterByCurrencyId($currencyId)
-                    ->select(ProductPurchasePriceTableMap::PURCHASE_PRICE)
-                    ->findOne()) {
+            if (null !== $purchasePrice = $this->customerFamilyService
+                    ->getPurchasePrice(
+                        $orderProduct->getProductSaleElementsId(),
+                        $currencyId)){
                 // Initialize equation
                 $equation = 'Equation not used';
 
@@ -83,6 +83,10 @@ class CustomerFamilyOrderListener implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @param OrderEvent $orderEvent
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     public function saveOrderFamilyAndEquation(OrderEvent $orderEvent)
     {
         $customerFamily = CustomerFamilyQuery::create()

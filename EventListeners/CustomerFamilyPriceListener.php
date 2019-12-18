@@ -2,6 +2,7 @@
 
 namespace CustomerFamily\EventListeners;
 
+use CustomerFamily\CustomerFamily;
 use CustomerFamily\Model\Map\ProductPurchasePriceTableMap;
 use CustomerFamily\Service\CustomerFamilyService;
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -13,8 +14,10 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Exception\TaxEngineException;
 use Thelia\Model\Currency;
+use Thelia\Model\Map\ProductPriceTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Product;
+use Thelia\Model\ProductPrice;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\ProductSaleElements;
 use Thelia\TaxEngine\TaxEngine;
@@ -54,7 +57,7 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
 
     /**
      * @param LoopExtendsBuildModelCriteriaEvent $event
-     * @return mixed
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function extendProductModelCriteria(LoopExtendsBuildModelCriteriaEvent $event)
     {
@@ -63,6 +66,7 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
             // Get associated prices
             $customerFamilyPrice = $this->customerFamilyService->getCustomerFamilyPrice($customerFamilyId, 0, 1);
             $customerFamilyPromoPrice = $this->customerFamilyService->getCustomerFamilyPrice($customerFamilyId, 1, 1);
+            $useProductPrice = CustomerFamily::getConfigValue('customer_family_price_mode', null);
 
             if ($customerFamilyPrice !== null || $customerFamilyPromoPrice !== null) {
                 // Get currency & search
@@ -77,13 +81,23 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
                     $searchType = null;
                 }
 
+                $tableName = ProductPurchasePriceTableMap::TABLE_NAME;
+                $colCurrencyId = ProductPurchasePriceTableMap::CURRENCY_ID;
+                $colPrice = ProductPurchasePriceTableMap::PURCHASE_PRICE;
+
+                if ($useProductPrice){
+                    $tableName = ProductPriceTableMap::TABLE_NAME;
+                    $colCurrencyId = ProductPriceTableMap::COL_CURRENCY_ID;
+                    $colPrice = ProductPriceTableMap::COL_PRICE;
+                }
+
                 // Link each PSE with its corresponding purchase price, according to the PSE id
                 $productPurchasePriceJoin = new Join();
                 $productPurchasePriceJoin->addExplicitCondition(
                     ProductSaleElementsTableMap::TABLE_NAME,
                     'ID',
                     $searchType,
-                    ProductPurchasePriceTableMap::TABLE_NAME,
+                    $tableName,
                     'PRODUCT_SALE_ELEMENTS_ID'
                 );
                 $productPurchasePriceJoin->setJoinType(Criteria::LEFT_JOIN);
@@ -91,11 +105,11 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
                 // Add the link to the search, and add a link condition based on the currency
                 $search
                     ->addJoinObject($productPurchasePriceJoin, 'purchase_price_join')
-                    ->addJoinCondition('purchase_price_join', ProductPurchasePriceTableMap::CURRENCY_ID.' = ?', $currencyId, null, \PDO::PARAM_INT);
+                    ->addJoinCondition('purchase_price_join', $colCurrencyId.' = ?', $currencyId, null, \PDO::PARAM_INT);
 
                 // Add
-                $this->addProductCalculatedPrice($customerFamilyPrice, $search);
-                $this->addProductCalculatedPromoPrice($customerFamilyPromoPrice, $search);
+                $this->addProductCalculatedPrice($customerFamilyPrice, $search, $colPrice);
+                $this->addProductCalculatedPromoPrice($customerFamilyPromoPrice, $search, $colPrice);
             }
         }
     }
@@ -143,17 +157,18 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
     /**
      * @param \CustomerFamily\Model\CustomerFamilyPrice $customerFamilyPrice
      * @param \Propel\Runtime\ActiveQuery\ModelCriteria $search
+     * @param $colPrice
      */
-    protected function addProductCalculatedPrice($customerFamilyPrice, $search)
+    protected function addProductCalculatedPrice($customerFamilyPrice, $search, $colPrice)
     {
         // Check if products' prices have to be changed depending on the customer's family
         if ($customerFamilyPrice !== null) {
             $search
                 ->withColumn(
-                    'IF (' . ProductPurchasePriceTableMap::PURCHASE_PRICE . ' IS NULL,
+                    'IF (' . $colPrice . ' IS NULL,
                         NULL,
                         (' .
-                            ProductPurchasePriceTableMap::PURCHASE_PRICE .
+                            $colPrice .
                             '+' . $customerFamilyPrice->getAmountAddedBefore() .
                         ') * ' . $customerFamilyPrice->getMultiplicationCoefficient() .
                         ' + ' . $customerFamilyPrice->getAmountAddedAfter() .
@@ -168,17 +183,18 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
     /**
      * @param \CustomerFamily\Model\CustomerFamilyPrice $customerFamilyPromoPrice
      * @param \Propel\Runtime\ActiveQuery\ModelCriteria $search
+     * @param $colPrice
      */
-    protected function addProductCalculatedPromoPrice($customerFamilyPromoPrice, $search)
+    protected function addProductCalculatedPromoPrice($customerFamilyPromoPrice, $search, $colPrice)
     {
         // Check if products' promo prices have to be changed depending on the customer's family
         if ($customerFamilyPromoPrice !== null) {
             $search
                 ->withColumn(
-                    'IF (' . ProductPurchasePriceTableMap::PURCHASE_PRICE . ' IS NULL,
+                    'IF (' . $colPrice . ' IS NULL,
                         NULL,
                         (' .
-                            ProductPurchasePriceTableMap::PURCHASE_PRICE .
+                            $colPrice .
                             '+' . $customerFamilyPromoPrice->getAmountAddedBefore() .
                         ') * ' . $customerFamilyPromoPrice->getMultiplicationCoefficient() .
                         ' + ' . $customerFamilyPromoPrice->getAmountAddedAfter() .

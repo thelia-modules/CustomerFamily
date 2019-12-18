@@ -36,4 +36,8 @@
         <default key="_controller">CustomerFamily\Controller\Admin\CustomerFamilyPriceController::calculatePricesAction</default>
     </route>
 
+    <route id="customer.family.price.mode.update" path="/admin/CustomerFamily/selectPriceMode" methods="post">
+        <default key="_controller">CustomerFamily\Controller\Admin\CustomerFamilyPriceController::updatePriceModeAction</default>
+    </route>
+
 </routes>
