@@ -5,10 +5,9 @@ Create customer families (professional, private individual, ...) and manage spec
 Also allow to define purchase prices for products.
 
 ## Compatibility
-* To use on Thelia 2.3.x, use tag [1.3](https://github.com/thelia-modules/CustomerFamily/tree/1.3)
-* To use on Thelia 2.2.x, use tag [1.2](https://github.com/thelia-modules/CustomerFamily/tree/1.2)
-* To use on Thelia 2.1.x, use tag [1.1](https://github.com/thelia-modules/CustomerFamily/tree/1.1)
-* To use on Thelia 2.0.x, use tag [1.0](https://github.com/thelia-modules/CustomerFamily/tree/1.0)
+    Thelia >= 2.3.x
+    
+    For use with lower version of Thelia look for older tags on this module.
 
 ## Installation
 
@@ -22,7 +21,7 @@ Also allow to define purchase prices for products.
 Add it in your main thelia composer.json file
 
 ```
-composer require thelia/customer-family-module:~1.3.0
+composer require thelia/customer-family-module:~1.4.0
 ```
 
 ## Usage
@@ -45,20 +44,20 @@ This loop returns client families
 
 #### Input arguments
 
-|Argument |Description |Version |
-|---      |---         |--- |
-|**id** | family id | 1.0
-|**exclude_id** | exclude family id | 1.0
-|**is_default** | filter default family | 1.3
+|Argument |Description |
+|---      |---         |
+|**id** | family id |
+|**exclude_id** | exclude family id |
+|**is_default** | filter default family |
 
 #### Output values
 
-|Argument |Description |Version |
-|---      |---         |--- |
-|**CUSTOMER_FAMILY_ID** | customer family id | 1.0
-|**CODE** | customer family code | 1.0
-|**TITLE_CUSTOMER_FAMILY** | customer family title | 1.0
-|**IS_DEFAULT** | default customer family | 1.3
+|Argument |Description |
+|---      |---         |
+|**CUSTOMER_FAMILY_ID** | customer family id |
+|**CODE** | customer family code 
+|**TITLE_CUSTOMER_FAMILY** | customer family title |
+|**IS_DEFAULT** | default customer family |
 
 #### Example
 ```
@@ -73,20 +72,20 @@ This loop returns customer family for specific customer or inverse
 
 #### Input arguments
 
-|Argument |Description |Version |
-|---      |---         |--- |
-|**customer_id** | customer id | 1.0
-|**customer_family_id** | family id | 1.0
-|**customer_family_code** | family code | 1.3.10
+|Argument |Description |
+|---      |---         |
+|**customer_id** | customer id |
+|**customer_family_id** | family id |
+|**customer_family_code** | family code |
 
 #### Output values
 
-|Argument |Description |Version |
-|---      |---         |--- |
-|**CUSTOMER_FAMILY_ID** | customer family id | 1.0
-|**CUSTOMER_ID** | customer id | 1.0
-|**SIRET** | siret number | 1.0
-|**VAT** | vat number id | 1.0
+|Argument |Description |
+|---      |---         |
+|**CUSTOMER_FAMILY_ID** | customer family id |
+|**CUSTOMER_ID** | customer id |
+|**SIRET** | siret number |
+|**VAT** | vat number id |
 
 #### Example
 ```
@@ -101,23 +100,23 @@ This loop returns the customer family's equation data
 
 #### Input arguments
 
-|Argument |Description |Version |
-|---      |---         |--- |
-|**customer_family_id** | family id | 1.3
-|**promo** | equation for the promo price or not | 1.3
-|**use_equation** | is the equation used to calculate price | 1.3
+|Argument |Description |
+|---      |---         |
+|**customer_family_id** | family id |
+|**promo** | equation for the promo price or not |
+|**use_equation** | is the equation used to calculate price |
 
 #### Output values
 
-|Argument |Description |Version |
-|---      |---         |--- |
-|**CUSTOMER_FAMILY_ID** | customer family id | 1.3
-|**PROMO** | equation for the promo price or not | 1.3
-|**USE_EQUATION** | is the equation used to calculate price | 1.3
-|**AMOUNT_ADDED_BEFORE** | amount directly added to the purchase price | 1.3
-|**AMOUNT_ADDED_AFTER** | amount added to the purchase price after the multiplication | 1.3
-|**COEFFICIENT** | coefficient the purchase price added to AMOUNT_ADDED_BEFORE is multiplied by | 1.3
-|**IS_TAXED** | are taxes applied on the final calculated price | 1.3
+|Argument |Description |
+|---      |---         |
+|**CUSTOMER_FAMILY_ID** | customer family id |
+|**PROMO** | equation for the promo price or not |
+|**USE_EQUATION** | is the equation used to calculate price |
+|**AMOUNT_ADDED_BEFORE** | amount directly added to the purchase price | 
+|**AMOUNT_ADDED_AFTER** | amount added to the purchase price after the multiplication |
+|**COEFFICIENT** | coefficient the purchase price added to AMOUNT_ADDED_BEFORE is multiplied by |
+|**IS_TAXED** | are taxes applied on the final calculated price |
 
 #### Example
 ```
@@ -133,20 +132,20 @@ This loop returns the PSE's calculated price based on the given customer family 
 
 #### Input arguments
 
-|Argument |Description |Version |
-|---      |---         |--- |
-|**pse_id** | *mandatory*, PSE id | 1.3
-|**currency_id** | currency id *(if not given, use default currency)* | 1.3
-|**customer_family_id** | *mandatory*, customer family id | 1.3
+|Argument |Description |
+|---      |---         |
+|**pse_id** | *mandatory*, PSE id |
+|**currency_id** | currency id *(if not given, use default currency)* |
+|**customer_family_id** | *mandatory*, customer family id |
 
 #### Output values
 
-|Argument |Description |Version |
-|---      |---         |--- |
-|**CALCULATED_PRICE** | customer family id | 1.3
-|**CALCULATED_TAXED_PRICE** | equation for the promo price or not | 1.3
-|**CALCULATED_PROMO_PRICE** | is the equation used to calculate price | 1.3
-|**CALCULATED_TAXED_PROMO_PRICE** | amount directly added to the purchase price | 1.3
+|Argument |Description |
+|---      |---         |
+|**CALCULATED_PRICE** | customer family id |
+|**CALCULATED_TAXED_PRICE** | equation for the promo price or not |
+|**CALCULATED_PROMO_PRICE** | is the equation used to calculate price |
+|**CALCULATED_TAXED_PROMO_PRICE** | amount directly added to the purchase price |
 
 #### Example
 ```
@@ -164,9 +163,9 @@ This form extend customer_create_form
 
 |Name |Type |Required |Version |
 |--- |--- |--- |--- |
-|**customer_family_id** | integer | true | 1.0
-|**siret** | string | false | 1.0
-|**vat** | string | false | 1.0
+|**customer_family_id** | integer | true |
+|**siret** | string | false |
+|**vat** | string | false |
 
 ## Default
 
