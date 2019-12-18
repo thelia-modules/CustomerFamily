@@ -22,7 +22,7 @@ Also allow to define purchase prices for products.
 Add it in your main thelia composer.json file
 
 ```
-composer require thelia/customer-family-module:~1.0
+composer require thelia/customer-family-module:~1.3.0
 ```
 
 ## Usage
