@@ -19,6 +19,10 @@ class BaseCustomerFamilyLoopExtend
     {
         $currentCustomer = $this->securityContext->getCustomerUser();
 
+        if (null === $currentCustomer) {
+            return null;
+        }
+
         $customerFamily = CustomerFamilyQuery::create()
             ->useCustomerCustomerFamilyQuery()
                 ->filterByCustomerId($currentCustomer->getId())
