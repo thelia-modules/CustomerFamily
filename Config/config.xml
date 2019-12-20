@@ -87,6 +87,21 @@
             <argument type="service" id="customer.family.service"/>
             <tag name="kernel.event_subscriber"/>
 		</service>
+
+		<service id="customer.family.category.loop_extend" class="CustomerFamily\LoopExtend\CategoryLoopExtend">
+			<argument type="service" id="thelia.securityContext"/>
+			<tag name="kernel.event_subscriber"/>
+		</service>
+
+		<service id="customer.family.brand.loop_extend" class="CustomerFamily\LoopExtend\BrandLoopExtend">
+			<argument type="service" id="thelia.securityContext"/>
+			<tag name="kernel.event_subscriber"/>
+		</service>
+
+		<service id="customer.family.product.loop_extend" class="CustomerFamily\LoopExtend\ProductLoopExtend">
+			<argument type="service" id="thelia.securityContext"/>
+			<tag name="kernel.event_subscriber"/>
+		</service>
 	</services>
 
 	<hooks>

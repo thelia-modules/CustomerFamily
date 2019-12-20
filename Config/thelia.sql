@@ -13,11 +13,13 @@ CREATE TABLE `customer_family`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `code` VARCHAR(45) NOT NULL,
+    `category_restriction_enabled` TINYINT DEFAULT 0,
+    `brand_restriction_enabled` TINYINT DEFAULT 0,
     `is_default` TINYINT,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    UNIQUE INDEX `customer_family_U_1` (`code`)
+    UNIQUE INDEX `customer_family_u_4db226` (`code`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -34,11 +36,11 @@ CREATE TABLE `customer_customer_family`
     `vat` VARCHAR(50),
     PRIMARY KEY (`customer_id`),
     INDEX `idx_customer_customer_family_customer_family_id` (`customer_family_id`),
-    CONSTRAINT `customer_customer_family_FK_1`
+    CONSTRAINT `customer_customer_family_fk_7e8f3e`
         FOREIGN KEY (`customer_id`)
         REFERENCES `customer` (`id`)
         ON DELETE CASCADE,
-    CONSTRAINT `customer_customer_family_FK_2`
+    CONSTRAINT `customer_customer_family_fk_90b22e`
         FOREIGN KEY (`customer_family_id`)
         REFERENCES `customer_family` (`id`)
         ON DELETE CASCADE
@@ -79,7 +81,7 @@ CREATE TABLE `product_purchase_price`
     `currency_id` INTEGER NOT NULL,
     `purchase_price` DECIMAL(16,6) DEFAULT 0,
     PRIMARY KEY (`product_sale_elements_id`,`currency_id`),
-    INDEX `FI_currency_id` (`currency_id`),
+    INDEX `fi_currency_id` (`currency_id`),
     CONSTRAINT `fk_product_sale_elements_id`
         FOREIGN KEY (`product_sale_elements_id`)
         REFERENCES `product_sale_elements` (`id`)
@@ -122,7 +124,7 @@ CREATE TABLE `customer_family_order`
     `order_id` INTEGER NOT NULL,
     `customer_family_id` INTEGER NOT NULL,
     PRIMARY KEY (`order_id`),
-    INDEX `FI_customer_family_order_customer_family_id` (`customer_family_id`),
+    INDEX `fi_customer_family_order_customer_family_id` (`customer_family_id`),
     CONSTRAINT `fk_customer_family_order_customer_family_order_id`
         FOREIGN KEY (`order_id`)
         REFERENCES `order` (`id`)
@@ -131,6 +133,56 @@ CREATE TABLE `customer_family_order`
         FOREIGN KEY (`customer_family_id`)
         REFERENCES `customer_family` (`id`)
         ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- customer_family_available_category
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `customer_family_available_category`;
+
+CREATE TABLE `customer_family_available_category`
+(
+    `customer_family_id` INTEGER NOT NULL,
+    `category_id` INTEGER NOT NULL,
+    PRIMARY KEY (`customer_family_id`,`category_id`),
+    INDEX `idx_customer_family_available_category_customer_family_id` (`customer_family_id`),
+    INDEX `idx_customer_family_available_category_category_id` (`category_id`),
+    CONSTRAINT `fk_customer_family_available_category_customer_family_id`
+        FOREIGN KEY (`customer_family_id`)
+        REFERENCES `customer_family` (`id`)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_customer_family_available_category_category_id`
+        FOREIGN KEY (`category_id`)
+        REFERENCES `category` (`id`)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- customer_family_available_brand
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `customer_family_available_brand`;
+
+CREATE TABLE `customer_family_available_brand`
+(
+    `customer_family_id` INTEGER NOT NULL,
+    `brand_id` INTEGER NOT NULL,
+    PRIMARY KEY (`customer_family_id`,`brand_id`),
+    INDEX `idx_customer_family_available_brand_customer_family_id` (`customer_family_id`),
+    INDEX `idx_customer_family_available_brand_brand_id` (`brand_id`),
+    CONSTRAINT `fk_customer_family_available_brand_customer_family_id`
+        FOREIGN KEY (`customer_family_id`)
+        REFERENCES `customer_family` (`id`)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_customer_family_available_brand_brand_id`
+        FOREIGN KEY (`brand_id`)
+        REFERENCES `brand` (`id`)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -145,7 +197,7 @@ CREATE TABLE `customer_family_i18n`
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
     `title` VARCHAR(255),
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `customer_family_i18n_FK_1`
+    CONSTRAINT `customer_family_i18n_fk_0253ce`
         FOREIGN KEY (`id`)
         REFERENCES `customer_family` (`id`)
         ON DELETE CASCADE

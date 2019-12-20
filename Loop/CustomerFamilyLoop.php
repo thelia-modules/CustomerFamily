@@ -12,6 +12,7 @@
 
 namespace CustomerFamily\Loop;
 
+use CustomerFamily\Model\Base\CustomerFamily;
 use CustomerFamily\Model\CustomerFamilyQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
@@ -82,19 +83,21 @@ class CustomerFamilyLoop extends BaseI18nLoop implements PropelSearchLoopInterfa
 
     /**
      * @param LoopResult $loopResult
-     *
+     *`
      * @return LoopResult
      */
     public function parseResults(LoopResult $loopResult)
     {
         foreach ($loopResult->getResultDataCollection() as $customerFamily) {
-            /** @var \CustomerFamily\Model\CustomerFamily $customerFamily */
+            /** @var CustomerFamily $customerFamily */
             $loopResultRow = new LoopResultRow($customerFamily);
             $loopResultRow
                 ->set("CUSTOMER_FAMILY_ID", $customerFamily->getId())
                 ->set("CODE", $customerFamily->getCode())
                 ->set("TITLE_CUSTOMER_FAMILY", $customerFamily->getVirtualColumn('i18n_TITLE'))
-                ->set("IS_DEFAULT", $customerFamily->getIsDefault());
+                ->set("IS_DEFAULT", $customerFamily->getIsDefault())
+                ->set("CATEGORY_RESTRICTION_ENABLED", $customerFamily->getCategoryRestrictionEnabled())
+                ->set("BRAND_RESTRICTION_ENABLED", $customerFamily->getBrandRestrictionEnabled());
 
             $loopResult->addRow($loopResultRow);
         }

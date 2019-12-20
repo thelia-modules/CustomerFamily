@@ -20,7 +20,10 @@ use CustomerFamily\Form\CustomerCustomerFamilyForm;
 use CustomerFamily\Form\CustomerFamilyCreateForm;
 use CustomerFamily\Form\CustomerFamilyDeleteForm;
 use CustomerFamily\Form\CustomerFamilyUpdateForm;
+use CustomerFamily\Model\CustomerFamilyAvailableBrand;
+use CustomerFamily\Model\CustomerFamilyAvailableCategory;
 use CustomerFamily\Model\CustomerFamilyQuery;
+use Propel\Runtime\Propel;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Core\HttpFoundation\JsonResponse;
@@ -31,8 +34,8 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
 use Thelia\Form\CustomerUpdateForm;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Model\Base\CustomerQuery;
 use Thelia\Model\Customer;
+use Thelia\Model\CustomerQuery;
 use Thelia\Tools\URL;
 
 /**
@@ -41,6 +44,54 @@ use Thelia\Tools\URL;
  */
 class CustomerFamilyAdminController extends BaseAdminController
 {
+    public function viewAction($params = [])
+    {
+        $categoryRestrictions = [];
+        $brandRestrictions = [];
+
+        $customerFamilies = CustomerFamilyQuery::create()
+            ->find();
+
+        $con = Propel::getConnection();
+
+        /** @var CustomerFamily $customerFamily */
+        foreach ($customerFamilies as $customerFamily) {
+            $categoryRestrictionSql = "SELECT c.id, c.parent, ci18n.title, cfac.`customer_family_id`,
+                            CASE 
+                              WHEN cfac.`customer_family_id` IS NOT NULL THEN 1
+                              ELSE 0
+                            END as available 
+                            FROM category c
+                            LEFT JOIN `category_i18n` ci18n on c.`id` = ci18n.id AND ci18n.locale = :locale
+                            LEFT JOIN `customer_family_available_category` cfac ON c.`id` = cfac.`category_id` AND cfac.`customer_family_id` = :customerFamilyId";
+
+            $stmt = $con->prepare($categoryRestrictionSql);
+            $stmt->bindValue('locale', $this->getCurrentEditionLocale());
+            $stmt->bindValue('customerFamilyId', $customerFamily->getId());
+            $stmt->execute();
+
+            $categoryRestrictions[$customerFamily->getId()] = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            $brandRestrictionSql = "SELECT b.id, bi18n.title, cfab.`customer_family_id`,
+                            CASE 
+                              WHEN cfab.`customer_family_id` IS NOT NULL THEN 1
+                              ELSE 0
+                            END as available 
+                            FROM brand b
+                            LEFT JOIN `brand_i18n` bi18n on b.`id` = bi18n.id AND bi18n.locale = :locale
+                            LEFT JOIN `customer_family_available_brand` cfab ON b.`id` = cfab.`brand_id` AND cfab.`customer_family_id` = :customerFamilyId";
+
+            $stmt = $con->prepare($brandRestrictionSql);
+            $stmt->bindValue('locale', $this->getCurrentEditionLocale());
+            $stmt->bindValue('customerFamilyId', $customerFamily->getId());
+            $stmt->execute();
+
+            $brandRestrictions[$customerFamily->getId()] = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        }
+
+        return $this->render("customer_family_module_configuration", compact('categoryRestrictions', 'brandRestrictions'));
+    }
+
     /**
      * @param Request $request
      * @return mixed|\Thelia\Core\HttpFoundation\Response
@@ -299,6 +350,66 @@ class CustomerFamilyAdminController extends BaseAdminController
                 'customer_id' => $request->get('customer_customer_family_form')['customer_id'],
                 "order_creation_error" => Translator::getInstance()->trans($error, array(), CustomerFamily::MESSAGE_DOMAIN)
             ));
+    }
+
+    public function saveCustomerFamilyCategoryRestriction($customerFamilyId)
+    {
+        $customerFamily = CustomerFamilyQuery::create()
+            ->findOneById($customerFamilyId);
+
+        $restrictionEnabled = $this->getRequest()->get('restriction_enabled') === "on";
+        $customerFamily->setCategoryRestrictionEnabled($restrictionEnabled);
+        $customerFamily->save();
+
+        $con = Propel::getConnection();
+        $deleteSql =  "DELETE FROM `customer_family_available_category` WHERE `customer_family_available_category`.`customer_family_id` = :customerFamilyId";
+        $stmt = $con->prepare($deleteSql);
+        $stmt->bindValue('customerFamilyId', $customerFamilyId);
+        $stmt->execute();
+
+        $brands = $this->getRequest()->get('available_categories');
+        if (is_array($brands)) {
+            foreach ($this->getRequest()->get('available_categories') as $availableCategoryId) {
+                var_dump($customerFamilyId);
+                var_dump($availableCategoryId);
+                $customerFamilyAvailableCategory = new CustomerFamilyAvailableCategory();
+                $customerFamilyAvailableCategory->setCustomerFamilyId($customerFamilyId)
+                    ->setCategoryId($availableCategoryId)
+                    ->save();
+            }
+        }
+
+        return $this->renderAdminConfig(null, "", "");
+    }
+
+    public function saveCustomerFamilyBrandRestriction($customerFamilyId)
+    {
+        $customerFamily = CustomerFamilyQuery::create()
+            ->findOneById($customerFamilyId);
+
+        $restrictionEnabled = $this->getRequest()->get('restriction_enabled') === "on";
+        $customerFamily->setBrandRestrictionEnabled($restrictionEnabled);
+        $customerFamily->save();
+
+        $con = Propel::getConnection();
+        $deleteSql =  "DELETE FROM `customer_family_available_brand` WHERE `customer_family_available_brand`.`customer_family_id` = :customerFamilyId";
+        $stmt = $con->prepare($deleteSql);
+        $stmt->bindValue('customerFamilyId', $customerFamilyId);
+        $stmt->execute();
+
+        $categories = $this->getRequest()->get('available_categories');
+        if (is_array($categories)) {
+            foreach ($this->getRequest()->get('available_categories') as $availableBrandId) {
+                var_dump($customerFamilyId);
+                var_dump($availableBrandId);
+                $customerFamilyAvailableBrand = new CustomerFamilyAvailableBrand();
+                $customerFamilyAvailableBrand->setCustomerFamilyId($customerFamilyId)
+                    ->setBrandId($availableBrandId)
+                    ->save();
+            }
+        }
+
+        return $this->renderAdminConfig(null, "", "");
     }
 
     /**
