@@ -96,12 +96,12 @@ class CustomerFamilyService
     public function getPurchasePrice($pseId, $currencyId)
     {
         $mode = CustomerFamily::getConfigValue('customer_family_price_mode', 0);
-        if($mode == 1){
+        if ($mode == 1) {
             $pseProductPrice = $this->getPseProductPrice($pseId, $currencyId);
-            return $pseProductPrice->getPrice();
+            return $pseProductPrice !== null ? $pseProductPrice->getPrice() : null;
         }
         $pseProductPurchasePrice = $this->getPseProductPurchasePrice($pseId, $currencyId);
-        return $pseProductPurchasePrice->getPurchasePrice();
+        return $pseProductPurchasePrice !== null  ? $pseProductPurchasePrice->getPurchasePrice() : null;
     }
 
     /**
