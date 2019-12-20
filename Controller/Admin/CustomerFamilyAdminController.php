@@ -322,7 +322,7 @@ class CustomerFamilyAdminController extends BaseAdminController
 
             $this->dispatch(CustomerFamilyEvents::CUSTOMER_CUSTOMER_FAMILY_UPDATE, $event);
 
-            $this->generateRedirect(URL::getInstance()->absoluteUrl(
+            return $this->generateRedirect(URL::getInstance()->absoluteUrl(
                 '/admin/customer/update?customer_id='.$formValidate->get('customer_id')->getData()
             ));
         } catch (FormValidationException $ex) {
