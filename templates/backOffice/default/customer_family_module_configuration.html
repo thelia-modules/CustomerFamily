@@ -1,3 +1,21 @@
+{extends file="admin-layout.tpl"}
+
+{block name="after-bootstrap-css"}
+
+{/block}
+
+{block name="no-return-functions"}
+    {$admin_current_location = 'module'}
+{/block}
+
+{block name="page-title"}Configuration CustomerFamily{/block}
+
+{block name="check-resource"}admin.module{/block}
+{block name="check-access"}view{/block}
+{block name="check-module"}CustomerFamily{/block}
+
+{block name="main-content"}
+
 <div class="general-block-decorator" id="CustomerFamily">
     <div class="title">
         {intl l="Customer Family" d='customerfamily.bo.default'}
@@ -9,6 +27,8 @@
             <ul id="tabbed-menu" class="nav nav-tabs">
                 <li class="active"><a data-toggle="tab" href="#families">{intl l="Families" d='customerfamily.bo.default'}</a> </li>
                 <li><a data-toggle="tab" href="#prices_definition">{intl l="Prices definition" d='customerfamily.bo.default'}</a></li>
+                <li><a data-toggle="tab" href="#category_restrictions">{intl l="Category restrictions" d='customerfamily.bo.default'}</a></li>
+                <li><a data-toggle="tab" href="#brand_restrictions">{intl l="Brand restrictions" d='customerfamily.bo.default'}</a></li>
             </ul>
 
             <div class="tab-content">
@@ -374,6 +394,59 @@
                         </div>
                     </div>
                 </div>
+
+                <div id="category_restrictions" class="tab-pane form-container">
+                    <div class="row">
+                        {loop type='customer_family' name='customerfamily_loop'}
+                            <div class="col-md-12 general-block-decorator">
+                                <form method="post" action="{url path="/admin/module/CustomerFamily/category_restriction/%customerFamilyId" customerFamilyId=$CUSTOMER_FAMILY_ID}">
+                                    <div class="title title-without-tabs">
+                                        {$TITLE_CUSTOMER_FAMILY}
+                                    </div>
+                                    <label for="category_restriction_{$CUSTOMER_FAMILY_ID}">
+                                        <input name="restriction_enabled" class="restriction_toggler" id="category_restriction_{$CUSTOMER_FAMILY_ID}" type="checkbox" {if $CATEGORY_RESTRICTION_ENABLED}checked{/if}>
+                                        <span>{intl l="Enable category restriction for this customer family" d='customerfamily.bo.default'}</span>
+                                    </label>
+                                    <div class="restriction_toggled toggled_by_category_restriction_{$CUSTOMER_FAMILY_ID}">
+                                        <p>{intl l="Choose what categories will be available for this customer family" d='customerfamily.bo.default'}</p>
+                                        <select class="form-control" name="available_categories[]" id="" multiple>
+                                            {foreach from=$categoryRestrictions[$CUSTOMER_FAMILY_ID] item=categoryRestriction}
+                                                <option value="{$categoryRestriction.id}" {if $categoryRestriction.available}selected{/if}>{$categoryRestriction.title}</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                    <input type="submit" class="btn-block btn btn-success"/>
+                                </form>
+                            </div>
+                        {/loop}
+                    </div>
+                </div>
+                <div id="brand_restrictions" class="tab-pane form-container">
+                    <div class="row">
+                        {loop type='customer_family' name='customerfamily_loop'}
+                            <div class="col-md-12 general-block-decorator">
+                                <form method="post" action="{url path="/admin/module/CustomerFamily/brand_restriction/%customerFamilyId" customerFamilyId=$CUSTOMER_FAMILY_ID}">
+                                    <div class="title title-without-tabs">
+                                        {$TITLE_CUSTOMER_FAMILY}
+                                    </div>
+                                    <label for="brand_restriction_{$CUSTOMER_FAMILY_ID}">
+                                        <input name="restriction_enabled" class="restriction_toggler" id="brand_restriction_{$CUSTOMER_FAMILY_ID}" type="checkbox" {if $BRAND_RESTRICTION_ENABLED}checked{/if}>
+                                        <span>{intl l="Enable brand restriction for this customer family" d='customerfamily.bo.default'}</span>
+                                    </label>
+                                    <div class="restriction_toggled toggled_by_brand_restriction_{$CUSTOMER_FAMILY_ID}">
+                                        <p>{intl l="Choose what brands will be available for this customer family" d='customerfamily.bo.default'}</p>
+                                        <select class="form-control" name="available_categories[]" id="" multiple>
+                                            {foreach from=$brandRestrictions[$CUSTOMER_FAMILY_ID] item=brandRestriction}
+                                                <option value="{$brandRestriction.id}" {if $brandRestriction.available}selected{/if}>{$brandRestriction.title}</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                    <input type="submit" class="btn-block btn btn-success"/>
+                                </form>
+                            </div>
+                        {/loop}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -393,3 +466,25 @@
         </div>
     </div>
 </div>
+{/block}
+
+{block name="javascript-initialization"}
+    <script>
+        $('.restriction_toggler').each(function () {
+            triggerRestrictionToggler($(this));
+        });
+
+        $('.restriction_toggler').on('change', function () {
+            triggerRestrictionToggler($(this));
+        });
+
+        function triggerRestrictionToggler(restrictionToggler) {
+            var toggled = $('.toggled_by_'+restrictionToggler.attr('id'));
+            if (restrictionToggler.is(":checked")) {
+                toggled.show();
+            } else {
+                toggled.hide();
+            }
+        }
+    </script>
+{/block}
