@@ -8,6 +8,10 @@ use \PDO;
 use CustomerFamily\Model\CustomerCustomerFamily as ChildCustomerCustomerFamily;
 use CustomerFamily\Model\CustomerCustomerFamilyQuery as ChildCustomerCustomerFamilyQuery;
 use CustomerFamily\Model\CustomerFamily as ChildCustomerFamily;
+use CustomerFamily\Model\CustomerFamilyAvailableBrand as ChildCustomerFamilyAvailableBrand;
+use CustomerFamily\Model\CustomerFamilyAvailableBrandQuery as ChildCustomerFamilyAvailableBrandQuery;
+use CustomerFamily\Model\CustomerFamilyAvailableCategory as ChildCustomerFamilyAvailableCategory;
+use CustomerFamily\Model\CustomerFamilyAvailableCategoryQuery as ChildCustomerFamilyAvailableCategoryQuery;
 use CustomerFamily\Model\CustomerFamilyI18n as ChildCustomerFamilyI18n;
 use CustomerFamily\Model\CustomerFamilyI18nQuery as ChildCustomerFamilyI18nQuery;
 use CustomerFamily\Model\CustomerFamilyOrder as ChildCustomerFamilyOrder;
@@ -76,6 +80,20 @@ abstract class CustomerFamily implements ActiveRecordInterface
     protected $code;
 
     /**
+     * The value for the category_restriction_enabled field.
+     * Note: this column has a database default value of: 0
+     * @var        int
+     */
+    protected $category_restriction_enabled;
+
+    /**
+     * The value for the brand_restriction_enabled field.
+     * Note: this column has a database default value of: 0
+     * @var        int
+     */
+    protected $brand_restriction_enabled;
+
+    /**
      * The value for the is_default field.
      * @var        int
      */
@@ -110,6 +128,18 @@ abstract class CustomerFamily implements ActiveRecordInterface
      */
     protected $collCustomerFamilyOrders;
     protected $collCustomerFamilyOrdersPartial;
+
+    /**
+     * @var        ObjectCollection|ChildCustomerFamilyAvailableCategory[] Collection to store aggregation of ChildCustomerFamilyAvailableCategory objects.
+     */
+    protected $collCustomerFamilyAvailableCategories;
+    protected $collCustomerFamilyAvailableCategoriesPartial;
+
+    /**
+     * @var        ObjectCollection|ChildCustomerFamilyAvailableBrand[] Collection to store aggregation of ChildCustomerFamilyAvailableBrand objects.
+     */
+    protected $collCustomerFamilyAvailableBrands;
+    protected $collCustomerFamilyAvailableBrandsPartial;
 
     /**
      * @var        ObjectCollection|ChildCustomerFamilyI18n[] Collection to store aggregation of ChildCustomerFamilyI18n objects.
@@ -161,13 +191,39 @@ abstract class CustomerFamily implements ActiveRecordInterface
      * An array of objects scheduled for deletion.
      * @var ObjectCollection
      */
+    protected $customerFamilyAvailableCategoriesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $customerFamilyAvailableBrandsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
     protected $customerFamilyI18nsScheduledForDeletion = null;
 
     /**
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->category_restriction_enabled = 0;
+        $this->brand_restriction_enabled = 0;
+    }
+
+    /**
      * Initializes internal state of CustomerFamily\Model\Base\CustomerFamily object.
+     * @see applyDefaults()
      */
     public function __construct()
     {
+        $this->applyDefaultValues();
     }
 
     /**
@@ -444,6 +500,28 @@ abstract class CustomerFamily implements ActiveRecordInterface
     }
 
     /**
+     * Get the [category_restriction_enabled] column value.
+     *
+     * @return   int
+     */
+    public function getCategoryRestrictionEnabled()
+    {
+
+        return $this->category_restriction_enabled;
+    }
+
+    /**
+     * Get the [brand_restriction_enabled] column value.
+     *
+     * @return   int
+     */
+    public function getBrandRestrictionEnabled()
+    {
+
+        return $this->brand_restriction_enabled;
+    }
+
+    /**
      * Get the [is_default] column value.
      *
      * @return   int
@@ -537,6 +615,48 @@ abstract class CustomerFamily implements ActiveRecordInterface
     } // setCode()
 
     /**
+     * Set the value of [category_restriction_enabled] column.
+     *
+     * @param      int $v new value
+     * @return   \CustomerFamily\Model\CustomerFamily The current object (for fluent API support)
+     */
+    public function setCategoryRestrictionEnabled($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->category_restriction_enabled !== $v) {
+            $this->category_restriction_enabled = $v;
+            $this->modifiedColumns[CustomerFamilyTableMap::CATEGORY_RESTRICTION_ENABLED] = true;
+        }
+
+
+        return $this;
+    } // setCategoryRestrictionEnabled()
+
+    /**
+     * Set the value of [brand_restriction_enabled] column.
+     *
+     * @param      int $v new value
+     * @return   \CustomerFamily\Model\CustomerFamily The current object (for fluent API support)
+     */
+    public function setBrandRestrictionEnabled($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->brand_restriction_enabled !== $v) {
+            $this->brand_restriction_enabled = $v;
+            $this->modifiedColumns[CustomerFamilyTableMap::BRAND_RESTRICTION_ENABLED] = true;
+        }
+
+
+        return $this;
+    } // setBrandRestrictionEnabled()
+
+    /**
      * Set the value of [is_default] column.
      *
      * @param      int $v new value
@@ -609,6 +729,14 @@ abstract class CustomerFamily implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->category_restriction_enabled !== 0) {
+                return false;
+            }
+
+            if ($this->brand_restriction_enabled !== 0) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -642,16 +770,22 @@ abstract class CustomerFamily implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : CustomerFamilyTableMap::translateFieldName('Code', TableMap::TYPE_PHPNAME, $indexType)];
             $this->code = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : CustomerFamilyTableMap::translateFieldName('IsDefault', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : CustomerFamilyTableMap::translateFieldName('CategoryRestrictionEnabled', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->category_restriction_enabled = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CustomerFamilyTableMap::translateFieldName('BrandRestrictionEnabled', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->brand_restriction_enabled = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : CustomerFamilyTableMap::translateFieldName('IsDefault', TableMap::TYPE_PHPNAME, $indexType)];
             $this->is_default = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CustomerFamilyTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : CustomerFamilyTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : CustomerFamilyTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : CustomerFamilyTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -664,7 +798,7 @@ abstract class CustomerFamily implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 5; // 5 = CustomerFamilyTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 7; // 7 = CustomerFamilyTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \CustomerFamily\Model\CustomerFamily object", 0, $e);
@@ -730,6 +864,10 @@ abstract class CustomerFamily implements ActiveRecordInterface
             $this->collCustomerFamilyPrices = null;
 
             $this->collCustomerFamilyOrders = null;
+
+            $this->collCustomerFamilyAvailableCategories = null;
+
+            $this->collCustomerFamilyAvailableBrands = null;
 
             $this->collCustomerFamilyI18ns = null;
 
@@ -917,6 +1055,40 @@ abstract class CustomerFamily implements ActiveRecordInterface
                 }
             }
 
+            if ($this->customerFamilyAvailableCategoriesScheduledForDeletion !== null) {
+                if (!$this->customerFamilyAvailableCategoriesScheduledForDeletion->isEmpty()) {
+                    \CustomerFamily\Model\CustomerFamilyAvailableCategoryQuery::create()
+                        ->filterByPrimaryKeys($this->customerFamilyAvailableCategoriesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->customerFamilyAvailableCategoriesScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collCustomerFamilyAvailableCategories !== null) {
+            foreach ($this->collCustomerFamilyAvailableCategories as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->customerFamilyAvailableBrandsScheduledForDeletion !== null) {
+                if (!$this->customerFamilyAvailableBrandsScheduledForDeletion->isEmpty()) {
+                    \CustomerFamily\Model\CustomerFamilyAvailableBrandQuery::create()
+                        ->filterByPrimaryKeys($this->customerFamilyAvailableBrandsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->customerFamilyAvailableBrandsScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collCustomerFamilyAvailableBrands !== null) {
+            foreach ($this->collCustomerFamilyAvailableBrands as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             if ($this->customerFamilyI18nsScheduledForDeletion !== null) {
                 if (!$this->customerFamilyI18nsScheduledForDeletion->isEmpty()) {
                     \CustomerFamily\Model\CustomerFamilyI18nQuery::create()
@@ -966,6 +1138,12 @@ abstract class CustomerFamily implements ActiveRecordInterface
         if ($this->isColumnModified(CustomerFamilyTableMap::CODE)) {
             $modifiedColumns[':p' . $index++]  = 'CODE';
         }
+        if ($this->isColumnModified(CustomerFamilyTableMap::CATEGORY_RESTRICTION_ENABLED)) {
+            $modifiedColumns[':p' . $index++]  = 'CATEGORY_RESTRICTION_ENABLED';
+        }
+        if ($this->isColumnModified(CustomerFamilyTableMap::BRAND_RESTRICTION_ENABLED)) {
+            $modifiedColumns[':p' . $index++]  = 'BRAND_RESTRICTION_ENABLED';
+        }
         if ($this->isColumnModified(CustomerFamilyTableMap::IS_DEFAULT)) {
             $modifiedColumns[':p' . $index++]  = 'IS_DEFAULT';
         }
@@ -991,6 +1169,12 @@ abstract class CustomerFamily implements ActiveRecordInterface
                         break;
                     case 'CODE':
                         $stmt->bindValue($identifier, $this->code, PDO::PARAM_STR);
+                        break;
+                    case 'CATEGORY_RESTRICTION_ENABLED':
+                        $stmt->bindValue($identifier, $this->category_restriction_enabled, PDO::PARAM_INT);
+                        break;
+                    case 'BRAND_RESTRICTION_ENABLED':
+                        $stmt->bindValue($identifier, $this->brand_restriction_enabled, PDO::PARAM_INT);
                         break;
                     case 'IS_DEFAULT':
                         $stmt->bindValue($identifier, $this->is_default, PDO::PARAM_INT);
@@ -1070,12 +1254,18 @@ abstract class CustomerFamily implements ActiveRecordInterface
                 return $this->getCode();
                 break;
             case 2:
-                return $this->getIsDefault();
+                return $this->getCategoryRestrictionEnabled();
                 break;
             case 3:
-                return $this->getCreatedAt();
+                return $this->getBrandRestrictionEnabled();
                 break;
             case 4:
+                return $this->getIsDefault();
+                break;
+            case 5:
+                return $this->getCreatedAt();
+                break;
+            case 6:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1109,9 +1299,11 @@ abstract class CustomerFamily implements ActiveRecordInterface
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getCode(),
-            $keys[2] => $this->getIsDefault(),
-            $keys[3] => $this->getCreatedAt(),
-            $keys[4] => $this->getUpdatedAt(),
+            $keys[2] => $this->getCategoryRestrictionEnabled(),
+            $keys[3] => $this->getBrandRestrictionEnabled(),
+            $keys[4] => $this->getIsDefault(),
+            $keys[5] => $this->getCreatedAt(),
+            $keys[6] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1127,6 +1319,12 @@ abstract class CustomerFamily implements ActiveRecordInterface
             }
             if (null !== $this->collCustomerFamilyOrders) {
                 $result['CustomerFamilyOrders'] = $this->collCustomerFamilyOrders->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collCustomerFamilyAvailableCategories) {
+                $result['CustomerFamilyAvailableCategories'] = $this->collCustomerFamilyAvailableCategories->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collCustomerFamilyAvailableBrands) {
+                $result['CustomerFamilyAvailableBrands'] = $this->collCustomerFamilyAvailableBrands->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collCustomerFamilyI18ns) {
                 $result['CustomerFamilyI18ns'] = $this->collCustomerFamilyI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1172,12 +1370,18 @@ abstract class CustomerFamily implements ActiveRecordInterface
                 $this->setCode($value);
                 break;
             case 2:
-                $this->setIsDefault($value);
+                $this->setCategoryRestrictionEnabled($value);
                 break;
             case 3:
-                $this->setCreatedAt($value);
+                $this->setBrandRestrictionEnabled($value);
                 break;
             case 4:
+                $this->setIsDefault($value);
+                break;
+            case 5:
+                $this->setCreatedAt($value);
+                break;
+            case 6:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1206,9 +1410,11 @@ abstract class CustomerFamily implements ActiveRecordInterface
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setCode($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setIsDefault($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setUpdatedAt($arr[$keys[4]]);
+        if (array_key_exists($keys[2], $arr)) $this->setCategoryRestrictionEnabled($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setBrandRestrictionEnabled($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setIsDefault($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
     }
 
     /**
@@ -1222,6 +1428,8 @@ abstract class CustomerFamily implements ActiveRecordInterface
 
         if ($this->isColumnModified(CustomerFamilyTableMap::ID)) $criteria->add(CustomerFamilyTableMap::ID, $this->id);
         if ($this->isColumnModified(CustomerFamilyTableMap::CODE)) $criteria->add(CustomerFamilyTableMap::CODE, $this->code);
+        if ($this->isColumnModified(CustomerFamilyTableMap::CATEGORY_RESTRICTION_ENABLED)) $criteria->add(CustomerFamilyTableMap::CATEGORY_RESTRICTION_ENABLED, $this->category_restriction_enabled);
+        if ($this->isColumnModified(CustomerFamilyTableMap::BRAND_RESTRICTION_ENABLED)) $criteria->add(CustomerFamilyTableMap::BRAND_RESTRICTION_ENABLED, $this->brand_restriction_enabled);
         if ($this->isColumnModified(CustomerFamilyTableMap::IS_DEFAULT)) $criteria->add(CustomerFamilyTableMap::IS_DEFAULT, $this->is_default);
         if ($this->isColumnModified(CustomerFamilyTableMap::CREATED_AT)) $criteria->add(CustomerFamilyTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(CustomerFamilyTableMap::UPDATED_AT)) $criteria->add(CustomerFamilyTableMap::UPDATED_AT, $this->updated_at);
@@ -1289,6 +1497,8 @@ abstract class CustomerFamily implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setCode($this->getCode());
+        $copyObj->setCategoryRestrictionEnabled($this->getCategoryRestrictionEnabled());
+        $copyObj->setBrandRestrictionEnabled($this->getBrandRestrictionEnabled());
         $copyObj->setIsDefault($this->getIsDefault());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
@@ -1313,6 +1523,18 @@ abstract class CustomerFamily implements ActiveRecordInterface
             foreach ($this->getCustomerFamilyOrders() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addCustomerFamilyOrder($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getCustomerFamilyAvailableCategories() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addCustomerFamilyAvailableCategory($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getCustomerFamilyAvailableBrands() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addCustomerFamilyAvailableBrand($relObj->copy($deepCopy));
                 }
             }
 
@@ -1371,6 +1593,12 @@ abstract class CustomerFamily implements ActiveRecordInterface
         }
         if ('CustomerFamilyOrder' == $relationName) {
             return $this->initCustomerFamilyOrders();
+        }
+        if ('CustomerFamilyAvailableCategory' == $relationName) {
+            return $this->initCustomerFamilyAvailableCategories();
+        }
+        if ('CustomerFamilyAvailableBrand' == $relationName) {
+            return $this->initCustomerFamilyAvailableBrands();
         }
         if ('CustomerFamilyI18n' == $relationName) {
             return $this->initCustomerFamilyI18ns();
@@ -2085,6 +2313,498 @@ abstract class CustomerFamily implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collCustomerFamilyAvailableCategories collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addCustomerFamilyAvailableCategories()
+     */
+    public function clearCustomerFamilyAvailableCategories()
+    {
+        $this->collCustomerFamilyAvailableCategories = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collCustomerFamilyAvailableCategories collection loaded partially.
+     */
+    public function resetPartialCustomerFamilyAvailableCategories($v = true)
+    {
+        $this->collCustomerFamilyAvailableCategoriesPartial = $v;
+    }
+
+    /**
+     * Initializes the collCustomerFamilyAvailableCategories collection.
+     *
+     * By default this just sets the collCustomerFamilyAvailableCategories collection to an empty array (like clearcollCustomerFamilyAvailableCategories());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initCustomerFamilyAvailableCategories($overrideExisting = true)
+    {
+        if (null !== $this->collCustomerFamilyAvailableCategories && !$overrideExisting) {
+            return;
+        }
+        $this->collCustomerFamilyAvailableCategories = new ObjectCollection();
+        $this->collCustomerFamilyAvailableCategories->setModel('\CustomerFamily\Model\CustomerFamilyAvailableCategory');
+    }
+
+    /**
+     * Gets an array of ChildCustomerFamilyAvailableCategory objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildCustomerFamily is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildCustomerFamilyAvailableCategory[] List of ChildCustomerFamilyAvailableCategory objects
+     * @throws PropelException
+     */
+    public function getCustomerFamilyAvailableCategories($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collCustomerFamilyAvailableCategoriesPartial && !$this->isNew();
+        if (null === $this->collCustomerFamilyAvailableCategories || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collCustomerFamilyAvailableCategories) {
+                // return empty collection
+                $this->initCustomerFamilyAvailableCategories();
+            } else {
+                $collCustomerFamilyAvailableCategories = ChildCustomerFamilyAvailableCategoryQuery::create(null, $criteria)
+                    ->filterByCustomerFamily($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collCustomerFamilyAvailableCategoriesPartial && count($collCustomerFamilyAvailableCategories)) {
+                        $this->initCustomerFamilyAvailableCategories(false);
+
+                        foreach ($collCustomerFamilyAvailableCategories as $obj) {
+                            if (false == $this->collCustomerFamilyAvailableCategories->contains($obj)) {
+                                $this->collCustomerFamilyAvailableCategories->append($obj);
+                            }
+                        }
+
+                        $this->collCustomerFamilyAvailableCategoriesPartial = true;
+                    }
+
+                    reset($collCustomerFamilyAvailableCategories);
+
+                    return $collCustomerFamilyAvailableCategories;
+                }
+
+                if ($partial && $this->collCustomerFamilyAvailableCategories) {
+                    foreach ($this->collCustomerFamilyAvailableCategories as $obj) {
+                        if ($obj->isNew()) {
+                            $collCustomerFamilyAvailableCategories[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collCustomerFamilyAvailableCategories = $collCustomerFamilyAvailableCategories;
+                $this->collCustomerFamilyAvailableCategoriesPartial = false;
+            }
+        }
+
+        return $this->collCustomerFamilyAvailableCategories;
+    }
+
+    /**
+     * Sets a collection of CustomerFamilyAvailableCategory objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $customerFamilyAvailableCategories A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildCustomerFamily The current object (for fluent API support)
+     */
+    public function setCustomerFamilyAvailableCategories(Collection $customerFamilyAvailableCategories, ConnectionInterface $con = null)
+    {
+        $customerFamilyAvailableCategoriesToDelete = $this->getCustomerFamilyAvailableCategories(new Criteria(), $con)->diff($customerFamilyAvailableCategories);
+
+
+        //since at least one column in the foreign key is at the same time a PK
+        //we can not just set a PK to NULL in the lines below. We have to store
+        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
+        $this->customerFamilyAvailableCategoriesScheduledForDeletion = clone $customerFamilyAvailableCategoriesToDelete;
+
+        foreach ($customerFamilyAvailableCategoriesToDelete as $customerFamilyAvailableCategoryRemoved) {
+            $customerFamilyAvailableCategoryRemoved->setCustomerFamily(null);
+        }
+
+        $this->collCustomerFamilyAvailableCategories = null;
+        foreach ($customerFamilyAvailableCategories as $customerFamilyAvailableCategory) {
+            $this->addCustomerFamilyAvailableCategory($customerFamilyAvailableCategory);
+        }
+
+        $this->collCustomerFamilyAvailableCategories = $customerFamilyAvailableCategories;
+        $this->collCustomerFamilyAvailableCategoriesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related CustomerFamilyAvailableCategory objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related CustomerFamilyAvailableCategory objects.
+     * @throws PropelException
+     */
+    public function countCustomerFamilyAvailableCategories(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collCustomerFamilyAvailableCategoriesPartial && !$this->isNew();
+        if (null === $this->collCustomerFamilyAvailableCategories || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collCustomerFamilyAvailableCategories) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getCustomerFamilyAvailableCategories());
+            }
+
+            $query = ChildCustomerFamilyAvailableCategoryQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByCustomerFamily($this)
+                ->count($con);
+        }
+
+        return count($this->collCustomerFamilyAvailableCategories);
+    }
+
+    /**
+     * Method called to associate a ChildCustomerFamilyAvailableCategory object to this object
+     * through the ChildCustomerFamilyAvailableCategory foreign key attribute.
+     *
+     * @param    ChildCustomerFamilyAvailableCategory $l ChildCustomerFamilyAvailableCategory
+     * @return   \CustomerFamily\Model\CustomerFamily The current object (for fluent API support)
+     */
+    public function addCustomerFamilyAvailableCategory(ChildCustomerFamilyAvailableCategory $l)
+    {
+        if ($this->collCustomerFamilyAvailableCategories === null) {
+            $this->initCustomerFamilyAvailableCategories();
+            $this->collCustomerFamilyAvailableCategoriesPartial = true;
+        }
+
+        if (!in_array($l, $this->collCustomerFamilyAvailableCategories->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddCustomerFamilyAvailableCategory($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param CustomerFamilyAvailableCategory $customerFamilyAvailableCategory The customerFamilyAvailableCategory object to add.
+     */
+    protected function doAddCustomerFamilyAvailableCategory($customerFamilyAvailableCategory)
+    {
+        $this->collCustomerFamilyAvailableCategories[]= $customerFamilyAvailableCategory;
+        $customerFamilyAvailableCategory->setCustomerFamily($this);
+    }
+
+    /**
+     * @param  CustomerFamilyAvailableCategory $customerFamilyAvailableCategory The customerFamilyAvailableCategory object to remove.
+     * @return ChildCustomerFamily The current object (for fluent API support)
+     */
+    public function removeCustomerFamilyAvailableCategory($customerFamilyAvailableCategory)
+    {
+        if ($this->getCustomerFamilyAvailableCategories()->contains($customerFamilyAvailableCategory)) {
+            $this->collCustomerFamilyAvailableCategories->remove($this->collCustomerFamilyAvailableCategories->search($customerFamilyAvailableCategory));
+            if (null === $this->customerFamilyAvailableCategoriesScheduledForDeletion) {
+                $this->customerFamilyAvailableCategoriesScheduledForDeletion = clone $this->collCustomerFamilyAvailableCategories;
+                $this->customerFamilyAvailableCategoriesScheduledForDeletion->clear();
+            }
+            $this->customerFamilyAvailableCategoriesScheduledForDeletion[]= clone $customerFamilyAvailableCategory;
+            $customerFamilyAvailableCategory->setCustomerFamily(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this CustomerFamily is new, it will return
+     * an empty collection; or if this CustomerFamily has previously
+     * been saved, it will retrieve related CustomerFamilyAvailableCategories from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in CustomerFamily.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildCustomerFamilyAvailableCategory[] List of ChildCustomerFamilyAvailableCategory objects
+     */
+    public function getCustomerFamilyAvailableCategoriesJoinCategory($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildCustomerFamilyAvailableCategoryQuery::create(null, $criteria);
+        $query->joinWith('Category', $joinBehavior);
+
+        return $this->getCustomerFamilyAvailableCategories($query, $con);
+    }
+
+    /**
+     * Clears out the collCustomerFamilyAvailableBrands collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addCustomerFamilyAvailableBrands()
+     */
+    public function clearCustomerFamilyAvailableBrands()
+    {
+        $this->collCustomerFamilyAvailableBrands = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collCustomerFamilyAvailableBrands collection loaded partially.
+     */
+    public function resetPartialCustomerFamilyAvailableBrands($v = true)
+    {
+        $this->collCustomerFamilyAvailableBrandsPartial = $v;
+    }
+
+    /**
+     * Initializes the collCustomerFamilyAvailableBrands collection.
+     *
+     * By default this just sets the collCustomerFamilyAvailableBrands collection to an empty array (like clearcollCustomerFamilyAvailableBrands());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initCustomerFamilyAvailableBrands($overrideExisting = true)
+    {
+        if (null !== $this->collCustomerFamilyAvailableBrands && !$overrideExisting) {
+            return;
+        }
+        $this->collCustomerFamilyAvailableBrands = new ObjectCollection();
+        $this->collCustomerFamilyAvailableBrands->setModel('\CustomerFamily\Model\CustomerFamilyAvailableBrand');
+    }
+
+    /**
+     * Gets an array of ChildCustomerFamilyAvailableBrand objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildCustomerFamily is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildCustomerFamilyAvailableBrand[] List of ChildCustomerFamilyAvailableBrand objects
+     * @throws PropelException
+     */
+    public function getCustomerFamilyAvailableBrands($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collCustomerFamilyAvailableBrandsPartial && !$this->isNew();
+        if (null === $this->collCustomerFamilyAvailableBrands || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collCustomerFamilyAvailableBrands) {
+                // return empty collection
+                $this->initCustomerFamilyAvailableBrands();
+            } else {
+                $collCustomerFamilyAvailableBrands = ChildCustomerFamilyAvailableBrandQuery::create(null, $criteria)
+                    ->filterByCustomerFamily($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collCustomerFamilyAvailableBrandsPartial && count($collCustomerFamilyAvailableBrands)) {
+                        $this->initCustomerFamilyAvailableBrands(false);
+
+                        foreach ($collCustomerFamilyAvailableBrands as $obj) {
+                            if (false == $this->collCustomerFamilyAvailableBrands->contains($obj)) {
+                                $this->collCustomerFamilyAvailableBrands->append($obj);
+                            }
+                        }
+
+                        $this->collCustomerFamilyAvailableBrandsPartial = true;
+                    }
+
+                    reset($collCustomerFamilyAvailableBrands);
+
+                    return $collCustomerFamilyAvailableBrands;
+                }
+
+                if ($partial && $this->collCustomerFamilyAvailableBrands) {
+                    foreach ($this->collCustomerFamilyAvailableBrands as $obj) {
+                        if ($obj->isNew()) {
+                            $collCustomerFamilyAvailableBrands[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collCustomerFamilyAvailableBrands = $collCustomerFamilyAvailableBrands;
+                $this->collCustomerFamilyAvailableBrandsPartial = false;
+            }
+        }
+
+        return $this->collCustomerFamilyAvailableBrands;
+    }
+
+    /**
+     * Sets a collection of CustomerFamilyAvailableBrand objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $customerFamilyAvailableBrands A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildCustomerFamily The current object (for fluent API support)
+     */
+    public function setCustomerFamilyAvailableBrands(Collection $customerFamilyAvailableBrands, ConnectionInterface $con = null)
+    {
+        $customerFamilyAvailableBrandsToDelete = $this->getCustomerFamilyAvailableBrands(new Criteria(), $con)->diff($customerFamilyAvailableBrands);
+
+
+        //since at least one column in the foreign key is at the same time a PK
+        //we can not just set a PK to NULL in the lines below. We have to store
+        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
+        $this->customerFamilyAvailableBrandsScheduledForDeletion = clone $customerFamilyAvailableBrandsToDelete;
+
+        foreach ($customerFamilyAvailableBrandsToDelete as $customerFamilyAvailableBrandRemoved) {
+            $customerFamilyAvailableBrandRemoved->setCustomerFamily(null);
+        }
+
+        $this->collCustomerFamilyAvailableBrands = null;
+        foreach ($customerFamilyAvailableBrands as $customerFamilyAvailableBrand) {
+            $this->addCustomerFamilyAvailableBrand($customerFamilyAvailableBrand);
+        }
+
+        $this->collCustomerFamilyAvailableBrands = $customerFamilyAvailableBrands;
+        $this->collCustomerFamilyAvailableBrandsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related CustomerFamilyAvailableBrand objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related CustomerFamilyAvailableBrand objects.
+     * @throws PropelException
+     */
+    public function countCustomerFamilyAvailableBrands(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collCustomerFamilyAvailableBrandsPartial && !$this->isNew();
+        if (null === $this->collCustomerFamilyAvailableBrands || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collCustomerFamilyAvailableBrands) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getCustomerFamilyAvailableBrands());
+            }
+
+            $query = ChildCustomerFamilyAvailableBrandQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByCustomerFamily($this)
+                ->count($con);
+        }
+
+        return count($this->collCustomerFamilyAvailableBrands);
+    }
+
+    /**
+     * Method called to associate a ChildCustomerFamilyAvailableBrand object to this object
+     * through the ChildCustomerFamilyAvailableBrand foreign key attribute.
+     *
+     * @param    ChildCustomerFamilyAvailableBrand $l ChildCustomerFamilyAvailableBrand
+     * @return   \CustomerFamily\Model\CustomerFamily The current object (for fluent API support)
+     */
+    public function addCustomerFamilyAvailableBrand(ChildCustomerFamilyAvailableBrand $l)
+    {
+        if ($this->collCustomerFamilyAvailableBrands === null) {
+            $this->initCustomerFamilyAvailableBrands();
+            $this->collCustomerFamilyAvailableBrandsPartial = true;
+        }
+
+        if (!in_array($l, $this->collCustomerFamilyAvailableBrands->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddCustomerFamilyAvailableBrand($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param CustomerFamilyAvailableBrand $customerFamilyAvailableBrand The customerFamilyAvailableBrand object to add.
+     */
+    protected function doAddCustomerFamilyAvailableBrand($customerFamilyAvailableBrand)
+    {
+        $this->collCustomerFamilyAvailableBrands[]= $customerFamilyAvailableBrand;
+        $customerFamilyAvailableBrand->setCustomerFamily($this);
+    }
+
+    /**
+     * @param  CustomerFamilyAvailableBrand $customerFamilyAvailableBrand The customerFamilyAvailableBrand object to remove.
+     * @return ChildCustomerFamily The current object (for fluent API support)
+     */
+    public function removeCustomerFamilyAvailableBrand($customerFamilyAvailableBrand)
+    {
+        if ($this->getCustomerFamilyAvailableBrands()->contains($customerFamilyAvailableBrand)) {
+            $this->collCustomerFamilyAvailableBrands->remove($this->collCustomerFamilyAvailableBrands->search($customerFamilyAvailableBrand));
+            if (null === $this->customerFamilyAvailableBrandsScheduledForDeletion) {
+                $this->customerFamilyAvailableBrandsScheduledForDeletion = clone $this->collCustomerFamilyAvailableBrands;
+                $this->customerFamilyAvailableBrandsScheduledForDeletion->clear();
+            }
+            $this->customerFamilyAvailableBrandsScheduledForDeletion[]= clone $customerFamilyAvailableBrand;
+            $customerFamilyAvailableBrand->setCustomerFamily(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this CustomerFamily is new, it will return
+     * an empty collection; or if this CustomerFamily has previously
+     * been saved, it will retrieve related CustomerFamilyAvailableBrands from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in CustomerFamily.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildCustomerFamilyAvailableBrand[] List of ChildCustomerFamilyAvailableBrand objects
+     */
+    public function getCustomerFamilyAvailableBrandsJoinBrand($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildCustomerFamilyAvailableBrandQuery::create(null, $criteria);
+        $query->joinWith('Brand', $joinBehavior);
+
+        return $this->getCustomerFamilyAvailableBrands($query, $con);
+    }
+
+    /**
      * Clears out the collCustomerFamilyI18ns collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -2316,11 +3036,14 @@ abstract class CustomerFamily implements ActiveRecordInterface
     {
         $this->id = null;
         $this->code = null;
+        $this->category_restriction_enabled = null;
+        $this->brand_restriction_enabled = null;
         $this->is_default = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);
@@ -2353,6 +3076,16 @@ abstract class CustomerFamily implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collCustomerFamilyAvailableCategories) {
+                foreach ($this->collCustomerFamilyAvailableCategories as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collCustomerFamilyAvailableBrands) {
+                foreach ($this->collCustomerFamilyAvailableBrands as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collCustomerFamilyI18ns) {
                 foreach ($this->collCustomerFamilyI18ns as $o) {
                     $o->clearAllReferences($deep);
@@ -2367,6 +3100,8 @@ abstract class CustomerFamily implements ActiveRecordInterface
         $this->collCustomerCustomerFamilies = null;
         $this->collCustomerFamilyPrices = null;
         $this->collCustomerFamilyOrders = null;
+        $this->collCustomerFamilyAvailableCategories = null;
+        $this->collCustomerFamilyAvailableBrands = null;
         $this->collCustomerFamilyI18ns = null;
     }
 

@@ -58,7 +58,7 @@ class CustomerFamilyTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 5;
+    const NUM_COLUMNS = 7;
 
     /**
      * The number of lazy-loaded columns
@@ -68,7 +68,7 @@ class CustomerFamilyTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 5;
+    const NUM_HYDRATE_COLUMNS = 7;
 
     /**
      * the column name for the ID field
@@ -79,6 +79,16 @@ class CustomerFamilyTableMap extends TableMap
      * the column name for the CODE field
      */
     const CODE = 'customer_family.CODE';
+
+    /**
+     * the column name for the CATEGORY_RESTRICTION_ENABLED field
+     */
+    const CATEGORY_RESTRICTION_ENABLED = 'customer_family.CATEGORY_RESTRICTION_ENABLED';
+
+    /**
+     * the column name for the BRAND_RESTRICTION_ENABLED field
+     */
+    const BRAND_RESTRICTION_ENABLED = 'customer_family.BRAND_RESTRICTION_ENABLED';
 
     /**
      * the column name for the IS_DEFAULT field
@@ -116,12 +126,12 @@ class CustomerFamilyTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Code', 'IsDefault', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'code', 'isDefault', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(CustomerFamilyTableMap::ID, CustomerFamilyTableMap::CODE, CustomerFamilyTableMap::IS_DEFAULT, CustomerFamilyTableMap::CREATED_AT, CustomerFamilyTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'CODE', 'IS_DEFAULT', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'code', 'is_default', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
+        self::TYPE_PHPNAME       => array('Id', 'Code', 'CategoryRestrictionEnabled', 'BrandRestrictionEnabled', 'IsDefault', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'code', 'categoryRestrictionEnabled', 'brandRestrictionEnabled', 'isDefault', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(CustomerFamilyTableMap::ID, CustomerFamilyTableMap::CODE, CustomerFamilyTableMap::CATEGORY_RESTRICTION_ENABLED, CustomerFamilyTableMap::BRAND_RESTRICTION_ENABLED, CustomerFamilyTableMap::IS_DEFAULT, CustomerFamilyTableMap::CREATED_AT, CustomerFamilyTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'CODE', 'CATEGORY_RESTRICTION_ENABLED', 'BRAND_RESTRICTION_ENABLED', 'IS_DEFAULT', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'code', 'category_restriction_enabled', 'brand_restriction_enabled', 'is_default', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -131,12 +141,12 @@ class CustomerFamilyTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Code' => 1, 'IsDefault' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'code' => 1, 'isDefault' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
-        self::TYPE_COLNAME       => array(CustomerFamilyTableMap::ID => 0, CustomerFamilyTableMap::CODE => 1, CustomerFamilyTableMap::IS_DEFAULT => 2, CustomerFamilyTableMap::CREATED_AT => 3, CustomerFamilyTableMap::UPDATED_AT => 4, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CODE' => 1, 'IS_DEFAULT' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'code' => 1, 'is_default' => 2, 'created_at' => 3, 'updated_at' => 4, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Code' => 1, 'CategoryRestrictionEnabled' => 2, 'BrandRestrictionEnabled' => 3, 'IsDefault' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'code' => 1, 'categoryRestrictionEnabled' => 2, 'brandRestrictionEnabled' => 3, 'isDefault' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
+        self::TYPE_COLNAME       => array(CustomerFamilyTableMap::ID => 0, CustomerFamilyTableMap::CODE => 1, CustomerFamilyTableMap::CATEGORY_RESTRICTION_ENABLED => 2, CustomerFamilyTableMap::BRAND_RESTRICTION_ENABLED => 3, CustomerFamilyTableMap::IS_DEFAULT => 4, CustomerFamilyTableMap::CREATED_AT => 5, CustomerFamilyTableMap::UPDATED_AT => 6, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CODE' => 1, 'CATEGORY_RESTRICTION_ENABLED' => 2, 'BRAND_RESTRICTION_ENABLED' => 3, 'IS_DEFAULT' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'code' => 1, 'category_restriction_enabled' => 2, 'brand_restriction_enabled' => 3, 'is_default' => 4, 'created_at' => 5, 'updated_at' => 6, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -157,6 +167,8 @@ class CustomerFamilyTableMap extends TableMap
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('CODE', 'Code', 'VARCHAR', true, 45, null);
+        $this->addColumn('CATEGORY_RESTRICTION_ENABLED', 'CategoryRestrictionEnabled', 'TINYINT', false, null, 0);
+        $this->addColumn('BRAND_RESTRICTION_ENABLED', 'BrandRestrictionEnabled', 'TINYINT', false, null, 0);
         $this->addColumn('IS_DEFAULT', 'IsDefault', 'TINYINT', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
@@ -170,6 +182,8 @@ class CustomerFamilyTableMap extends TableMap
         $this->addRelation('CustomerCustomerFamily', '\\CustomerFamily\\Model\\CustomerCustomerFamily', RelationMap::ONE_TO_MANY, array('id' => 'customer_family_id', ), 'CASCADE', null, 'CustomerCustomerFamilies');
         $this->addRelation('CustomerFamilyPrice', '\\CustomerFamily\\Model\\CustomerFamilyPrice', RelationMap::ONE_TO_MANY, array('id' => 'customer_family_id', ), 'CASCADE', 'RESTRICT', 'CustomerFamilyPrices');
         $this->addRelation('CustomerFamilyOrder', '\\CustomerFamily\\Model\\CustomerFamilyOrder', RelationMap::ONE_TO_MANY, array('id' => 'customer_family_id', ), null, 'CASCADE', 'CustomerFamilyOrders');
+        $this->addRelation('CustomerFamilyAvailableCategory', '\\CustomerFamily\\Model\\CustomerFamilyAvailableCategory', RelationMap::ONE_TO_MANY, array('id' => 'customer_family_id', ), 'CASCADE', 'CASCADE', 'CustomerFamilyAvailableCategories');
+        $this->addRelation('CustomerFamilyAvailableBrand', '\\CustomerFamily\\Model\\CustomerFamilyAvailableBrand', RelationMap::ONE_TO_MANY, array('id' => 'customer_family_id', ), 'CASCADE', 'CASCADE', 'CustomerFamilyAvailableBrands');
         $this->addRelation('CustomerFamilyI18n', '\\CustomerFamily\\Model\\CustomerFamilyI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'CustomerFamilyI18ns');
     } // buildRelations()
 
@@ -195,6 +209,8 @@ class CustomerFamilyTableMap extends TableMap
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
                 CustomerCustomerFamilyTableMap::clearInstancePool();
                 CustomerFamilyPriceTableMap::clearInstancePool();
+                CustomerFamilyAvailableCategoryTableMap::clearInstancePool();
+                CustomerFamilyAvailableBrandTableMap::clearInstancePool();
                 CustomerFamilyI18nTableMap::clearInstancePool();
             }
 
@@ -338,12 +354,16 @@ class CustomerFamilyTableMap extends TableMap
         if (null === $alias) {
             $criteria->addSelectColumn(CustomerFamilyTableMap::ID);
             $criteria->addSelectColumn(CustomerFamilyTableMap::CODE);
+            $criteria->addSelectColumn(CustomerFamilyTableMap::CATEGORY_RESTRICTION_ENABLED);
+            $criteria->addSelectColumn(CustomerFamilyTableMap::BRAND_RESTRICTION_ENABLED);
             $criteria->addSelectColumn(CustomerFamilyTableMap::IS_DEFAULT);
             $criteria->addSelectColumn(CustomerFamilyTableMap::CREATED_AT);
             $criteria->addSelectColumn(CustomerFamilyTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.CODE');
+            $criteria->addSelectColumn($alias . '.CATEGORY_RESTRICTION_ENABLED');
+            $criteria->addSelectColumn($alias . '.BRAND_RESTRICTION_ENABLED');
             $criteria->addSelectColumn($alias . '.IS_DEFAULT');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');

@@ -24,12 +24,16 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildCustomerFamilyQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildCustomerFamilyQuery orderByCode($order = Criteria::ASC) Order by the code column
+ * @method     ChildCustomerFamilyQuery orderByCategoryRestrictionEnabled($order = Criteria::ASC) Order by the category_restriction_enabled column
+ * @method     ChildCustomerFamilyQuery orderByBrandRestrictionEnabled($order = Criteria::ASC) Order by the brand_restriction_enabled column
  * @method     ChildCustomerFamilyQuery orderByIsDefault($order = Criteria::ASC) Order by the is_default column
  * @method     ChildCustomerFamilyQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildCustomerFamilyQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildCustomerFamilyQuery groupById() Group by the id column
  * @method     ChildCustomerFamilyQuery groupByCode() Group by the code column
+ * @method     ChildCustomerFamilyQuery groupByCategoryRestrictionEnabled() Group by the category_restriction_enabled column
+ * @method     ChildCustomerFamilyQuery groupByBrandRestrictionEnabled() Group by the brand_restriction_enabled column
  * @method     ChildCustomerFamilyQuery groupByIsDefault() Group by the is_default column
  * @method     ChildCustomerFamilyQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildCustomerFamilyQuery groupByUpdatedAt() Group by the updated_at column
@@ -50,6 +54,14 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildCustomerFamilyQuery rightJoinCustomerFamilyOrder($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CustomerFamilyOrder relation
  * @method     ChildCustomerFamilyQuery innerJoinCustomerFamilyOrder($relationAlias = null) Adds a INNER JOIN clause to the query using the CustomerFamilyOrder relation
  *
+ * @method     ChildCustomerFamilyQuery leftJoinCustomerFamilyAvailableCategory($relationAlias = null) Adds a LEFT JOIN clause to the query using the CustomerFamilyAvailableCategory relation
+ * @method     ChildCustomerFamilyQuery rightJoinCustomerFamilyAvailableCategory($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CustomerFamilyAvailableCategory relation
+ * @method     ChildCustomerFamilyQuery innerJoinCustomerFamilyAvailableCategory($relationAlias = null) Adds a INNER JOIN clause to the query using the CustomerFamilyAvailableCategory relation
+ *
+ * @method     ChildCustomerFamilyQuery leftJoinCustomerFamilyAvailableBrand($relationAlias = null) Adds a LEFT JOIN clause to the query using the CustomerFamilyAvailableBrand relation
+ * @method     ChildCustomerFamilyQuery rightJoinCustomerFamilyAvailableBrand($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CustomerFamilyAvailableBrand relation
+ * @method     ChildCustomerFamilyQuery innerJoinCustomerFamilyAvailableBrand($relationAlias = null) Adds a INNER JOIN clause to the query using the CustomerFamilyAvailableBrand relation
+ *
  * @method     ChildCustomerFamilyQuery leftJoinCustomerFamilyI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the CustomerFamilyI18n relation
  * @method     ChildCustomerFamilyQuery rightJoinCustomerFamilyI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CustomerFamilyI18n relation
  * @method     ChildCustomerFamilyQuery innerJoinCustomerFamilyI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the CustomerFamilyI18n relation
@@ -59,12 +71,16 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildCustomerFamily findOneById(int $id) Return the first ChildCustomerFamily filtered by the id column
  * @method     ChildCustomerFamily findOneByCode(string $code) Return the first ChildCustomerFamily filtered by the code column
+ * @method     ChildCustomerFamily findOneByCategoryRestrictionEnabled(int $category_restriction_enabled) Return the first ChildCustomerFamily filtered by the category_restriction_enabled column
+ * @method     ChildCustomerFamily findOneByBrandRestrictionEnabled(int $brand_restriction_enabled) Return the first ChildCustomerFamily filtered by the brand_restriction_enabled column
  * @method     ChildCustomerFamily findOneByIsDefault(int $is_default) Return the first ChildCustomerFamily filtered by the is_default column
  * @method     ChildCustomerFamily findOneByCreatedAt(string $created_at) Return the first ChildCustomerFamily filtered by the created_at column
  * @method     ChildCustomerFamily findOneByUpdatedAt(string $updated_at) Return the first ChildCustomerFamily filtered by the updated_at column
  *
  * @method     array findById(int $id) Return ChildCustomerFamily objects filtered by the id column
  * @method     array findByCode(string $code) Return ChildCustomerFamily objects filtered by the code column
+ * @method     array findByCategoryRestrictionEnabled(int $category_restriction_enabled) Return ChildCustomerFamily objects filtered by the category_restriction_enabled column
+ * @method     array findByBrandRestrictionEnabled(int $brand_restriction_enabled) Return ChildCustomerFamily objects filtered by the brand_restriction_enabled column
  * @method     array findByIsDefault(int $is_default) Return ChildCustomerFamily objects filtered by the is_default column
  * @method     array findByCreatedAt(string $created_at) Return ChildCustomerFamily objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildCustomerFamily objects filtered by the updated_at column
@@ -156,7 +172,7 @@ abstract class CustomerFamilyQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, CODE, IS_DEFAULT, CREATED_AT, UPDATED_AT FROM customer_family WHERE ID = :p0';
+        $sql = 'SELECT ID, CODE, CATEGORY_RESTRICTION_ENABLED, BRAND_RESTRICTION_ENABLED, IS_DEFAULT, CREATED_AT, UPDATED_AT FROM customer_family WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -313,6 +329,88 @@ abstract class CustomerFamilyQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CustomerFamilyTableMap::CODE, $code, $comparison);
+    }
+
+    /**
+     * Filter the query on the category_restriction_enabled column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByCategoryRestrictionEnabled(1234); // WHERE category_restriction_enabled = 1234
+     * $query->filterByCategoryRestrictionEnabled(array(12, 34)); // WHERE category_restriction_enabled IN (12, 34)
+     * $query->filterByCategoryRestrictionEnabled(array('min' => 12)); // WHERE category_restriction_enabled > 12
+     * </code>
+     *
+     * @param     mixed $categoryRestrictionEnabled The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCustomerFamilyQuery The current query, for fluid interface
+     */
+    public function filterByCategoryRestrictionEnabled($categoryRestrictionEnabled = null, $comparison = null)
+    {
+        if (is_array($categoryRestrictionEnabled)) {
+            $useMinMax = false;
+            if (isset($categoryRestrictionEnabled['min'])) {
+                $this->addUsingAlias(CustomerFamilyTableMap::CATEGORY_RESTRICTION_ENABLED, $categoryRestrictionEnabled['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($categoryRestrictionEnabled['max'])) {
+                $this->addUsingAlias(CustomerFamilyTableMap::CATEGORY_RESTRICTION_ENABLED, $categoryRestrictionEnabled['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(CustomerFamilyTableMap::CATEGORY_RESTRICTION_ENABLED, $categoryRestrictionEnabled, $comparison);
+    }
+
+    /**
+     * Filter the query on the brand_restriction_enabled column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByBrandRestrictionEnabled(1234); // WHERE brand_restriction_enabled = 1234
+     * $query->filterByBrandRestrictionEnabled(array(12, 34)); // WHERE brand_restriction_enabled IN (12, 34)
+     * $query->filterByBrandRestrictionEnabled(array('min' => 12)); // WHERE brand_restriction_enabled > 12
+     * </code>
+     *
+     * @param     mixed $brandRestrictionEnabled The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCustomerFamilyQuery The current query, for fluid interface
+     */
+    public function filterByBrandRestrictionEnabled($brandRestrictionEnabled = null, $comparison = null)
+    {
+        if (is_array($brandRestrictionEnabled)) {
+            $useMinMax = false;
+            if (isset($brandRestrictionEnabled['min'])) {
+                $this->addUsingAlias(CustomerFamilyTableMap::BRAND_RESTRICTION_ENABLED, $brandRestrictionEnabled['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($brandRestrictionEnabled['max'])) {
+                $this->addUsingAlias(CustomerFamilyTableMap::BRAND_RESTRICTION_ENABLED, $brandRestrictionEnabled['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(CustomerFamilyTableMap::BRAND_RESTRICTION_ENABLED, $brandRestrictionEnabled, $comparison);
     }
 
     /**
@@ -659,6 +757,152 @@ abstract class CustomerFamilyQuery extends ModelCriteria
         return $this
             ->joinCustomerFamilyOrder($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'CustomerFamilyOrder', '\CustomerFamily\Model\CustomerFamilyOrderQuery');
+    }
+
+    /**
+     * Filter the query by a related \CustomerFamily\Model\CustomerFamilyAvailableCategory object
+     *
+     * @param \CustomerFamily\Model\CustomerFamilyAvailableCategory|ObjectCollection $customerFamilyAvailableCategory  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCustomerFamilyQuery The current query, for fluid interface
+     */
+    public function filterByCustomerFamilyAvailableCategory($customerFamilyAvailableCategory, $comparison = null)
+    {
+        if ($customerFamilyAvailableCategory instanceof \CustomerFamily\Model\CustomerFamilyAvailableCategory) {
+            return $this
+                ->addUsingAlias(CustomerFamilyTableMap::ID, $customerFamilyAvailableCategory->getCustomerFamilyId(), $comparison);
+        } elseif ($customerFamilyAvailableCategory instanceof ObjectCollection) {
+            return $this
+                ->useCustomerFamilyAvailableCategoryQuery()
+                ->filterByPrimaryKeys($customerFamilyAvailableCategory->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByCustomerFamilyAvailableCategory() only accepts arguments of type \CustomerFamily\Model\CustomerFamilyAvailableCategory or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the CustomerFamilyAvailableCategory relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildCustomerFamilyQuery The current query, for fluid interface
+     */
+    public function joinCustomerFamilyAvailableCategory($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('CustomerFamilyAvailableCategory');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'CustomerFamilyAvailableCategory');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the CustomerFamilyAvailableCategory relation CustomerFamilyAvailableCategory object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \CustomerFamily\Model\CustomerFamilyAvailableCategoryQuery A secondary query class using the current class as primary query
+     */
+    public function useCustomerFamilyAvailableCategoryQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinCustomerFamilyAvailableCategory($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CustomerFamilyAvailableCategory', '\CustomerFamily\Model\CustomerFamilyAvailableCategoryQuery');
+    }
+
+    /**
+     * Filter the query by a related \CustomerFamily\Model\CustomerFamilyAvailableBrand object
+     *
+     * @param \CustomerFamily\Model\CustomerFamilyAvailableBrand|ObjectCollection $customerFamilyAvailableBrand  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCustomerFamilyQuery The current query, for fluid interface
+     */
+    public function filterByCustomerFamilyAvailableBrand($customerFamilyAvailableBrand, $comparison = null)
+    {
+        if ($customerFamilyAvailableBrand instanceof \CustomerFamily\Model\CustomerFamilyAvailableBrand) {
+            return $this
+                ->addUsingAlias(CustomerFamilyTableMap::ID, $customerFamilyAvailableBrand->getCustomerFamilyId(), $comparison);
+        } elseif ($customerFamilyAvailableBrand instanceof ObjectCollection) {
+            return $this
+                ->useCustomerFamilyAvailableBrandQuery()
+                ->filterByPrimaryKeys($customerFamilyAvailableBrand->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByCustomerFamilyAvailableBrand() only accepts arguments of type \CustomerFamily\Model\CustomerFamilyAvailableBrand or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the CustomerFamilyAvailableBrand relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildCustomerFamilyQuery The current query, for fluid interface
+     */
+    public function joinCustomerFamilyAvailableBrand($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('CustomerFamilyAvailableBrand');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'CustomerFamilyAvailableBrand');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the CustomerFamilyAvailableBrand relation CustomerFamilyAvailableBrand object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \CustomerFamily\Model\CustomerFamilyAvailableBrandQuery A secondary query class using the current class as primary query
+     */
+    public function useCustomerFamilyAvailableBrandQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinCustomerFamilyAvailableBrand($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CustomerFamilyAvailableBrand', '\CustomerFamily\Model\CustomerFamilyAvailableBrandQuery');
     }
 
     /**
