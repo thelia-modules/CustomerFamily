@@ -409,7 +409,7 @@
                                     </label>
                                     <div class="restriction_toggled toggled_by_category_restriction_{$CUSTOMER_FAMILY_ID}">
                                         <p>{intl l="Choose what categories will be available for this customer family" d='customerfamily.bo.default'}</p>
-                                        <select class="form-control" name="available_categories[]" id="" multiple>
+                                        <select class="form-control" name="available_categories[]" multiple>
                                             {foreach from=$categoryRestrictions[$CUSTOMER_FAMILY_ID] item=categoryRestriction}
                                                 <option value="{$categoryRestriction.id}" {if $categoryRestriction.available}selected{/if}>{$categoryRestriction.title}</option>
                                             {/foreach}
@@ -435,7 +435,7 @@
                                     </label>
                                     <div class="restriction_toggled toggled_by_brand_restriction_{$CUSTOMER_FAMILY_ID}">
                                         <p>{intl l="Choose what brands will be available for this customer family" d='customerfamily.bo.default'}</p>
-                                        <select class="form-control" name="available_categories[]" id="" multiple>
+                                        <select class="form-control" name="available_categories[]" multiple>
                                             {foreach from=$brandRestrictions[$CUSTOMER_FAMILY_ID] item=brandRestriction}
                                                 <option value="{$brandRestriction.id}" {if $brandRestriction.available}selected{/if}>{$brandRestriction.title}</option>
                                             {/foreach}
@@ -468,8 +468,64 @@
 </div>
 {/block}
 
+
 {block name="javascript-initialization"}
+    {javascripts file="assets/js/bootstrap-switch/bootstrap-switch.js"}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
     <script>
+        //delete
+        var $modalDelete = $('.js-modal-delete');
+
+        $('.js-action-delete').on('click', function(event){
+            var id = $(this).data('id');
+            $modalDelete.find('form').attr('action', '{url path="/admin/module/CustomerFamily/delete"}/'+id);
+            $modalDelete.modal('show');
+            event.preventDefault();
+        });
+        //end delete
+
+        //update
+        var $modalUpdate = $('.js-modal-update');
+
+        $('.js-action-update').on('click', function(event){
+            var id = $(this).data('id');
+
+            $modalUpdate.find('.js-field-code').val($(this).data('code'));
+            $modalUpdate.find('.js-field-title').val($(this).data('title'));
+
+            $modalUpdate.find('form').attr('action', '{url path="/admin/module/CustomerFamily/update"}/'+id);
+            $modalUpdate.modal('show');
+            event.preventDefault();
+        });
+        //end update
+
+        $(".switch-small").bootstrapSwitch();
+
+        // Default family
+        $(".update-default-family").on("switch-change", function(e, data){
+
+            var form = $("#update-default-family-form");
+            $('body').append('<div class="modal-backdrop fade in" id="loading-event"><div class="loading"></div></div>');
+
+            $('#default_family_id').val($(this).data('id'));
+
+            $.ajax({
+                url: form.attr('action'),
+                type: form.attr('method'),
+                data: form.serialize()
+            })
+                .done(function(){
+                    $("#loading-event").remove();
+                    location.href = "{url path='/admin/module/CustomerFamily'}";
+                })
+                .fail(function(jqXHR, textStatus, errorThrown){
+                    $("#loading-event").remove();
+                    $('#update-default-family-failed-body').html(jqXHR.responseJSON.error);
+                    $("#update-default-family-failed").modal("show");
+                });
+        });
+
         $('.restriction_toggler').each(function () {
             triggerRestrictionToggler($(this));
         });
