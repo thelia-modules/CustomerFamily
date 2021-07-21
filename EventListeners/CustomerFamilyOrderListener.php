@@ -13,6 +13,7 @@ use CustomerFamily\Service\CustomerFamilyService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Model\Event\OrderEvent as PropelOrderEvents;
 
 /**
  * Class CustomerFamilyOrderListener
@@ -37,7 +38,7 @@ class CustomerFamilyOrderListener implements EventSubscriberInterface
     {
         return [
             TheliaEvents::ORDER_BEFORE_PAYMENT => ['createOrderPurchasePrices', 128],
-            TheliaEvents::ORDER_AFTER_CREATE => ['saveOrderFamilyAndEquation', 128]
+            PropelOrderEvents::POST_INSERT => ['saveOrderFamilyAndEquation', 128]
         ];
     }
 
@@ -84,18 +85,18 @@ class CustomerFamilyOrderListener implements EventSubscriberInterface
     }
 
     /**
-     * @param OrderEvent $orderEvent
+     * @param PropelOrderEvents $orderEvent
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function saveOrderFamilyAndEquation(OrderEvent $orderEvent)
+    public function saveOrderFamilyAndEquation(PropelOrderEvents $orderEvent)
     {
         $customerFamily = CustomerFamilyQuery::create()
             ->findOneById(
-                $this->customerFamilyService->getCustomerCustomerFamilyId($orderEvent->getOrder()->getCustomerId())
+                $this->customerFamilyService->getCustomerCustomerFamilyId($orderEvent->getModel()->getCustomerId())
             );
 
         (new CustomerFamilyOrder())
-            ->setOrderId($orderEvent->getOrder()->getId())
+            ->setOrderId($orderEvent->getModel()->getId())
             ->setCustomerFamilyId($customerFamily->getId())
             ->save();
     }

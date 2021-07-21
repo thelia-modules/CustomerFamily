@@ -37,11 +37,11 @@
                 <div id="families" class="tab-pane active form-container">
                     <div class="row">
                         <div class="col-md-6">
-                            {if $hide_flags != true}
+                            {if $hide_flags|default:null != true}
                                 <ul class="nav nav-pills">
                                     {loop name="lang_list" type="lang"}
                                         <li {if $ID == $edit_language_id}class="active"{/if}>
-                                            {if $current_tab}
+                                            {if $current_tab|default:null}
                                                 {$lang_url = {url path="/admin/module/CustomerFamily" edit_language_id=$ID current_tab=$current_tab}}
                                             {else}
                                                 {$lang_url = {url path="/admin/module/CustomerFamily" edit_language_id=$ID}}
@@ -55,7 +55,7 @@
                             {/if}
                         </div>
 
-                        {form name="customer.family.delete.form"}
+                        {form name="customer_family_delete_form"}
                             {if $form_error}
                                 <div class="alert alert-danger">{$form_error_message}</div
                             {/if}
@@ -132,12 +132,12 @@
                                 <tfoot class="text-center">
                                     <tr>
                                         <td colspan="4">
-                                            {form name="customer.family.create.form"}
+                                            {form name="customer_family_create_form"}
                                                 <form action="{url path="/admin/module/CustomerFamily/create"}" method="POST" class="form-inline">
                                                     {if $form_error}
                                                         <div class="alert alert-danger">{$form_error_message}</div
                                                     {/if}
-                                                    {form_hidden_fields form=$form}
+                                                    {form_hidden_fields}
                                                     {form_field form=$form field="locale"}
                                                         <input type="hidden" name="{$name}" value="{$edit_language_locale}" />
                                                     {/form_field}
@@ -163,7 +163,7 @@
                         </div>
                     </div>
 
-                    {form name="customer.family.delete.form"}
+                    {form name="customer_family_delete_form"}
                         <div class="modal js-modal-delete" tabindex="-1" role="dialog" aria-labelledby="Delete family" aria-hidden="true">
                             <div class="modal-dialog">
                                 <form action="" method="POST">
@@ -182,7 +182,7 @@
                         </div>
                     {/form}
 
-                    {form name="customer.family.update.form"}
+                    {form name="customer_family_update_form"}
                         <div class="modal js-modal-update" tabindex="-1" role="dialog" aria-labelledby="Update family" aria-hidden="true">
                             <div class="modal-dialog">
                                 <form action="" method="POST">

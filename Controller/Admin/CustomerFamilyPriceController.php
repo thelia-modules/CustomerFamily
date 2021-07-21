@@ -3,6 +3,7 @@
 namespace CustomerFamily\Controller\Admin;
 
 use CustomerFamily\CustomerFamily;
+use CustomerFamily\Form\CustomerFamilyPriceForm;
 use CustomerFamily\Form\CustomerFamilyPriceModeForm;
 use CustomerFamily\Model\CustomerFamilyPrice;
 use CustomerFamily\Model\CustomerFamilyPriceQuery;
@@ -10,10 +11,13 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Translation\Translator;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Tools\URL;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
+ * @Route("/admin", name="customer_family")
  * Class CustomerFamilyPriceController
  * @package CustomerFamily\Controller
  * @author Etienne Perriere <eperriere@openstudio.fr>
@@ -24,8 +28,9 @@ class CustomerFamilyPriceController extends BaseAdminController
      * Add or update amounts and factor to calculate prices for customer families
      *
      * @return mixed|\Symfony\Component\HttpFoundation\Response|\Thelia\Core\HttpFoundation\Response|static
+     * @Route("/module/CustomerFamily/update-price-calculation", name="_update_price_calculation", methods="POST")
      */
-    public function updateAction()
+    public function updateAction(Translator $translator)
     {
         // Check rights
         if (null !== $response = $this->checkAuth(
@@ -36,7 +41,7 @@ class CustomerFamilyPriceController extends BaseAdminController
             return $response;
         }
 
-        $form = $this->createForm('customer_family_price_update');
+        $form = $this->createForm(CustomerFamilyPriceForm::getName());
         $error = null;
         $ex = null;
 
@@ -70,7 +75,7 @@ class CustomerFamilyPriceController extends BaseAdminController
 
         if ($error !== null) {
             $this->setupFormErrorContext(
-                $this->getTranslator()->trans("CustomerFamily configuration", [], CustomerFamily::MODULE_DOMAIN),
+                $translator->trans("CustomerFamily configuration", [], CustomerFamily::MODULE_DOMAIN),
                 $error,
                 $form,
                 $ex
@@ -78,12 +83,15 @@ class CustomerFamilyPriceController extends BaseAdminController
             return $this->render('module-configure', ['module_code' => 'CustomerFamily']);
         }
 
-        return RedirectResponse::create(URL::getInstance()->absoluteUrl("/admin/module/CustomerFamily"));
+        return new RedirectResponse(URL::getInstance()->absoluteUrl("/admin/module/CustomerFamily"));
     }
 
+    /**
+     * @Route("/CustomerFamily/selectPriceMode", name="_update_price", methods="POST")
+     */
     public function updatePriceModeAction()
     {
-        $form = new CustomerFamilyPriceModeForm($this->getRequest());
+        $form = $this->createForm(CustomerFamilyPriceModeForm::getName());
         $vForm = $this->validateForm($form);
 
         $mode = $vForm->get('price_mode')->getData();

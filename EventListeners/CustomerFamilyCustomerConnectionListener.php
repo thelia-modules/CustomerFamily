@@ -5,6 +5,7 @@ namespace CustomerFamily\EventListeners;
 use CustomerFamily\Service\CustomerFamilyService;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Event\Customer\CustomerLoginEvent;
 use Thelia\Core\Event\DefaultActionEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -18,12 +19,12 @@ use Thelia\Model\ProductSaleElementsQuery;
  */
 class CustomerFamilyCustomerConnectionListener implements EventSubscriberInterface
 {
-    protected $request;
+    protected $requestStack;
     protected $customerFamilyService;
 
-    public function __construct(Request $request, CustomerFamilyService $customerFamilyService)
+    public function __construct(RequestStack $requestStack, CustomerFamilyService $customerFamilyService)
     {
-        $this->request = $request;
+        $this->requestStack = $requestStack;
         $this->customerFamilyService = $customerFamilyService;
     }
 
@@ -52,7 +53,7 @@ class CustomerFamilyCustomerConnectionListener implements EventSubscriberInterfa
     public function customerLogout(DefaultActionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         // Get cart & loop on its items
-        $cart = $this->request->getSession()->getSessionCart($dispatcher);
+        $cart = $this->requestStack->getCurrentRequest()->getSession()->getSessionCart($dispatcher);
 
         /** @var \Thelia\Model\CartItem $cartItem */
         foreach ($cart->getCartItems() as $cartItem) {
@@ -90,7 +91,7 @@ class CustomerFamilyCustomerConnectionListener implements EventSubscriberInterfa
     public function customerLogin(CustomerLoginEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         // Get cart & loop on its items
-        $cart = $this->request->getSession()->getSessionCart($dispatcher);
+        $cart = $this->requestStack->getCurrentRequest()->getSession()->getSessionCart($dispatcher);
 
         /** @var \Thelia\Model\CartItem $cartItem */
         foreach ($cart->getCartItems() as $cartItem) {

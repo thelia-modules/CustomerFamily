@@ -2,6 +2,7 @@
 
 namespace CustomerFamily\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Thelia\Form\BaseForm;
 
 /**
@@ -10,7 +11,7 @@ use Thelia\Form\BaseForm;
  */
 class CustomerFamilyUpdateDefaultForm extends BaseForm
 {
-    public function getName()
+    public static function getName()
     {
         return 'customer_family_update_default_form';
     }
@@ -20,7 +21,7 @@ class CustomerFamilyUpdateDefaultForm extends BaseForm
         $this->formBuilder
             ->add(
                 'customer_family_id',
-                'integer'
+                IntegerType::class
             );
     }
 }

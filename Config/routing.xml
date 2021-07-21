@@ -4,12 +4,12 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
 
-    <route id="customer.family.config.view" path="/admin/module/CustomerFamily">
+    <!--<route id="customer.family.config.view" path="/admin/module/CustomerFamily">
         <default key="_controller">CustomerFamily\Controller\Admin\CustomerFamilyAdminController::viewAction</default>
-    </route>
+    </route>-->
 
     <!-- Customer Family -->
-    <route id="customer.family.create" path="/admin/module/CustomerFamily/create" methods="post">
+    <!--<route id="customer.family.create" path="/admin/module/CustomerFamily/create" methods="post">
         <default key="_controller">CustomerFamily\Controller\Admin\CustomerFamilyAdminController::createAction</default>
     </route>
 
@@ -29,10 +29,10 @@
 
     <route id="customer.family.customer.update" path="/admin/module/CustomerFamily/customer/update" methods="post">
         <default key="_controller">CustomerFamily\Controller\Admin\CustomerFamilyAdminController::customerUpdateAction</default>
-    </route>
+    </route>-->
 
     <!-- Prices management -->
-    <route id="customer.family.price.update" path="/admin/module/CustomerFamily/update-price-calculation" methods="post">
+    <!--<route id="customer.family.price.update" path="/admin/module/CustomerFamily/update-price-calculation" methods="post">
         <default key="_controller">CustomerFamily\Controller\Admin\CustomerFamilyPriceController::updateAction</default>
     </route>
 
@@ -52,5 +52,5 @@
     <route id="customer.family.brand_restriction" path="/admin/module/CustomerFamily/brand_restriction/{customerFamilyId}" methods="post">
         <default key="_controller">CustomerFamily\Controller\Admin\CustomerFamilyAdminController::saveCustomerFamilyBrandRestriction</default>
         <requirement key="customerFamilyId">\d+</requirement>
-    </route>
+    </route>-->
 </routes>

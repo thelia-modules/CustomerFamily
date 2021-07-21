@@ -12,6 +12,8 @@
 
 namespace CustomerFamily\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints;
 use CustomerFamily\CustomerFamily;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -27,7 +29,7 @@ class CustomerCustomerFamilyForm extends BaseForm
     /**
      * @return string the name of you form. This name must be unique
      */
-    public function getName()
+    public static function getName()
     {
         return 'customer_customer_family_form';
     }
@@ -59,7 +61,7 @@ class CustomerCustomerFamilyForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add('customer_id', 'integer', array(
+            ->add('customer_id', IntegerType::class, array(
                     'constraints' => array(
                         new Constraints\NotBlank()
                     ),
@@ -72,7 +74,7 @@ class CustomerCustomerFamilyForm extends BaseForm
                         'for' => 'customer_id'
                     )
                 ))
-            ->add('customer_family_id', 'integer', array(
+            ->add('customer_family_id', IntegerType::class, array(
                     'constraints' => array(
                         new Constraints\NotBlank()
                     ),
@@ -87,7 +89,7 @@ class CustomerCustomerFamilyForm extends BaseForm
                 ))
             ->add(
                 'siret',
-                'text',
+                TextType::class,
                 array(
                     'required' => false,
                     'empty_data' => false,
@@ -103,7 +105,7 @@ class CustomerCustomerFamilyForm extends BaseForm
             )
             ->add(
                 'vat',
-                'text',
+                TextType::class,
                 array(
                     'required' => false,
                     'empty_data' => false,

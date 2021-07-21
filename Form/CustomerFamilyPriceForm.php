@@ -2,6 +2,9 @@
 
 namespace CustomerFamily\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Thelia\Form\BaseForm;
 
 /**
@@ -11,7 +14,7 @@ use Thelia\Form\BaseForm;
  */
 class CustomerFamilyPriceForm extends BaseForm
 {
-    public function getName()
+    public static function getName()
     {
         return 'customer_family_price_update';
     }
@@ -21,44 +24,44 @@ class CustomerFamilyPriceForm extends BaseForm
         $this->formBuilder
             ->add(
                 'customer_family_id',
-                'integer'
+                IntegerType::class
             )
             ->add(
                 'promo',
-                'integer'
+                IntegerType::class
             )
             ->add(
                 'use_equation',
-                'checkbox',
+                CheckboxType::class,
                 []
             )
             ->add(
                 'amount_added_before',
-                'number',
+                NumberType::class,
                 [
-                    'precision' => 6,
+                    'scale' => 6,
                     'required' => false
                 ]
             )
             ->add(
                 'amount_added_after',
-                'number',
+                NumberType::class,
                 [
-                    'precision' => 6,
+                    'scale' => 6,
                     'required' => false
                 ]
             )
             ->add(
                 'coefficient',
-                'number',
+                NumberType::class,
                 [
-                    'precision' => 6,
+                    'scale' => 6,
                     'required' => false
                 ]
             )
             ->add(
                 'is_taxed',
-                'checkbox',
+                CheckboxType::class,
                 []
             )
         ;

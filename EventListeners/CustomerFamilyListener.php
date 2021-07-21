@@ -22,6 +22,7 @@ use CustomerFamily\Model\CustomerFamilyQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -38,8 +39,8 @@ class CustomerFamilyListener implements EventSubscriberInterface
     const THELIA_CUSTOMER_CREATE_FORM_NAME = 'thelia_customer_create';
     const THELIA_CUSTOMER_UPDATE_FORM_NAME = 'thelia_customer_profile_update';
 
-    /** @var \Thelia\Core\HttpFoundation\Request */
-    protected $request;
+    /** @var RequestStack */
+    protected $requestStack;
 
     /** @var \Thelia\Core\Template\ParserInterface */
     protected $parser;
@@ -52,9 +53,9 @@ class CustomerFamilyListener implements EventSubscriberInterface
      * @param ParserInterface $parser
      * @param MailerFactory $mailer
      */
-    public function __construct(Request $request, ParserInterface $parser, MailerFactory $mailer)
+    public function __construct(RequestStack $requestStack, ParserInterface $parser, MailerFactory $mailer)
     {
-        $this->request = $request;
+        $this->requestStack = $requestStack;
         $this->parser = $parser;
         $this->mailer = $mailer;
     }
@@ -69,7 +70,7 @@ class CustomerFamilyListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::AFTER_CREATECUSTOMER => array(
+            TheliaEvents::CUSTOMER_CREATEACCOUNT => array(
                 'afterCreateCustomer', 100
             ),
             TheliaEvents::CUSTOMER_UPDATEPROFILE => array(
@@ -140,7 +141,7 @@ class CustomerFamilyListener implements EventSubscriberInterface
      */
     public function afterCreateCustomer(CustomerEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        $form = $this->request->request->get(self::THELIA_CUSTOMER_CREATE_FORM_NAME);
+        $form = $this->requestStack->getCurrentRequest()->request->get(self::THELIA_CUSTOMER_CREATE_FORM_NAME);
 
         if (is_null($form) or !array_key_exists(CustomerFamilyFormListener::CUSTOMER_FAMILY_CODE_FIELD_NAME, $form)) {
             // Nothing to create the new CustomerCustomerFamily => stop here !
@@ -167,7 +168,7 @@ class CustomerFamilyListener implements EventSubscriberInterface
             ->setVat($vat)
         ;
 
-        $dispatcher->dispatch(CustomerFamilyEvents::CUSTOMER_CUSTOMER_FAMILY_UPDATE, $updateEvent);
+        $dispatcher->dispatch($updateEvent, CustomerFamilyEvents::CUSTOMER_CUSTOMER_FAMILY_UPDATE);
     }
 
     /**
@@ -177,7 +178,7 @@ class CustomerFamilyListener implements EventSubscriberInterface
      */
     public function customerUpdateProfile(CustomerCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        $form = $this->request->request->get(self::THELIA_CUSTOMER_UPDATE_FORM_NAME);
+        $form = $this->requestStack->getCurrentRequest()->request->get(self::THELIA_CUSTOMER_UPDATE_FORM_NAME);
 
         if (is_null($form) or !array_key_exists(CustomerFamilyFormListener::CUSTOMER_FAMILY_CODE_FIELD_NAME, $form)) {
             // Nothing to update => stop here !
@@ -203,7 +204,7 @@ class CustomerFamilyListener implements EventSubscriberInterface
             ->setVat($vat)
         ;
 
-        $dispatcher->dispatch(CustomerFamilyEvents::CUSTOMER_CUSTOMER_FAMILY_UPDATE, $updateEvent);
+        $dispatcher->dispatch($updateEvent, CustomerFamilyEvents::CUSTOMER_CUSTOMER_FAMILY_UPDATE);
     }
 
     /**
@@ -233,11 +234,11 @@ class CustomerFamilyListener implements EventSubscriberInterface
      */
     protected function getCustomerFamilyForm()
     {
-        if (null != $form = $this->request->request->get("customer_family_customer_profile_update_form")) {
+        if (null != $form = $this->requestStack->getCurrentRequest()->request->get("customer_family_customer_profile_update_form")) {
             return $form;
         }
 
-        if (null != $form = $this->request->request->get(self::THELIA_CUSTOMER_CREATE_FORM_NAME)) {
+        if (null != $form = $this->requestStack->getCurrentRequest()->request->get(self::THELIA_CUSTOMER_CREATE_FORM_NAME)) {
             return $form;
         }
 
