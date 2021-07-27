@@ -104,6 +104,10 @@
 		</service>
 	</services>-->
 
+    <services>
+        <service id="customer.family.service" alias="CustomerFamily\Service\CustomerFamilyService" public="true"/>
+    </services>
+
 	<hooks>
 		<!-- Global hook class -->
 		<hook id="customer.family.hook" class="CustomerFamily\Hook\CustomerFamilyHook">
