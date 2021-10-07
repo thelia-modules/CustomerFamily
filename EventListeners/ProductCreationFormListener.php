@@ -5,6 +5,8 @@ namespace CustomerFamily\EventListeners;
 use CustomerFamily\CustomerFamily;
 use CustomerFamily\Model\ProductPurchasePrice;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Constraints;
 use Thelia\Core\Event\Product\ProductCreateEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -19,15 +21,15 @@ use Thelia\Core\Translation\Translator;
  */
 class ProductCreationFormListener implements EventSubscriberInterface
 {
-    /** @var \Thelia\Core\HttpFoundation\Request */
-    protected $request;
+    /** @var RequestStack */
+    protected $requestStack;
 
     /**
-     * @param Request $request
+     * @param RequestStack $requestStack
      */
-    public function __construct(Request $request)
+    public function __construct(RequestStack $requestStack)
     {
-        $this->request = $request;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -53,12 +55,12 @@ class ProductCreationFormListener implements EventSubscriberInterface
         $event->getForm()->getFormBuilder()
             ->add(
                 'purchase_price',
-                'number',
+                NumberType::class,
                 [
                     'constraints' => [
                         new Constraints\GreaterThanOrEqual(['value' => 0])
                     ],
-                    'label' => $this->trans('Purchase price'),
+                    'label' => self::trans('Purchase price'),
                     'label_attr' => ['for' => 'purchase_price']
                 ]
             )
@@ -74,7 +76,7 @@ class ProductCreationFormListener implements EventSubscriberInterface
      */
     public function createProductPurchasePrice(ProductCreateEvent $event)
     {
-        if (null != $purchasePrice = $this->request->get('thelia_product_creation')['purchase_price']) {
+        if (null != $purchasePrice = $this->requestStack->getCurrentRequest()->get('thelia_product_creation')['purchase_price']) {
             (new ProductPurchasePrice())
                 ->setProductSaleElementsId($event->getProduct()->getDefaultSaleElements()->getId())
                 ->setCurrencyId($event->getCurrencyId())

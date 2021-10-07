@@ -10,7 +10,7 @@ class BaseCustomerFamilyLoopExtend
     /** @var SecurityContext */
     protected $securityContext;
 
-    public function __construct($securityContext)
+    public function __construct(SecurityContext $securityContext)
     {
         $this->securityContext = $securityContext;
     }

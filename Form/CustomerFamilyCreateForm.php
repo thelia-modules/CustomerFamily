@@ -13,6 +13,7 @@
 namespace CustomerFamily\Form;
 
 use CustomerFamily\CustomerFamily;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
@@ -29,7 +30,7 @@ class CustomerFamilyCreateForm extends BaseForm
     /**
      * @return string the name of you form. This name must be unique
      */
-    public function getName()
+    public static function getName()
     {
         return 'customer_family_create_form';
     }
@@ -52,7 +53,7 @@ class CustomerFamilyCreateForm extends BaseForm
         $this->formBuilder
             ->add(
                 'code',
-                'text',
+                TextType::class,
                 array(
                     'constraints' => array(
                         new NotBlank()
@@ -71,7 +72,7 @@ class CustomerFamilyCreateForm extends BaseForm
             )
             ->add(
                 'title',
-                'text',
+                TextType::class,
                 array(
                     'constraints' => array(
                         new NotBlank()
@@ -88,13 +89,13 @@ class CustomerFamilyCreateForm extends BaseForm
             )
             ->add(
                 'locale',
-                'text',
+                TextType::class,
                 array(
                     'constraints' => array(
                         new NotBlank(),
-                        new Callback(array("methods" => array(
+                        new Callback(
                             array($this, "checkLocale")
-                        )))
+                        )
                     ),
                     'required' => true,
                     'empty_data' => false,

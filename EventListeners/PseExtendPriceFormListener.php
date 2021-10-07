@@ -5,6 +5,8 @@ namespace CustomerFamily\EventListeners;
 use CustomerFamily\Model\ProductPurchasePrice;
 use CustomerFamily\Model\ProductPurchasePriceQuery;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Constraints;
@@ -43,12 +45,12 @@ class PseExtendPriceFormListener implements EventSubscriberInterface
         $event->getForm()->getFormBuilder()
             ->add(
                 'purchase_price',
-                'collection',
+                CollectionType::class,
                 [
-                    'type'  => 'number',
+                    'entry_type'  => NumberType::class,
                     'allow_add'    => true,
                     'allow_delete' => true,
-                    'options' => [
+                    'entry_options' => [
                         'constraints' => [
                             new Constraints\GreaterThanOrEqual(['value' => 0])
                         ]

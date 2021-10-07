@@ -19,17 +19,23 @@ use CustomerFamily\Event\CustomerFamilyEvents;
 use CustomerFamily\Form\CustomerCustomerFamilyForm;
 use CustomerFamily\Form\CustomerFamilyCreateForm;
 use CustomerFamily\Form\CustomerFamilyDeleteForm;
+use CustomerFamily\Form\CustomerFamilyUpdateDefaultForm;
 use CustomerFamily\Form\CustomerFamilyUpdateForm;
 use CustomerFamily\Model\CustomerFamilyAvailableBrand;
 use CustomerFamily\Model\CustomerFamilyAvailableCategory;
 use CustomerFamily\Model\CustomerFamilyQuery;
 use Propel\Runtime\Propel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Core\HttpFoundation\JsonResponse;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
 use Thelia\Form\CustomerUpdateForm;
@@ -37,13 +43,18 @@ use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerQuery;
 use Thelia\Tools\URL;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
+ * @Route("/admin/module/CustomerFamily", name="customer_family")
  * Class CustomerFamilyAdminController
  * @package CustomerFamily\Controller\Admin
  */
 class CustomerFamilyAdminController extends BaseAdminController
 {
+    /**
+     * @Route("", name="_view", methods="GET")
+     */
     public function viewAction($params = [])
     {
         $categoryRestrictions = [];
@@ -95,15 +106,16 @@ class CustomerFamilyAdminController extends BaseAdminController
     /**
      * @param Request $request
      * @return mixed|\Thelia\Core\HttpFoundation\Response
+     * @Route("/create", name="_create", methods="POST")
      */
-    public function createAction(Request $request)
+    public function createAction(EventDispatcherInterface $eventDispatcher, RequestStack $requestStack, ParserContext $parserContext)
     {
         if (null !== $response = $this->checkAuth(array(AdminResources::MODULE), array('CustomerFamily'), AccessManager::CREATE)) {
             return $response;
         }
 
         $error = "";
-        $form = new CustomerFamilyCreateForm($request);
+        $form = $this->createForm(CustomerFamilyCreateForm::getName());
 
         try {
             $formValidate = $this->validateForm($form);
@@ -111,7 +123,7 @@ class CustomerFamilyAdminController extends BaseAdminController
             $event = new CustomerFamilyEvent();
             $event->hydrateByForm($formValidate);
 
-            $this->dispatch(CustomerFamilyEvents::CUSTOMER_FAMILY_CREATE, $event);
+            $eventDispatcher->dispatch($event, CustomerFamilyEvents::CUSTOMER_FAMILY_CREATE);
 
         } catch (\Exception $e) {
             $error = $e->getMessage();
@@ -123,22 +135,23 @@ class CustomerFamilyAdminController extends BaseAdminController
             CustomerFamily::MODULE_DOMAIN
         );
 
-        return self::renderAdminConfig($form, $message, $error);
+        return $this->renderAdminConfig($form, $message, $error, $parserContext, $requestStack->getCurrentRequest()->getSession());
     }
 
     /**
      * @param Request $request
      * @param $id
      * @return mixed|\Thelia\Core\HttpFoundation\Response
+     * @Route("/update/{id}", name="_update", methods="POST")
      */
-    public function updateAction(Request $request, $id)
+    public function updateAction($id, EventDispatcherInterface $eventDispatcher, RequestStack $requestStack, ParserContext $parserContext)
     {
         if (null !== $response = $this->checkAuth(array(AdminResources::MODULE), array('CustomerFamily'), AccessManager::UPDATE)) {
             return $response;
         }
 
         $error = "";
-        $form = new CustomerFamilyUpdateForm($request);
+        $form = $this->createForm(CustomerFamilyUpdateForm::getName());
 
         try {
             $formValidate = $this->validateForm($form);
@@ -152,7 +165,7 @@ class CustomerFamilyAdminController extends BaseAdminController
             $event = new CustomerFamilyEvent($customerFamily);
             $event->hydrateByForm($formValidate);
 
-            $this->dispatch(CustomerFamilyEvents::CUSTOMER_FAMILY_UPDATE, $event);
+            $eventDispatcher->dispatch($event, CustomerFamilyEvents::CUSTOMER_FAMILY_UPDATE);
 
         } catch (\Exception $e) {
             $error = $e->getMessage();
@@ -164,7 +177,7 @@ class CustomerFamilyAdminController extends BaseAdminController
             CustomerFamily::MODULE_DOMAIN
         );
 
-        return self::renderAdminConfig($form, $message, $error);
+        return $this->renderAdminConfig($form, $message, $error, $parserContext, $requestStack->getCurrentRequest()->getSession());
     }
 
     /**
@@ -172,8 +185,9 @@ class CustomerFamilyAdminController extends BaseAdminController
      * There must be at least one default family
      *
      * @return mixed|\Symfony\Component\HttpFoundation\Response|static
+     * @Route("/update-default", name="_update-default", methods="POST")
      */
-    public function updateDefaultAction()
+    public function updateDefaultAction(Translator $translator)
     {
         if (null !== $response = $this->checkAuth([AdminResources::MODULE], ['CustomerFamily'], AccessManager::UPDATE)) {
             return $response;
@@ -181,7 +195,7 @@ class CustomerFamilyAdminController extends BaseAdminController
 
         $error = null;
         $ex = null;
-        $form = $this->createForm('customer_family_update_default_form');
+        $form = $this->createForm(CustomerFamilyUpdateDefaultForm::getName());
 
         try {
             $vForm = $this->validateForm($form);
@@ -217,15 +231,15 @@ class CustomerFamilyAdminController extends BaseAdminController
 
         if ($error !== null) {
             $this->setupFormErrorContext(
-                $this->getTranslator()->trans("Error updating default family", [], CustomerFamily::MODULE_DOMAIN),
+                $translator->trans("Error updating default family", [], CustomerFamily::MODULE_DOMAIN),
                 $error,
                 $form,
                 $ex
             );
-            return JsonResponse::create(['error'=>$error], 500);
+            return new JsonResponse(['error'=>$error], 500);
         }
 
-        return RedirectResponse::create(URL::getInstance()->absoluteUrl("/admin/module/CustomerFamily"));
+        return new RedirectResponse(URL::getInstance()->absoluteUrl("/admin/module/CustomerFamily"));
 
     }
 
@@ -233,15 +247,16 @@ class CustomerFamilyAdminController extends BaseAdminController
      * @param Request $request
      * @param $id
      * @return mixed|\Thelia\Core\HttpFoundation\Response
+     * @Route("/delete/{id}", name="_delete", methods="POST")
      */
-    public function deleteAction(Request $request, $id)
+    public function deleteAction($id, EventDispatcherInterface $eventDispatcher, RequestStack $requestStack, ParserContext $parserContext)
     {
         if (null !== $response = $this->checkAuth(array(AdminResources::MODULE), array('CustomerFamily'), AccessManager::DELETE)) {
             return $response;
         }
 
         $error = "";
-        $form = new CustomerFamilyDeleteForm($request);
+        $form = $this->createForm(CustomerFamilyDeleteForm::getName());
 
         try {
             $formValidate = $this->validateForm($form);
@@ -254,7 +269,7 @@ class CustomerFamilyAdminController extends BaseAdminController
 
             $event = new CustomerFamilyEvent($customerFamily);
 
-            $this->dispatch(CustomerFamilyEvents::CUSTOMER_FAMILY_DELETE, $event);
+            $eventDispatcher->dispatch($event, CustomerFamilyEvents::CUSTOMER_FAMILY_DELETE);
 
         } catch (\Exception $e) {
             $error = $e->getMessage();
@@ -266,7 +281,7 @@ class CustomerFamilyAdminController extends BaseAdminController
             CustomerFamily::MODULE_DOMAIN
         );
 
-        return self::renderAdminConfig($form, $message, $error);
+        return $this->renderAdminConfig($form, $message, $error, $parserContext, $requestStack->getCurrentRequest()->getSession());
     }
 
     /**
@@ -275,26 +290,26 @@ class CustomerFamilyAdminController extends BaseAdminController
      * @param string $errorMessage
      * @return \Symfony\Component\HttpFoundation\Response|static
      */
-    protected function renderAdminConfig($form, $successMessage, $errorMessage)
+    protected function renderAdminConfig($form, $successMessage, $errorMessage, ParserContext $parserContext, SessionInterface $session)
     {
         if (!empty($errorMessage)) {
             $form->setErrorMessage($errorMessage);
 
-            $this->getParserContext()
+            $parserContext
                 ->addForm($form)
                 ->setGeneralError($errorMessage);
         }
 
         //for compatibility 2.0
-        if (method_exists($this->getSession(), "getFlashBag")) {
+        if (method_exists($session, "getFlashBag")) {
             if (empty($errorMessage)) {
-                $this->getSession()->getFlashBag()->add("success", $successMessage);
+                $session->getFlashBag()->add("success", $successMessage);
             } else {
-                $this->getSession()->getFlashBag()->add("danger", $errorMessage);
+                $session->getFlashBag()->add("danger", $errorMessage);
             }
         }
 
-        return RedirectResponse::create(
+        return new RedirectResponse(
             URL::getInstance()->absoluteUrl("/admin/module/CustomerFamily")
         );
     }
@@ -302,15 +317,16 @@ class CustomerFamilyAdminController extends BaseAdminController
     /**
      * @param Request $request
      * @return mixed|\Thelia\Core\HttpFoundation\Response
+     * @Route("/customer/update", name="_customer_update", methods="POST")
      */
-    public function customerUpdateAction(Request $request)
+    public function customerUpdateAction(RequestStack $requestStack, ParserContext $parserContext, EventDispatcherInterface $eventDispatcher)
     {
         if (null !== $response = $this->checkAuth(array(AdminResources::MODULE), array('CustomerFamily'), AccessManager::UPDATE)) {
             return $response;
         }
 
         $error = "";
-        $form = new CustomerCustomerFamilyForm($request);
+        $form = $this->createForm(CustomerCustomerFamilyForm::getName());
         try {
             $formValidate = $this->validateForm($form);
             $event = new CustomerCustomerFamilyEvent($formValidate->get('customer_id')->getData());
@@ -320,7 +336,7 @@ class CustomerFamilyAdminController extends BaseAdminController
                 ->setVat($formValidate->get('vat')->getData())
             ;
 
-            $this->dispatch(CustomerFamilyEvents::CUSTOMER_CUSTOMER_FAMILY_UPDATE, $event);
+            $eventDispatcher->dispatch($event, CustomerFamilyEvents::CUSTOMER_CUSTOMER_FAMILY_UPDATE);
 
             return $this->generateRedirect(URL::getInstance()->absoluteUrl(
                 '/admin/customer/update?customer_id='.$formValidate->get('customer_id')->getData()
@@ -335,29 +351,33 @@ class CustomerFamilyAdminController extends BaseAdminController
             $form->setErrorMessage($error);
         }
 
-        $this->getParserContext()
+        $parserContext
             ->addForm($form)
             ->setGeneralError($error);
 
         //Don't forget to fill the Customer form
-        $customerId = $request->get('customer_customer_family_form')['customer_id'];
+        $customerId = $requestStack->getCurrentRequest()->get('customer_customer_family_form')['customer_id'];
         if (null != $customer = CustomerQuery::create()->findPk($customerId)) {
             $customerForm = $this->hydrateCustomerForm($customer);
-            $this->getParserContext()->addForm($customerForm);
+            $parserContext->addForm($customerForm);
         }
 
         return $this->render('customer-edit', array(
-                'customer_id' => $request->get('customer_customer_family_form')['customer_id'],
+                'customer_id' => $requestStack->getCurrentRequest()->get('customer_customer_family_form')['customer_id'],
                 "order_creation_error" => Translator::getInstance()->trans($error, array(), CustomerFamily::MESSAGE_DOMAIN)
             ));
     }
 
-    public function saveCustomerFamilyCategoryRestriction($customerFamilyId)
+    /**
+     * @Route("/category_restriction/{customerFamilyId}", name="_category_restriction", methods="POST")
+     */
+    public function saveCustomerFamilyCategoryRestriction($customerFamilyId, ParserContext $parserContext, RequestStack $requestStack)
     {
         $customerFamily = CustomerFamilyQuery::create()
             ->findOneById($customerFamilyId);
 
-        $restrictionEnabled = $this->getRequest()->get('restriction_enabled') === "on";
+        $request = $requestStack->getCurrentRequest();
+        $restrictionEnabled = $request->get('restriction_enabled') === "on";
         $customerFamily->setCategoryRestrictionEnabled($restrictionEnabled);
         $customerFamily->save();
 
@@ -367,9 +387,9 @@ class CustomerFamilyAdminController extends BaseAdminController
         $stmt->bindValue('customerFamilyId', $customerFamilyId);
         $stmt->execute();
 
-        $brands = $this->getRequest()->get('available_categories');
+        $brands = $request->get('available_categories');
         if (is_array($brands)) {
-            foreach ($this->getRequest()->get('available_categories') as $availableCategoryId) {
+            foreach ($request->get('available_categories') as $availableCategoryId) {
                 var_dump($customerFamilyId);
                 var_dump($availableCategoryId);
                 $customerFamilyAvailableCategory = new CustomerFamilyAvailableCategory();
@@ -379,15 +399,19 @@ class CustomerFamilyAdminController extends BaseAdminController
             }
         }
 
-        return $this->renderAdminConfig(null, "", "");
+        return $this->renderAdminConfig(null, "", "", $parserContext, $request->getSession());
     }
 
-    public function saveCustomerFamilyBrandRestriction($customerFamilyId)
+    /**
+     * @Route("/brand_restriction/{customerFamilyId}", name="_brand_restriction", methods="POST")
+     */
+    public function saveCustomerFamilyBrandRestriction($customerFamilyId, ParserContext $parserContext, RequestStack $requestStack)
     {
         $customerFamily = CustomerFamilyQuery::create()
             ->findOneById($customerFamilyId);
 
-        $restrictionEnabled = $this->getRequest()->get('restriction_enabled') === "on";
+        $request = $requestStack->getCurrentRequest();
+        $restrictionEnabled = $request->get('restriction_enabled') === "on";
         $customerFamily->setBrandRestrictionEnabled($restrictionEnabled);
         $customerFamily->save();
 
@@ -397,9 +421,9 @@ class CustomerFamilyAdminController extends BaseAdminController
         $stmt->bindValue('customerFamilyId', $customerFamilyId);
         $stmt->execute();
 
-        $categories = $this->getRequest()->get('available_categories');
+        $categories = $request->get('available_categories');
         if (is_array($categories)) {
-            foreach ($this->getRequest()->get('available_categories') as $availableBrandId) {
+            foreach ($request->get('available_categories') as $availableBrandId) {
                 var_dump($customerFamilyId);
                 var_dump($availableBrandId);
                 $customerFamilyAvailableBrand = new CustomerFamilyAvailableBrand();
@@ -409,12 +433,12 @@ class CustomerFamilyAdminController extends BaseAdminController
             }
         }
 
-        return $this->renderAdminConfig(null, "", "");
+        return $this->renderAdminConfig(null, "", "", $parserContext, $request->getSession());
     }
 
     /**
      * @param Customer $customer
-     * @return CustomerUpdateForm
+     * @return BaseForm
      */
     protected function hydrateCustomerForm(Customer $customer)
     {
@@ -445,6 +469,6 @@ class CustomerFamilyAdminController extends BaseAdminController
         }
 
         // A loop is used in the template
-        return new CustomerUpdateForm($this->getRequest(), 'form', $data);
+        return $this->createForm(CustomerUpdateForm::getName(), FormType::class, $data);
     }
 }

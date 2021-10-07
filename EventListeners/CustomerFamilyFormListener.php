@@ -15,6 +15,9 @@ namespace CustomerFamily\EventListeners;
 use CustomerFamily\CustomerFamily;
 use CustomerFamily\Model\CustomerCustomerFamilyQuery;
 use CustomerFamily\Model\CustomerFamilyQuery;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -42,15 +45,15 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
 
     const CUSTOMER_FAMILY_VAT_FIELD_NAME = 'vat';
 
-    /** @var \Thelia\Core\HttpFoundation\Request */
-    protected $request;
+    /** @var RequestStack */
+    protected $requestStack;
 
     /**
-     * @param Request $request
+     * @param RequestStack $requestStack
      */
-    public function __construct(Request $request)
+    public function __construct(RequestStack $requestStack)
     {
-        $this->request = $request;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -81,23 +84,19 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
 
         /** @var \CustomerFamily\Model\CustomerFamily $customerFamily */
         foreach (CustomerFamilyQuery::create()->find() as $customerFamily) {
-            $customerFamilyChoices[$customerFamily->getCode()] = self::trans($customerFamily->getTitle());
+            $customerFamilyChoices[self::trans($customerFamily->getTitle())] = $customerFamily->getCode();
         }
 
         // Building additional fields
         $event->getForm()->getFormBuilder()
             ->add(
                 self::CUSTOMER_FAMILY_CODE_FIELD_NAME,
-                'choice',
+                ChoiceType::class,
                 array(
                     'constraints' => array(
                         new Constraints\Callback(
                             array(
-                                'methods' => array(
-                                    array(
-                                        $this, 'checkCustomerFamily'
-                                    )
-                                )
+                                $this, 'checkCustomerFamily'
                             )
                         ),
                         new Constraints\NotBlank(),
@@ -114,7 +113,7 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
             )
             ->add(
                 self::CUSTOMER_FAMILY_SIRET_FIELD_NAME,
-                'text',
+                TextType::class,
                 array(
                     'required' => true,
                     'empty_data' => false,
@@ -127,7 +126,7 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
             )
             ->add(
                 self::CUSTOMER_FAMILY_VAT_FIELD_NAME,
-                'text',
+                TextType::class,
                 array(
                     'required' => true,
                     'empty_data' => false,
@@ -149,7 +148,7 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
     public function addCustomerFamilyFieldsForUpdate(TheliaFormEvent $event)
     {
         // Adding new fields
-        $customer = $this->request->getSession()->getCustomerUser();
+        $customer = $this->requestStack->getCurrentRequest()->getSession()->getCustomerUser();
 
         if (is_null($customer)) {
             // No customer => no account update => stop here
@@ -169,7 +168,7 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
 
         /** @var \CustomerFamily\Model\CustomerFamily $customerFamilyChoice */
         foreach (CustomerFamilyQuery::create()->find() as $customerFamilyChoice) {
-            $customerFamilyChoices[$customerFamilyChoice->getCode()] = self::trans($customerFamilyChoice->getTitle());
+            $customerFamilyChoices[self::trans($customerFamilyChoice->getTitle())] = $customerFamilyChoice->getCode();
         }
 
 
@@ -177,12 +176,12 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
         $event->getForm()->getFormBuilder()
             ->add(
                 self::CUSTOMER_FAMILY_CODE_FIELD_NAME,
-                'choice',
+                ChoiceType::class,
                 array(
                     'constraints' => array(
-                        new Constraints\Callback(array('methods' => array(
+                        new Constraints\Callback(
                             array($this, 'checkCustomerFamily')
-                        ))),
+                        ),
                         new Constraints\NotBlank(),
                     ),
                     'choices' => $customerFamilyChoices,
@@ -198,7 +197,7 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
             )
             ->add(
                 self::CUSTOMER_FAMILY_SIRET_FIELD_NAME,
-                'text',
+                TextType::class,
                 array(
                     'required' => true,
                     'empty_data' => false,
@@ -212,7 +211,7 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
             )
             ->add(
                 self::CUSTOMER_FAMILY_VAT_FIELD_NAME,
-                'text',
+                TextType::class,
                 array(
                     'required' => true,
                     'empty_data' => false,

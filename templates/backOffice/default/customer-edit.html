@@ -10,7 +10,7 @@
             <div class="col-md-12 title title-without-tabs">{intl l="Family of this customer" d="customerfamily"}</div>
             <div class="col-md-12">
                 <div class="col-md-12">
-                    {form name="customer.customer.family.form"}
+                    {form name="customer_customer_family_form"}
                     <form class="form-horizontal" action="{url path="/admin/module/CustomerFamily/customer/update"}" method="post">
 
                     {form_hidden_fields form=$form}
@@ -27,7 +27,7 @@
                         <div class="control-input">
                             <select name="{$name}" id="{$label_attr.for}" class="form-control">
                                 {loop name="customer_family" type="customer_family"}
-                                <option data-code="{$CODE}" value="{$CUSTOMER_FAMILY_ID}" {if {$_customer_family_id_} == $CUSTOMER_FAMILY_ID}selected{/if}>{$TITLE_CUSTOMER_FAMILY}</option>
+                                <option data-code="{$CODE}" value="{$CUSTOMER_FAMILY_ID}" {if {$_customer_family_id_|default:null} == $CUSTOMER_FAMILY_ID}selected{/if}>{$TITLE_CUSTOMER_FAMILY}</option>
                                 {/loop}
                             </select>
                         </div>
@@ -39,7 +39,7 @@
                         <label class="control-label" for="{$label_attr.for}">{$label} <span class="required">*</span></label>
 
                         <div class="control-input">
-                            <input type="text" name="{$name}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder siret"}" value="{$_siret_}"{if $required} aria-required="true"{/if}{if !isset($error_focus) && $error} autofocus{/if}>
+                            <input type="text" name="{$name}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder siret"}" value="{$_siret_|default:null}"{if $required} aria-required="true"{/if}{if !isset($error_focus) && $error} autofocus{/if}>
                             {if $error }
                             <span class="help-block">{$message}</span>
                             {assign var="error_focus" value="true"}
@@ -53,7 +53,7 @@
                         <label class="control-label" for="{$label_attr.for}">{$label} <span class="required">*</span></label>
 
                         <div class="control-input">
-                            <input type="text" name="{$name}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder vat"}" value="{$_vat_}"{if $required} aria-required="true"{/if}{if !isset($error_focus) && $error} autofocus{/if}>
+                            <input type="text" name="{$name}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder vat"}" value="{$_vat_|default:null}"{if $required} aria-required="true"{/if}{if !isset($error_focus) && $error} autofocus{/if}>
                             {if $error }
                             <span class="help-block">{$message}</span>
                             {assign var="error_focus" value="true"}
