@@ -139,10 +139,10 @@
 		</hook>
 
 		<!-- Additional fields for the register form -->
-		<!--<hook id="customer.family.register.form" class="CustomerFamily\Hook\CustomerFamilyRegisterFormHook">
+		<hook id="customer.family.register.form" class="CustomerFamily\Hook\CustomerFamilyRegisterFormHook">
 			<tag name="hook.event_listener" event="register.form-bottom" type="front" method="onRegisterFormBottom"/>
 			<tag name="hook.event_listener" event="register.after-javascript-include" type="front" method="onRegisterAfterJSInclude"/>
-		</hook>-->
+		</hook>
 
 		<!-- Showing customer family information -->
 		<hook id="customer.family.account.display" class="CustomerFamily\Hook\CustomerFamilyAccountDisplayHook">
@@ -150,10 +150,10 @@
 		</hook>
 
 		<!-- Additional fields for the account update form -->
-		<!--<hook id="customer.family.update.form" class="CustomerFamily\Hook\CustomerFamilyUpdateFormHook">
+		<hook id="customer.family.update.form" class="CustomerFamily\Hook\CustomerFamilyUpdateFormHook">
 			<tag name="hook.event_listener" event="account-update.form-bottom" type="front" method="onAccountUpdateFormBottom"/>
 			<tag name="hook.event_listener" event="account-update.after-javascript-include" type="front" method="onAccountUpdateAfterJSInclude"/>
-		</hook>-->
+		</hook>
 
 	</hooks>
 
