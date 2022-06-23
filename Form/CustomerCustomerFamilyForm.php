@@ -62,9 +62,6 @@ class CustomerCustomerFamilyForm extends BaseForm
     {
         $this->formBuilder
             ->add('customer_id', IntegerType::class, array(
-                    'constraints' => array(
-                        new Constraints\NotBlank()
-                    ),
                     'label' => Translator::getInstance()->trans(
                         'Customer',
                         array(),
@@ -75,9 +72,6 @@ class CustomerCustomerFamilyForm extends BaseForm
                     )
                 ))
             ->add('customer_family_id', IntegerType::class, array(
-                    'constraints' => array(
-                        new Constraints\NotBlank()
-                    ),
                     'label' => Translator::getInstance()->trans(
                         'Customer family',
                         array(),
@@ -92,7 +86,6 @@ class CustomerCustomerFamilyForm extends BaseForm
                 TextType::class,
                 array(
                     'required' => false,
-                    'empty_data' => false,
                     'label' => Translator::getInstance()->trans(
                         'Siret number',
                         array(),
@@ -108,7 +101,6 @@ class CustomerCustomerFamilyForm extends BaseForm
                 TextType::class,
                 array(
                     'required' => false,
-                    'empty_data' => false,
                     'label' => Translator::getInstance()->trans(
                         'Vat',
                         array(),

@@ -98,12 +98,9 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
                             array(
                                 $this, 'checkCustomerFamily'
                             )
-                        ),
-                        new Constraints\NotBlank(),
+                        )
                     ),
                     'choices' => $customerFamilyChoices,
-                    'empty_data' => false,
-                    'required' => false,
                     'label' => self::trans('Customer family'),
                     'label_attr' => array(
                         'for' => 'customer_family_id',
@@ -115,8 +112,6 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
                 self::CUSTOMER_FAMILY_SIRET_FIELD_NAME,
                 TextType::class,
                 array(
-                    'required' => true,
-                    'empty_data' => false,
                     'label' => self::trans('Siret number'),
                     'label_attr' => array(
                         'for' => 'siret'
@@ -128,8 +123,6 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
                 self::CUSTOMER_FAMILY_VAT_FIELD_NAME,
                 TextType::class,
                 array(
-                    'required' => true,
-                    'empty_data' => false,
                     'label' => self::trans('Vat'),
                     'label_attr' => array(
                         'for' => 'vat'
@@ -181,12 +174,9 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
                     'constraints' => array(
                         new Constraints\Callback(
                             array($this, 'checkCustomerFamily')
-                        ),
-                        new Constraints\NotBlank(),
+                        )
                     ),
                     'choices' => $customerFamilyChoices,
-                    'empty_data' => false,
-                    'required' => false,
                     'label' => self::trans('Customer family'),
                     'label_attr' => array(
                         'for' => 'customer_family_id',
@@ -199,8 +189,6 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
                 self::CUSTOMER_FAMILY_SIRET_FIELD_NAME,
                 TextType::class,
                 array(
-                    'required' => true,
-                    'empty_data' => false,
                     'label' => self::trans('Siret number'),
                     'label_attr' => array(
                         'for' => 'siret'
@@ -213,8 +201,6 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
                 self::CUSTOMER_FAMILY_VAT_FIELD_NAME,
                 TextType::class,
                 array(
-                    'required' => true,
-                    'empty_data' => false,
                     'label' => self::trans('Vat'),
                     'label_attr' => array(
                         'for' => 'vat'
@@ -234,6 +220,10 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
      */
     public function checkCustomerFamily($value, ExecutionContextInterface $context)
     {
+        if(!$value || !is_int($value)){
+            return ;
+        }
+
         if (CustomerFamilyQuery::create()->filterByCode($value)->count() == 0) {
             $context->addViolation(self::trans('The customer family is not valid'));
         }
