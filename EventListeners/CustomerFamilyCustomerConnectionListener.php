@@ -67,11 +67,11 @@ class CustomerFamilyCustomerConnectionListener implements EventSubscriberInterfa
                 $cart->getCurrencyId()
             );
 
-            if ($prices['price'] !== null) {
+            if (isset($prices['price'])) {
                 $cartItem->setPrice($prices['price']);
             }
 
-            if ($prices['promoPrice'] !== null) {
+            if (isset($prices['promoPrice'])) {
                 $cartItem->setPromoPrice($prices['promoPrice']);
             }
 
@@ -105,11 +105,11 @@ class CustomerFamilyCustomerConnectionListener implements EventSubscriberInterfa
                 $cart->getCurrencyId()
             );
 
-            if ($prices['price'] !== null) {
+            if (isset($prices['price'])) {
                 $cartItem->setPrice($prices['price']);
             }
 
-            if ($prices['promoPrice'] !== null) {
+            if (isset($prices['promoPrice'])) {
                 $cartItem->setPromoPrice($prices['promoPrice']);
             }
 
