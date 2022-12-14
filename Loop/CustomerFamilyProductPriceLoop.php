@@ -65,11 +65,11 @@ class CustomerFamilyProductPriceLoop extends BaseLoop implements ArraySearchLoop
         $prices = $customerFamilyService->calculateCustomerFamilyPsePrice($pse, $items['customerFamilyId'], $items['currency_id']);
 
         $loopResultRow = new LoopResultRow();
-
-        $loopResultRow->set("CALCULATED_PRICE", $prices['price']);
-        $loopResultRow->set("CALCULATED_TAXED_PRICE", $prices['taxedPrice']);
-        $loopResultRow->set("CALCULATED_PROMO_PRICE", $prices['promoPrice']);
-        $loopResultRow->set("CALCULATED_TAXED_PROMO_PRICE", $prices['taxedPromoPrice']);
+        
+        $loopResultRow->set("CALCULATED_PRICE", $prices['price'] ?? null);
+        $loopResultRow->set("CALCULATED_TAXED_PRICE", $prices['taxedPrice'] ?? null);
+        $loopResultRow->set("CALCULATED_PROMO_PRICE", $prices['promoPrice'] ?? null);
+        $loopResultRow->set("CALCULATED_TAXED_PROMO_PRICE", $prices['taxedPromoPrice'] ?? null);
 
         $loopResult->addRow($loopResultRow);
 
