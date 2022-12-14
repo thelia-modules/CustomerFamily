@@ -141,7 +141,7 @@ class CustomerFamilyListener implements EventSubscriberInterface
      */
     public function afterCreateCustomer(CustomerEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        $form = $this->requestStack->getCurrentRequest()->request->get(self::THELIA_CUSTOMER_CREATE_FORM_NAME);
+        $form = $this->requestStack->getCurrentRequest()->request->all()[self::THELIA_CUSTOMER_CREATE_FORM_NAME];
 
         if (is_null($form) or !array_key_exists(CustomerFamilyFormListener::CUSTOMER_FAMILY_CODE_FIELD_NAME, $form)) {
             // Nothing to create the new CustomerCustomerFamily => stop here !
