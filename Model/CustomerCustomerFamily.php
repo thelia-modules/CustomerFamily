@@ -20,7 +20,7 @@ class CustomerCustomerFamily extends BaseCustomerCustomerFamily
      */
     public function setSiret($v)
     {
-        parent::setSiret($v);
+        return parent::setSiret($v);
     }
 
     /**
@@ -36,6 +36,6 @@ class CustomerCustomerFamily extends BaseCustomerCustomerFamily
      */
     public function setVat($v)
     {
-        parent::setVat($v);
+        return parent::setVat($v);
     }
 }
