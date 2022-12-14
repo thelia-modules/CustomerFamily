@@ -190,7 +190,7 @@ class CustomerFamilyService
                 'taxedPromoPrice' => $taxedPromoPrice
             ];
         }
-        return null;
+        return [];
     }
 
     /**
