@@ -67,7 +67,6 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
     {
         return array(
             TheliaEvents::FORM_AFTER_BUILD.'.'.self::THELIA_CUSTOMER_CREATE_FORM_NAME => array('addCustomerFamilyFieldsForRegister', 128),
-            TheliaEvents::FORM_AFTER_BUILD.'.'.self::THELIA_ADMIN_CUSTOMER_CREATE_FORM_NAME => array('addCustomerFamilyFieldsForRegister', 128),
             TheliaEvents::FORM_AFTER_BUILD.'.'.self::THELIA_ACCOUNT_UPDATE_FORM_NAME  => array('addCustomerFamilyFieldsForUpdate', 128),
         );
     }
@@ -84,7 +83,7 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
 
         /** @var \CustomerFamily\Model\CustomerFamily $customerFamily */
         foreach (CustomerFamilyQuery::create()->find() as $customerFamily) {
-            $customerFamilyChoices[self::trans($customerFamily->getTitle())] = $customerFamily->getCode();
+            $customerFamilyChoices[$customerFamily->getTitle()] = $customerFamily->getCode();
         }
 
         // Building additional fields
@@ -161,7 +160,7 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
 
         /** @var \CustomerFamily\Model\CustomerFamily $customerFamilyChoice */
         foreach (CustomerFamilyQuery::create()->find() as $customerFamilyChoice) {
-            $customerFamilyChoices[self::trans($customerFamilyChoice->getTitle())] = $customerFamilyChoice->getCode();
+            $customerFamilyChoices[$customerFamilyChoice->getTitle()] = $customerFamilyChoice->getCode();
         }
 
 
