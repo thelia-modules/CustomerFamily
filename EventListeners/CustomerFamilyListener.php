@@ -178,7 +178,7 @@ class CustomerFamilyListener implements EventSubscriberInterface
      */
     public function customerUpdateProfile(CustomerCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        $form = $this->requestStack->getCurrentRequest()->request->get(self::THELIA_CUSTOMER_UPDATE_FORM_NAME);
+        $form = $this->requestStack->getCurrentRequest()->request->all()[self::THELIA_CUSTOMER_UPDATE_FORM_NAME];
 
         if (is_null($form) or !array_key_exists(CustomerFamilyFormListener::CUSTOMER_FAMILY_CODE_FIELD_NAME, $form)) {
             // Nothing to update => stop here !
