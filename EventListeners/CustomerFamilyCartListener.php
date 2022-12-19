@@ -45,11 +45,11 @@ class CustomerFamilyCartListener implements EventSubscriberInterface
         $pse = ProductSaleElementsQuery::create()->findOneById($pseId);
 
         $prices = $this->customerFamilyService->calculateCustomerPsePrice($pse);
-
-        if ($prices['price'] !== null) {
+        
+        if (isset($prices['price'])) {
             $cartEvent->getCartItem()->setPrice($prices['price']);
         }
-        if ($prices['promoPrice'] !== null) {
+        if (isset($prices['promoPrice'])) {
             $cartEvent->getCartItem()->setPromoPrice($prices['promoPrice']);
         }
 
