@@ -12,7 +12,7 @@ class CustomerCustomerFamily extends BaseCustomerCustomerFamily
      */
     public function getSiret(ConnectionInterface $con = null)
     {
-        parent::getSiret($con);
+        return parent::getSiret($con);
     }
 
     /**
@@ -28,7 +28,7 @@ class CustomerCustomerFamily extends BaseCustomerCustomerFamily
      */
     public function getVat(ConnectionInterface $con = null)
     {
-        parent::getVat($con);
+        return parent::getVat($con);
     }
 
     /**
