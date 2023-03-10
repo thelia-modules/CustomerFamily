@@ -4,11 +4,6 @@ Create customer families (professional, private individual, ...) and manage spec
 
 Also allow to define purchase prices for products.
 
-## Compatibility
-    Thelia >= 2.3.x
-    
-    For use with lower version of Thelia look for older tags on this module.
-
 ## Installation
 
 ### Manually
@@ -21,7 +16,7 @@ Also allow to define purchase prices for products.
 Add it in your main thelia composer.json file
 
 ```
-composer require thelia/customer-family-module:~1.5.0
+composer require thelia/customer-family-module:~2.0.0
 ```
 
 ## Usage
