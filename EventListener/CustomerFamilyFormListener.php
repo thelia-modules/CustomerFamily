@@ -10,7 +10,7 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace CustomerFamily\EventListeners;
+namespace CustomerFamily\EventListener;
 
 use CustomerFamily\CustomerFamily;
 use CustomerFamily\Model\CustomerCustomerFamilyQuery;
@@ -41,10 +41,6 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
 
     const CUSTOMER_FAMILY_CODE_FIELD_NAME = 'customer_family_code';
 
-    const CUSTOMER_FAMILY_SIRET_FIELD_NAME = 'siret';
-
-    const CUSTOMER_FAMILY_VAT_FIELD_NAME = 'vat';
-
     /** @var RequestStack */
     protected $requestStack;
 
@@ -71,11 +67,6 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
         );
     }
 
-    /**
-     * Callback used to add some fields to the Thelia's CustomerCreateForm.
-     * It add two fields : one for the SIRET number and one for VAT.
-     * @param TheliaFormEvent $event
-     */
     public function addCustomerFamilyFieldsForRegister(TheliaFormEvent $event)
     {
         // Retrieving CustomerFamily choices
@@ -107,36 +98,9 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
                     'mapped' => false,
                 )
             )
-            ->add(
-                self::CUSTOMER_FAMILY_SIRET_FIELD_NAME,
-                TextType::class,
-                array(
-                    'label' => self::trans('Siret number'),
-                    'label_attr' => array(
-                        'for' => 'siret'
-                    ),
-                    'mapped' => false,
-                )
-            )
-            ->add(
-                self::CUSTOMER_FAMILY_VAT_FIELD_NAME,
-                TextType::class,
-                array(
-                    'label' => self::trans('Vat'),
-                    'label_attr' => array(
-                        'for' => 'vat'
-                    ),
-                    'mapped' => false,
-                )
-            )
         ;
     }
 
-    /**
-     * Callback used to add some fields to the Thelia's CustomerCreateForm.
-     * It add two fields : one for the SIRET number and one for VAT.
-     * @param TheliaFormEvent $event
-     */
     public function addCustomerFamilyFieldsForUpdate(TheliaFormEvent $event)
     {
         // Adding new fields
@@ -151,8 +115,6 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
 
         $cfData = array(
             self::CUSTOMER_FAMILY_CODE_FIELD_NAME  => (is_null($customerCustomerFamily) or is_null($customerCustomerFamily->getCustomerFamily())) ? '' : $customerCustomerFamily->getCustomerFamily()->getCode(),
-            self::CUSTOMER_FAMILY_SIRET_FIELD_NAME => is_null($customerCustomerFamily) ? false : $customerCustomerFamily->getSiret(),
-            self::CUSTOMER_FAMILY_VAT_FIELD_NAME   => is_null($customerCustomerFamily) ? false : $customerCustomerFamily->getVat(),
         );
 
         // Retrieving CustomerFamily choices
@@ -182,30 +144,6 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
                     ),
                     'mapped' => false,
                     'data' => $cfData[self::CUSTOMER_FAMILY_CODE_FIELD_NAME],
-                )
-            )
-            ->add(
-                self::CUSTOMER_FAMILY_SIRET_FIELD_NAME,
-                TextType::class,
-                array(
-                    'label' => self::trans('Siret number'),
-                    'label_attr' => array(
-                        'for' => 'siret'
-                    ),
-                    'mapped' => false,
-                    'data' => $cfData[self::CUSTOMER_FAMILY_SIRET_FIELD_NAME],
-                )
-            )
-            ->add(
-                self::CUSTOMER_FAMILY_VAT_FIELD_NAME,
-                TextType::class,
-                array(
-                    'label' => self::trans('Vat'),
-                    'label_attr' => array(
-                        'for' => 'vat'
-                    ),
-                    'mapped' => false,
-                    'data' => $cfData[self::CUSTOMER_FAMILY_VAT_FIELD_NAME],
                 )
             )
         ;

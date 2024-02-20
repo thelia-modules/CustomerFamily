@@ -27,12 +27,6 @@ class CustomerCustomerFamilyEvent extends ActionEvent
     /** @var int */
     protected $customerFamilyId;
 
-    /** @var string */
-    protected $siret;
-
-    /** @var string */
-    protected $vat;
-
     /**
      * @param int $customerId
      */
@@ -41,12 +35,8 @@ class CustomerCustomerFamilyEvent extends ActionEvent
         $this->customerId = $customerId;
     }
 
-    /**
-     * @param int $customerFamilyId
-     *
-     * @return CustomerCustomerFamily
-     */
-    public function setCustomerFamilyId($customerFamilyId)
+
+    public function setCustomerFamilyId($customerFamilyId): CustomerCustomerFamilyEvent
     {
         $this->customerFamilyId = $customerFamilyId;
 
@@ -61,12 +51,8 @@ class CustomerCustomerFamilyEvent extends ActionEvent
         return $this->customerFamilyId;
     }
 
-    /**
-     * @param int $customerId
-     *
-     * @return CustomerCustomerFamily
-     */
-    public function setCustomerId($customerId)
+
+    public function setCustomerId($customerId): CustomerCustomerFamilyEvent
     {
         $this->customerId = $customerId;
 
@@ -79,45 +65,5 @@ class CustomerCustomerFamilyEvent extends ActionEvent
     public function getCustomerId()
     {
         return $this->customerId;
-    }
-
-    /**
-     * @param mixed $siret
-     *
-     * @return CustomerCustomerFamily
-     */
-    public function setSiret($siret)
-    {
-        $this->siret = $siret;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getSiret()
-    {
-        return $this->siret;
-    }
-
-    /**
-     * @param mixed $vat
-     *
-     * @return CustomerCustomerFamily
-     */
-    public function setVat($vat)
-    {
-        $this->vat = $vat;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getVat()
-    {
-        return $this->vat;
     }
 }

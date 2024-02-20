@@ -1,7 +1,5 @@
 {loop name="customer_customer_family" type="customer_customer_family" customer_id=$customer_id}
     {assign var="_customer_family_id_" value=$CUSTOMER_FAMILY_ID}
-    {assign var="_siret_" value=$SIRET}
-    {assign var="_vat_" value=$VAT}
 {/loop}
 
 <div class="row">
@@ -32,34 +30,6 @@
                             </select>
                         </div>
                     </div>
-                    {/form_field}
-
-                    {form_field form=$form field="siret"}
-                    <div class="form-group group-email {if $error}has-error{/if}">
-                        <label class="control-label" for="{$label_attr.for}">{$label} <span class="required">*</span></label>
-
-                        <div class="control-input">
-                            <input type="text" name="{$name}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder siret"}" value="{$_siret_|default:null}"{if $required} aria-required="true"{/if}{if !isset($error_focus) && $error} autofocus{/if}>
-                            {if $error }
-                            <span class="help-block">{$message}</span>
-                            {assign var="error_focus" value="true"}
-                            {/if}
-                        </div>
-                    </div><!--/.form-group-->
-                    {/form_field}
-
-                    {form_field form=$form field="vat"}
-                    <div class="form-group group-email {if $error}has-error{/if}">
-                        <label class="control-label" for="{$label_attr.for}">{$label} <span class="required">*</span></label>
-
-                        <div class="control-input">
-                            <input type="text" name="{$name}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder vat"}" value="{$_vat_|default:null}"{if $required} aria-required="true"{/if}{if !isset($error_focus) && $error} autofocus{/if}>
-                            {if $error }
-                            <span class="help-block">{$message}</span>
-                            {assign var="error_focus" value="true"}
-                            {/if}
-                        </div>
-                    </div><!--/.form-group-->
                     {/form_field}
 
                     <div class="col-md-2">

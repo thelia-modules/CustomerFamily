@@ -15,31 +15,3 @@
     </div>
   </div><!--/.form-group-->
 {/form_field}
-
-{* Additional fields for CustomerCustomerFamily creation. Should not be displayed if the customer is a particular one. *}
-<div id="customer-family-extra-fields" style="display:none">
-  {form_field form=$form field='siret' }
-    <div class="form-group{if $error} has-error{/if}">
-      <label class="control-label" for="{$label_attr.for}">{$label}</label>
-      <div class="control-input">
-        <input type="text" name="{$name}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l='Placeholder SIRET'}" value="{$value}">
-        {if $error }
-          <span class="help-block">{$message}</span>
-          {assign var="error_focus" value="true"}
-        {/if}
-      </div>
-    </div><!--/.form-group-->
-  {/form_field}
-  {form_field form=$form field='vat' }
-    <div class="form-group{if $error} has-error{/if}">
-      <label class="control-label" for="{$label_attr.for}">{$label}</label>
-      <div class="control-input">
-        <input type="text" name="{$name}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l='Placeholder V.A.T.'}" value="{$value}">
-        {if $error }
-          <span class="help-block">{$message}</span>
-          {assign var="error_focus" value="true"}
-        {/if}
-      </div>
-    </div><!--/.form-group-->
-  {/form_field}
-</div>

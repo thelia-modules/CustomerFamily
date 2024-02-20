@@ -4,6 +4,11 @@ Create customer families (professional, private individual, ...) and manage spec
 
 Also allow to define purchase prices for products.
 
+## Compatibility
+    Thelia >= 2.3.x
+    
+    For use with lower version of Thelia look for older tags on this module.
+
 ## Installation
 
 ### Manually
@@ -16,7 +21,7 @@ Also allow to define purchase prices for products.
 Add it in your main thelia composer.json file
 
 ```
-composer require thelia/customer-family-module:~2.0.0
+composer require thelia/customer-family-module:~1.5.0
 ```
 
 ## Usage
@@ -79,13 +84,11 @@ This loop returns customer family for specific customer or inverse
 |---      |---         |
 |**CUSTOMER_FAMILY_ID** | customer family id |
 |**CUSTOMER_ID** | customer id |
-|**SIRET** | siret number |
-|**VAT** | vat number id |
 
 #### Example
 ```
 {loop type="customer_customer_family" name="customer_customer_family_loop" customer_id="4"}
-    {SIRET}
+
 {/loop}
 ```
 
@@ -159,8 +162,6 @@ This form extend customer_create_form
 |Name |Type |Required |
 |--- |--- |--- |
 |**customer_family_id** | integer | true |
-|**siret** | string | false |
-|**vat** | string | false |
 
 ## Default
 
