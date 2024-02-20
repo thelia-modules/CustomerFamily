@@ -81,36 +81,6 @@ class CustomerCustomerFamilyForm extends BaseForm
                         'for' => 'customer_id'
                     )
                 ))
-            ->add(
-                'siret',
-                TextType::class,
-                array(
-                    'required' => false,
-                    'label' => Translator::getInstance()->trans(
-                        'Siret number',
-                        array(),
-                        CustomerFamily::MESSAGE_DOMAIN
-                    ),
-                    'label_attr' => array(
-                        'for' => 'siret'
-                    )
-                )
-            )
-            ->add(
-                'vat',
-                TextType::class,
-                array(
-                    'required' => false,
-                    'label' => Translator::getInstance()->trans(
-                        'Vat',
-                        array(),
-                        CustomerFamily::MESSAGE_DOMAIN
-                    ),
-                    'label_attr' => array(
-                        'for' => 'vat'
-                    )
-                )
-            )
         ;
     }
 }

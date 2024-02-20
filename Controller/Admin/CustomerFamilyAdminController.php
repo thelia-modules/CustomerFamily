@@ -332,8 +332,6 @@ class CustomerFamilyAdminController extends BaseAdminController
             $event = new CustomerCustomerFamilyEvent($formValidate->get('customer_id')->getData());
             $event
                 ->setCustomerFamilyId($formValidate->get('customer_family_id')->getData())
-                ->setSiret($formValidate->get('siret')->getData())
-                ->setVat($formValidate->get('vat')->getData())
             ;
 
             $eventDispatcher->dispatch($event, CustomerFamilyEvents::CUSTOMER_CUSTOMER_FAMILY_UPDATE);

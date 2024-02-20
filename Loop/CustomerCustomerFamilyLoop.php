@@ -88,8 +88,6 @@ class CustomerCustomerFamilyLoop extends BaseLoop implements PropelSearchLoopInt
             $loopResultRow
                 ->set("CUSTOMER_FAMILY_ID", $customerCustomerFamily->getCustomerFamilyId())
                 ->set("CUSTOMER_ID", $customerCustomerFamily->getCustomerId())
-                ->set("SIRET", $customerCustomerFamily->getSiret())
-                ->set("VAT", $customerCustomerFamily->getVat())
             ;
 
             $loopResult->addRow($loopResultRow);

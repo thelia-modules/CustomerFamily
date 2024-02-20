@@ -8,17 +8,6 @@
 				<th>{intl l='Customer family'}</th>
 				<td>{$TITLE_CUSTOMER_FAMILY}</td>
 			</tr>
-			{if $CODE != $particular}
-				{* The Customer should have a SIRET and a VAT. Display them. *}
-			<tr>
-				<th>{intl l='Siret number'}</th>
-				<td>{$SIRET}</td>
-			</tr>
-			<tr>
-				<th>{intl l='Vat'}</th>
-				<td>{$VAT}</td>
-			</tr>
-			{/if}
 		</tbody>
 	</table>
 	{/loop}

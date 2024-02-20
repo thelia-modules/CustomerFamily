@@ -10,7 +10,7 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace CustomerFamily\EventListeners;
+namespace CustomerFamily\EventListener;
 
 use CustomerFamily\CustomerFamily;
 use CustomerFamily\Event\CustomerCustomerFamilyEvent;
@@ -157,15 +157,9 @@ class CustomerFamilyListener implements EventSubscriberInterface
 
         $customerFamilyId = $customerFamily->getId();
 
-        // Ignore SIRET and VAT if the customer is not professional
-        $siret = $customerFamily->getCode() == CustomerFamily::CUSTOMER_FAMILY_PROFESSIONAL ? $form[CustomerFamilyFormListener::CUSTOMER_FAMILY_SIRET_FIELD_NAME] : '';
-        $vat = $customerFamily->getCode() == CustomerFamily::CUSTOMER_FAMILY_PROFESSIONAL ? $form[CustomerFamilyFormListener::CUSTOMER_FAMILY_VAT_FIELD_NAME] : '';
-
         $updateEvent = new CustomerCustomerFamilyEvent($event->getCustomer()->getId());
         $updateEvent
             ->setCustomerFamilyId($customerFamilyId)
-            ->setSiret($siret)
-            ->setVat($vat)
         ;
 
         $dispatcher->dispatch($updateEvent, CustomerFamilyEvents::CUSTOMER_CUSTOMER_FAMILY_UPDATE);
@@ -185,24 +179,13 @@ class CustomerFamilyListener implements EventSubscriberInterface
             return;
         }
 
-        // Erase SIRET and VAT if the customer is now in the 'particular' customer family.
-        if ($form[CustomerFamilyFormListener::CUSTOMER_FAMILY_CODE_FIELD_NAME] == CustomerFamily::CUSTOMER_FAMILY_PARTICULAR) {
-            $siret = '';
-            $vat = '';
-        } else {
-            $siret = $form[CustomerFamilyFormListener::CUSTOMER_FAMILY_SIRET_FIELD_NAME];
-            $vat = $form[CustomerFamilyFormListener::CUSTOMER_FAMILY_VAT_FIELD_NAME];
-        }
 
         $newCustomerFamily = CustomerFamilyQuery::create()->findOneByCode($form[CustomerFamilyFormListener::CUSTOMER_FAMILY_CODE_FIELD_NAME]);
 
 
         $updateEvent = new CustomerCustomerFamilyEvent($event->getCustomer()->getId());
         $updateEvent
-            ->setCustomerFamilyId($newCustomerFamily->getId())
-            ->setSiret($siret)
-            ->setVat($vat)
-        ;
+            ->setCustomerFamilyId($newCustomerFamily->getId());
 
         $dispatcher->dispatch($updateEvent, CustomerFamilyEvents::CUSTOMER_CUSTOMER_FAMILY_UPDATE);
     }
@@ -223,8 +206,6 @@ class CustomerFamilyListener implements EventSubscriberInterface
 
         $customerCustomerFamily
             ->setCustomerFamilyId($event->getCustomerFamilyId())
-            ->setSiret($event->getSiret())
-            ->setVat($event->getVat())
             ->save()
         ;
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace CustomerFamily\EventListeners;
+namespace CustomerFamily\EventListener;
 
 use CustomerFamily\CustomerFamily;
 use CustomerFamily\Model\ProductPurchasePrice;
