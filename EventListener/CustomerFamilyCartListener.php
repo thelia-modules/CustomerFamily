@@ -41,18 +41,9 @@ class CustomerFamilyCartListener implements EventSubscriberInterface
      */
     public function addCartItem(CartEvent $cartEvent)
     {
-        $pseId = $cartEvent->getProductSaleElementsId();
-        $pse = ProductSaleElementsQuery::create()->findOneById($pseId);
+        $cartItem = $cartEvent->getCartItem();
+        $this->customerFamilyService->setCustomerFamilyPriceToCartItem($cartItem);
 
-        $prices = $this->customerFamilyService->calculateCustomerPsePrice($pse);
-        
-        if (isset($prices['price'])) {
-            $cartEvent->getCartItem()->setPrice($prices['price']);
-        }
-        if (isset($prices['promoPrice'])) {
-            $cartEvent->getCartItem()->setPromoPrice($prices['promoPrice']);
-        }
-
-        $cartEvent->getCartItem()->save();
+        $cartItem->save();
     }
 }

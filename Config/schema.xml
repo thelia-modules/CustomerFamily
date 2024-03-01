@@ -110,5 +110,21 @@
 		</index>
 	</table>
 
+
+	<table name="customer_family_product_price">
+		<column name="customer_family_id" primaryKey="true" required="true" type="INTEGER" />
+		<column name="product_sale_elements_id" primaryKey="true" required="true" type="INTEGER" />
+		<column name="price" required="true" scale="6" size="16" type="DECIMAL" defaultValue="0.000000"/>
+		<column name="promo_price" required="true" scale="6" size="16" type="DECIMAL" defaultValue="0.000000"/>
+		<column name="promo" type="TINYINT" required="true" defaultValue="0"/>
+
+		<foreign-key foreignTable="customer_family" name="fk_customer_family_product_price_customer_family_id" onDelete="CASCADE" onUpdate="RESTRICT">
+			<reference foreign="id" local="customer_family_id" />
+		</foreign-key>
+		<foreign-key foreignTable="product_sale_elements" name="fk_customer_family_product_price_product_sale_elements_id" onDelete="CASCADE" onUpdate="RESTRICT">
+			<reference foreign="id" local="product_sale_elements_id" />
+		</foreign-key>
+	</table>
+
 	<external-schema filename="local/config/schema.xml" referenceOnly="true" />
 </database>

@@ -98,6 +98,6 @@ class CustomerFamilyPriceController extends BaseAdminController
 
         CustomerFamily::setConfigValue('customer_family_price_mode', $mode);
 
-        return RedirectResponse::create(URL::getInstance()->absoluteUrl("/admin/module/CustomerFamily"));
+        return new RedirectResponse(URL::getInstance()->absoluteUrl("/admin/module/CustomerFamily"));
     }
 }

@@ -6,6 +6,7 @@ use CustomerFamily\Service\CustomerFamilyService;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Customer\CustomerLoginEvent;
 use Thelia\Core\Event\DefaultActionEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -36,82 +37,21 @@ class CustomerFamilyCustomerConnectionListener implements EventSubscriberInterfa
     public static function getSubscribedEvents()
     {
         return [
-            TheliaEvents::CUSTOMER_LOGOUT => ['customerLogout', 128],
-            TheliaEvents::CUSTOMER_LOGIN => ['customerLogin', 128]
+            TheliaEvents::CUSTOMER_LOGOUT => ['refreshCartItemPrices', -230],
+            TheliaEvents::CUSTOMER_LOGIN => ['refreshCartItemPrices', -230]
         ];
     }
 
-    /**
-     * Update cart items' prices when logging out
-     *
-     * @param DefaultActionEvent $event
-     * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
-     * @throws \Exception
-     * @throws \Propel\Runtime\Exception\PropelException
-     */
-    public function customerLogout(DefaultActionEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    private function refreshCartItemPrices(ActionEvent $event, EventDispatcherInterface $dispatcher)
     {
-        // Get cart & loop on its items
         $cart = $this->requestStack->getCurrentRequest()->getSession()->getSessionCart($dispatcher);
 
-        /** @var \Thelia\Model\CartItem $cartItem */
         foreach ($cart->getCartItems() as $cartItem) {
-            // Get item's corresponding PSE
-            $pse = ProductSaleElementsQuery::create()->findOneById($cartItem->getProductSaleElementsId());
-
-            // Get pse's prices for the customer
-            $prices = $this->customerFamilyService->calculateCustomerPsePrice(
-                $pse,
+            $this->customerFamilyService->setCustomerFamilyPriceToCartItem(
+                $cartItem,
                 null,
                 $cart->getCurrencyId()
             );
-
-            if (isset($prices['price'])) {
-                $cartItem->setPrice($prices['price']);
-            }
-
-            if (isset($prices['promoPrice'])) {
-                $cartItem->setPromoPrice($prices['promoPrice']);
-            }
-
-            $cartItem->save();
-        }
-    }
-
-    /**
-     * Update cart items' prices when logging in
-     *
-     * @param CustomerLoginEvent $event
-     * @param $eventName
-     * @param EventDispatcherInterface $dispatcher
-     * @throws \Exception
-     * @throws \Propel\Runtime\Exception\PropelException
-     */
-    public function customerLogin(CustomerLoginEvent $event, $eventName, EventDispatcherInterface $dispatcher)
-    {
-        // Get cart & loop on its items
-        $cart = $this->requestStack->getCurrentRequest()->getSession()->getSessionCart($dispatcher);
-
-        /** @var \Thelia\Model\CartItem $cartItem */
-        foreach ($cart->getCartItems() as $cartItem) {
-            // Get item's corresponding PSE
-            $pse = ProductSaleElementsQuery::create()->findOneById($cartItem->getProductSaleElementsId());
-
-            // Get pse's prices for the customer
-            $prices = $this->customerFamilyService->calculateCustomerPsePrice(
-                $pse,
-                $event->getCustomer()->getId(),
-                $cart->getCurrencyId()
-            );
-
-            if (isset($prices['price'])) {
-                $cartItem->setPrice($prices['price']);
-            }
-
-            if (isset($prices['promoPrice'])) {
-                $cartItem->setPromoPrice($prices['promoPrice']);
-            }
 
             $cartItem->save();
         }
