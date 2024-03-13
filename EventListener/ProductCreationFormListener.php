@@ -76,6 +76,12 @@ class ProductCreationFormListener implements EventSubscriberInterface
      */
     public function createProductPurchasePrice(ProductCreateEvent $event)
     {
+        $request = $this->requestStack->getCurrentRequest();
+
+        if (!isset($request->get('thelia_product_creation')['purchase_price'])) {
+            return;
+        }
+
         if (null != $purchasePrice = $this->requestStack->getCurrentRequest()->get('thelia_product_creation')['purchase_price']) {
             (new ProductPurchasePrice())
                 ->setProductSaleElementsId($event->getProduct()->getDefaultSaleElements()->getId())

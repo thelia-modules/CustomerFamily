@@ -42,7 +42,7 @@ class CustomerFamilyCustomerConnectionListener implements EventSubscriberInterfa
         ];
     }
 
-    private function refreshCartItemPrices(ActionEvent $event, EventDispatcherInterface $dispatcher)
+    public function refreshCartItemPrices(ActionEvent $event, EventDispatcherInterface $dispatcher)
     {
         $cart = $this->requestStack->getCurrentRequest()->getSession()->getSessionCart($dispatcher);
 
