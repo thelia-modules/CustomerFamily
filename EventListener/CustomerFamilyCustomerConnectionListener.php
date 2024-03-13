@@ -22,11 +22,17 @@ class CustomerFamilyCustomerConnectionListener implements EventSubscriberInterfa
 {
     protected $requestStack;
     protected $customerFamilyService;
+    protected $dispatcher;
 
-    public function __construct(RequestStack $requestStack, CustomerFamilyService $customerFamilyService)
+    public function __construct(
+        RequestStack $requestStack,
+        CustomerFamilyService $customerFamilyService,
+        EventDispatcherInterface $dispatcher
+    )
     {
         $this->requestStack = $requestStack;
         $this->customerFamilyService = $customerFamilyService;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -42,9 +48,9 @@ class CustomerFamilyCustomerConnectionListener implements EventSubscriberInterfa
         ];
     }
 
-    public function refreshCartItemPrices(ActionEvent $event, EventDispatcherInterface $dispatcher)
+    public function refreshCartItemPrices(ActionEvent $event)
     {
-        $cart = $this->requestStack->getCurrentRequest()->getSession()->getSessionCart($dispatcher);
+        $cart = $this->requestStack->getCurrentRequest()->getSession()->getSessionCart($this->dispatcher);
 
         foreach ($cart->getCartItems() as $cartItem) {
             $this->customerFamilyService->setCustomerFamilyPriceToCartItem(
