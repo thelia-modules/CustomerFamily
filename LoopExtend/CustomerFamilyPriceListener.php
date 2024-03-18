@@ -299,7 +299,7 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
             ? $product->getVirtualColumn('CUSTOMER_FAMILY_PRODUCT_PROMO')
             : null;
 
-        if (empty($isPromo)) {
+        if (empty($isPromo) && $product->hasVirtualColumn('is_promo')) {
             $isPromo = $product->getVirtualColumn('is_promo');
         }
 
