@@ -7,6 +7,7 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use CustomerFamily\Api\Controller\CustomerFamilyProductPriceUpdateByRef;
 use CustomerFamily\Api\State\CustomerFamilyPricePersistProcessor;
 use CustomerFamily\Model\Map\CustomerFamilyProductPriceTableMap;
 use Propel\Runtime\Map\TableMap;
@@ -23,6 +24,11 @@ use Thelia\Api\Resource\PropelResourceTrait;
         ),
         new Get(
             uriTemplate: '/admin/customer_family_product_prices/{productSaleElementsId}/family/{customerFamilyCode}',
+        ),
+        new Put(
+            uriTemplate: '/admin/customer_family_product_prices/reference/{productSaleElementsRef}/family/{customerFamilyCode}',
+            controller: CustomerFamilyProductPriceUpdateByRef::class,
+            read: false,
         ),
         new Put(
             uriTemplate: '/admin/customer_family_product_prices/{productSaleElementsId}/family/{customerFamilyCode}',
