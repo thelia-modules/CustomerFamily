@@ -7,6 +7,9 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\OpenApi\Model\Operation;
+use ApiPlatform\OpenApi\Model\RequestBody;
+use CustomerFamily\Api\Controller\CustomerFamilyProductPriceCreateByRef;
 use CustomerFamily\Api\Controller\CustomerFamilyProductPriceUpdateByRef;
 use CustomerFamily\Api\State\CustomerFamilyPricePersistProcessor;
 use CustomerFamily\Model\Map\CustomerFamilyProductPriceTableMap;
@@ -21,6 +24,45 @@ use Thelia\Api\Resource\PropelResourceTrait;
         new Post(
             uriTemplate: '/admin/customer_family_product_prices',
             denormalizationContext: ['groups' => [self::GROUP_ADMIN_CREATE, self::GROUP_ADMIN_WRITE]]
+        ),
+        new Post(
+            uriTemplate: '/admin/customer_family_product_prices_by_ref',
+            controller: CustomerFamilyProductPriceCreateByRef::class,
+            openapi: new Operation(
+                requestBody: new RequestBody(
+                    content: new \ArrayObject([
+                        'application/json' => [
+                            'schema' => [
+                                'type' => 'object',
+                                'properties' => [
+                                    'customerFamilyCode' => [
+                                        'type' => 'string',
+                                        'example' =>'string'
+                                    ],
+                                    'productSaleElementsRef' => [
+                                        'type' => 'string',
+                                        'example' => 'string'
+                                    ],
+                                    'price' => [
+                                        'type' => 'number',
+                                        'format' => 'float',
+                                        'example' => 0.0
+                                    ],
+                                    'promoPrice' => [
+                                        'type' => 'number',
+                                        'format' => 'float',
+                                        'example' => 0.0
+                                    ],
+                                    'promo' => [
+                                        'type' => 'boolean',
+                                        'example' => true
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ])
+                )
+            ),
         ),
         new Get(
             uriTemplate: '/admin/customer_family_product_prices/{productSaleElementsId}/family/{customerFamilyCode}',
