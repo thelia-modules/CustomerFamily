@@ -258,8 +258,13 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
 
             $priceTax = $taxedPrice - $price;
 
+            $loopResultRow->set("HAS_CUSTOMER_FAMILY_PRICE",1);
+
             // Set new price & tax into the loop
             $loopResultRow
+                ->set("ORIGINAL_PRICE", $loopResultRow->get("PRICE"))
+                ->set("ORIGINAL_PRICE_TAX", $loopResultRow->get("PRICE_TAX"))
+                ->set("ORIGINAL_TAXED_PRICE", $loopResultRow->get("TAXED_PRICE"))
                 ->set("PRICE", $price)
                 ->set("PRICE_TAX", $priceTax)
                 ->set("TAXED_PRICE", $taxedPrice);
@@ -288,8 +293,13 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
 
             $promoPriceTax = $taxedPromoPrice - $promoPrice;
 
+            $loopResultRow->set("HAS_CUSTOMER_FAMILY_PROMO_PRICE",1);
+
             // Set new promo price & tax into the loop
             $loopResultRow
+                ->set("ORIGINAL_PROMO_PRICE", $loopResultRow->get("PROMO_PRICE"))
+                ->set("ORIGINAL_PROMO_PRICE_TAX", $loopResultRow->get("PROMO_PRICE_TAX"))
+                ->set("ORIGINAL_TAXED_PROMO_PRICE", $loopResultRow->get("TAXED_PROMO_PRICE"))
                 ->set("PROMO_PRICE", $promoPrice)
                 ->set("PROMO_PRICE_TAX", $promoPriceTax)
                 ->set("TAXED_PROMO_PRICE", $taxedPromoPrice);
@@ -299,13 +309,18 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
             ? $product->getVirtualColumn('CUSTOMER_FAMILY_PRODUCT_PROMO')
             : null;
 
-        if (empty($isPromo) && $product->hasVirtualColumn('is_promo')) {
+        if ($isPromo === null && $product->hasVirtualColumn('is_promo')) {
             $isPromo = $product->getVirtualColumn('is_promo');
         }
+
 
         // If current row is a product
         if ($product instanceof Product) {
             $loopResultRow
+                ->set("ORIGINAL_BEST_PRICE", $loopResultRow->get("BEST_PRICE"))
+                ->set("ORIGINAL_BEST_PRICE_TAX", $loopResultRow->get("BEST_PRICE_TAX"))
+                ->set("ORIGINAL_BEST_TAXED_PRICE", $loopResultRow->get("BEST_TAXED_PRICE"))
+                ->set("IS_PROMO", $isPromo === 1)
                 ->set("BEST_PRICE", $isPromo ? $promoPrice : $price)
                 ->set("BEST_PRICE_TAX", $isPromo ? $promoPriceTax : $priceTax)
                 ->set("BEST_TAXED_PRICE", $isPromo ? $taxedPromoPrice : $taxedPrice);
