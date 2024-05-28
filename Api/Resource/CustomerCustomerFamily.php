@@ -2,11 +2,9 @@
 
 namespace CustomerFamily\Api\Resource;
 
-use ApiPlatform\Metadata\Operation;
 use CustomerFamily\Model\CustomerCustomerFamilyQuery;
 use CustomerFamily\Model\CustomerFamilyQuery;
 use CustomerFamily\Model\Map\CustomerCustomerFamilyTableMap;
-use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
@@ -35,11 +33,6 @@ class CustomerCustomerFamily implements ResourceAddonInterface
     #[Ignore] public static function getPropelRelatedTableMap(): ?TableMap
     {
         return new CustomerCustomerFamilyTableMap();
-    }
-
-    public static function extendQuery(ModelCriteria $query, Operation $operation = null, array $context = []): void
-    {
-        // TODO: Implement extendQuery() method.
     }
 
     /**
