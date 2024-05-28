@@ -7,10 +7,10 @@
     <descriptive locale="fr_FR">
         <title>Famille de clients et prix d'achat</title>
     </descriptive>
-    <version>3.1.7</version>
+    <version>3.1.8</version>
     <author>
-        <name>Guillaume Barral / Etienne Perriere</name>
-        <email>gbarral@openstudio.fr / eperriere@openstudio.fr</email>
+        <name>Guillaume Barral / Etienne Perriere / Vincent Lopes</name>
+        <email>gbarral@openstudio.fr / eperriere@openstudio.fr / vlopes@openstudio.fr</email>
     </author>
     <type>classic</type>
     <thelia>2.5.4</thelia>
