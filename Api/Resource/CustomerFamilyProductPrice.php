@@ -2,6 +2,7 @@
 
 namespace CustomerFamily\Api\Resource;
 
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -12,10 +13,12 @@ use ApiPlatform\OpenApi\Model\RequestBody;
 use CustomerFamily\Api\Controller\CustomerFamilyProductPriceCreateByRef;
 use CustomerFamily\Api\Controller\CustomerFamilyProductPriceUpdateByRef;
 use CustomerFamily\Api\State\CustomerFamilyPricePersistProcessor;
+use CustomerFamily\Api\State\CustomerFamilyPriceProvider;
 use CustomerFamily\Model\Map\CustomerFamilyProductPriceTableMap;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Thelia\Api\Bridge\Propel\Attribute\CompositeIdentifiers;
 use Thelia\Api\Resource\PropelResourceInterface;
 use Thelia\Api\Resource\PropelResourceTrait;
 
@@ -66,6 +69,8 @@ use Thelia\Api\Resource\PropelResourceTrait;
         ),
         new Get(
             uriTemplate: '/admin/customer_family_product_prices/{productSaleElementsId}/family/{customerFamilyCode}',
+            uriVariables: ['productSaleElementsId', 'customerFamilyCode'],
+            provider: CustomerFamilyPriceProvider::class,
         ),
         new Put(
             uriTemplate: '/admin/customer_family_product_prices/reference/{productSaleElementsRef}/family/{customerFamilyCode}',
