@@ -11,7 +11,7 @@ use ApiPlatform\Metadata\Put;
 use CustomerFamily\Model\Map\CustomerFamilyTableMap;
 use Propel\Runtime\Map\TableMap;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 use Thelia\Api\Resource\AbstractTranslatableResource;
 use Thelia\Api\Resource\I18nCollection;
 use Thelia\Api\Resource\PropelResourceTrait;
@@ -53,9 +53,17 @@ class CustomerFamily extends AbstractTranslatableResource
 
     #[Groups([
         self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
     ])]
-    #[NotBlank(groups: [self::GROUP_ADMIN_WRITE])]
+    #[NotNull(groups: [self::GROUP_ADMIN_WRITE])]
     public string $code;
+
+    #[Groups([
+        self::GROUP_ADMIN_READ,
+        self::GROUP_ADMIN_WRITE,
+    ])]
+    #[NotNull(groups: [self::GROUP_ADMIN_WRITE])]
+    public ?bool $isDefault;
 
     #[Groups([self::GROUP_ADMIN_READ, self::GROUP_ADMIN_WRITE])]
     public I18nCollection $i18ns;
@@ -79,6 +87,17 @@ class CustomerFamily extends AbstractTranslatableResource
     public function setCode(string $code): CustomerFamily
     {
         $this->code = $code;
+        return $this;
+    }
+
+    public function getIsDefault(): ?bool
+    {
+        return $this->isDefault;
+    }
+
+    public function setIsDefault(?bool $isDefault): CustomerFamily
+    {
+        $this->isDefault = $isDefault;
         return $this;
     }
 
