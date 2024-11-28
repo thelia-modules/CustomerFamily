@@ -74,6 +74,8 @@ use Thelia\Api\Resource\PropelResourceTrait;
         ),
         new Put(
             uriTemplate: '/admin/customer_family_product_prices/reference/{productSaleElementsRef}/family/{customerFamilyCode}',
+            uriVariables: ['productSaleElementsRef','customerFamilyCode'],
+            requirements: ['productSaleElementsRef' => '.+'],//https://github.com/api-platform/core/issues/2953
             controller: CustomerFamilyProductPriceUpdateByRef::class,
             read: false,
         ),
