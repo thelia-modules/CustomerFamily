@@ -22,7 +22,7 @@ class CustomerFamilyProductPriceUpdateByRef
     {
         $customerFamilyProductPrice = CustomerFamilyProductPriceQuery::create()
             ->useProductSaleElementsQuery()
-            ->filterByRef(urldecode($productSaleElementsRef))
+            ->filterByRef($productSaleElementsRef)
             ->endUse()
             ->useCustomerFamilyQuery()
             ->filterByCode($customerFamilyCode)
