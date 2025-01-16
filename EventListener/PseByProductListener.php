@@ -2,7 +2,10 @@
 
 namespace CustomerFamily\EventListener;
 
+use CustomerFamily\Event\CustomerFamilyEvents;
+use CustomerFamily\Event\CustomerFamilyPriceChangeEvent;
 use CustomerFamily\Service\CustomerFamilyService;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Security\SecurityContext;
 use TheliaSmarty\Events\PseByProductEvent;
@@ -12,18 +15,28 @@ class PseByProductListener implements EventSubscriberInterface
     protected $customerFamilyService;
 
     protected $securityContext;
+    protected EventDispatcherInterface $dispatcher;
 
     public function __construct(
         CustomerFamilyService $customerFamilyService,
-        SecurityContext $securityContext
+        SecurityContext $securityContext,
+        EventDispatcherInterface $dispatcher
     )
     {
         $this->customerFamilyService = $customerFamilyService;
         $this->securityContext = $securityContext;
+        $this->dispatcher = $dispatcher;
     }
 
     public function updatePriceInPseByProduct(PseByProductEvent $event)
     {
+
+        $event = new CustomerFamilyPriceChangeEvent();
+        $this->dispatcher->dispatch($event, CustomerFamilyEvents::CUSTOMER_FAMILY_PRICE_CHANGE);
+
+        if (!$event->getAllowPriceChange()) {
+            return;
+        }
         $pse = $event->getProductSaleElements();
         $prices = $this->customerFamilyService->calculateCustomerFamilyPsePrice($pse);
 

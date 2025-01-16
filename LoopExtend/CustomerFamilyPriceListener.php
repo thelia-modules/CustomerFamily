@@ -3,6 +3,8 @@
 namespace CustomerFamily\LoopExtend;
 
 use CustomerFamily\CustomerFamily;
+use CustomerFamily\Event\CustomerFamilyEvents;
+use CustomerFamily\Event\CustomerFamilyPriceChangeEvent;
 use CustomerFamily\Model\Map\CustomerFamilyProductPriceTableMap;
 use CustomerFamily\Model\Map\ProductPurchasePriceTableMap;
 use CustomerFamily\Service\CustomerFamilyService;
@@ -10,6 +12,7 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Loop\LoopExtendsBuildModelCriteriaEvent;
 use Thelia\Core\Event\Loop\LoopExtendsParseResultsEvent;
@@ -29,12 +32,18 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
     protected $securityContext;
     protected $taxEngine;
     protected $customerFamilyService;
+    protected EventDispatcherInterface $dispatcher;
 
-    public function __construct(SecurityContext $securityContext, TaxEngine $taxEngine, CustomerFamilyService $customerFamilyService)
-    {
+    public function __construct(
+        SecurityContext $securityContext,
+        TaxEngine $taxEngine,
+        CustomerFamilyService $customerFamilyService,
+        EventDispatcherInterface $dispatcher
+    ) {
         $this->securityContext = $securityContext;
         $this->taxEngine = $taxEngine;
         $this->customerFamilyService = $customerFamilyService;
+        $this->dispatcher = $dispatcher;
     }
 
     public static function getSubscribedEvents()
@@ -102,6 +111,12 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
 
     public function extendProductParseResult(LoopExtendsParseResultsEvent $event)
     {
+        $event = new CustomerFamilyPriceChangeEvent();
+        $this->dispatcher->dispatch($event, CustomerFamilyEvents::CUSTOMER_FAMILY_PRICE_CHANGE);
+
+        if (!$event->getAllowPriceChange()) {
+            return;
+        }
         if ($event->getLoop()->getBackendContext()) {
             return;
         }

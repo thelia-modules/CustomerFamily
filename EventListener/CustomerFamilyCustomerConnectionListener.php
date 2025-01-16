@@ -2,6 +2,8 @@
 
 namespace CustomerFamily\EventListener;
 
+use CustomerFamily\Event\CustomerFamilyEvents;
+use CustomerFamily\Event\CustomerFamilyPriceChangeEvent;
 use CustomerFamily\Service\CustomerFamilyService;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -22,7 +24,7 @@ class CustomerFamilyCustomerConnectionListener implements EventSubscriberInterfa
 {
     protected $requestStack;
     protected $customerFamilyService;
-    protected $dispatcher;
+    protected EventDispatcherInterface $dispatcher;
 
     public function __construct(
         RequestStack $requestStack,
@@ -50,6 +52,13 @@ class CustomerFamilyCustomerConnectionListener implements EventSubscriberInterfa
 
     public function refreshCartItemPrices(ActionEvent $event)
     {
+        $event = new CustomerFamilyPriceChangeEvent();
+        $this->dispatcher->dispatch($event, CustomerFamilyEvents::CUSTOMER_FAMILY_PRICE_CHANGE);
+
+        if (!$event->getAllowPriceChange()) {
+            return;
+        }
+
         $cart = $this->requestStack->getCurrentRequest()->getSession()->getSessionCart($this->dispatcher);
 
         foreach ($cart->getCartItems() as $cartItem) {
