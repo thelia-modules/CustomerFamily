@@ -22,4 +22,5 @@ class CustomerFamilyEvents
     const CUSTOMER_FAMILY_CREATE = "action.admin.customer.family.create";
     const CUSTOMER_FAMILY_UPDATE = "action.admin.customer.family.update";
     const CUSTOMER_FAMILY_DELETE = "action.admin.customer.family.delete";
+    const CUSTOMER_FAMILY_PRICE_CHANGE = "action.admin.customer.family.price_change";
 }
