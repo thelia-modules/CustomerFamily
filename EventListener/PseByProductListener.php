@@ -31,10 +31,10 @@ class PseByProductListener implements EventSubscriberInterface
     public function updatePriceInPseByProduct(PseByProductEvent $event)
     {
 
-        $event = new CustomerFamilyPriceChangeEvent();
-        $this->dispatcher->dispatch($event, CustomerFamilyEvents::CUSTOMER_FAMILY_PRICE_CHANGE);
+        $priceChangeEvent = new CustomerFamilyPriceChangeEvent();
+        $this->dispatcher->dispatch($priceChangeEvent, CustomerFamilyEvents::CUSTOMER_FAMILY_PRICE_CHANGE);
 
-        if (!$event->getAllowPriceChange()) {
+        if (!$priceChangeEvent->getAllowPriceChange()) {
             return;
         }
         $pse = $event->getProductSaleElements();

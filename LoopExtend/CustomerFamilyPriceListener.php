@@ -111,10 +111,10 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
 
     public function extendProductParseResult(LoopExtendsParseResultsEvent $event)
     {
-        $event = new CustomerFamilyPriceChangeEvent();
-        $this->dispatcher->dispatch($event, CustomerFamilyEvents::CUSTOMER_FAMILY_PRICE_CHANGE);
+        $priceChangeEvent = new CustomerFamilyPriceChangeEvent();
+        $this->dispatcher->dispatch($priceChangeEvent, CustomerFamilyEvents::CUSTOMER_FAMILY_PRICE_CHANGE);
 
-        if (!$event->getAllowPriceChange()) {
+        if (!$priceChangeEvent->getAllowPriceChange()) {
             return;
         }
         if ($event->getLoop()->getBackendContext()) {
