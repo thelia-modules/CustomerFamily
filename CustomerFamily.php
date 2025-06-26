@@ -88,7 +88,7 @@ class CustomerFamily extends BaseModule
      *
      * @return Model\CustomerFamily
      */
-    public static function getCustomerFamilyByCode($code, $title = null, $locale = "fr_FR"): CustomerFamilyModel
+    public static function getCustomerFamilyByCode($code, $title = null, $locale = "fr_FR"): ?CustomerFamilyModel
     {
         if ($title == null) {
             $title = $code;
