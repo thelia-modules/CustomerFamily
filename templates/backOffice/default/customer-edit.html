@@ -1,4 +1,4 @@
-{loop name="customer_customer_family" type="customer_customer_family" customer_id=$customer_id}
+{loop name="customer_customer_family" type="customer_customer_family_loop" customer_id=$customer_id}
     {assign var="_customer_family_id_" value=$CUSTOMER_FAMILY_ID}
 {/loop}
 
@@ -24,7 +24,7 @@
                         <label for="{$label_attr.for}" class="control-label group-type-status">{$label} *</label>
                         <div class="control-input">
                             <select name="{$name}" id="{$label_attr.for}" class="form-control">
-                                {loop name="customer_family" type="customer_family"}
+                                {loop name="customer_family" type="customer_family_loop"}
                                 <option data-code="{$CODE}" value="{$CUSTOMER_FAMILY_ID}" {if {$_customer_family_id_|default:null} == $CUSTOMER_FAMILY_ID}selected{/if}>{$TITLE_CUSTOMER_FAMILY}</option>
                                 {/loop}
                             </select>

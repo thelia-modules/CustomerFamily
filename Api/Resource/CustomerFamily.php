@@ -101,17 +101,6 @@ class CustomerFamily extends AbstractTranslatableResource
         return $this;
     }
 
-    public function getI18ns(): I18nCollection
-    {
-        return $this->i18ns;
-    }
-
-    public function setI18ns(I18nCollection|array $i18ns): CustomerFamily
-    {
-        $this->i18ns = $i18ns;
-        return $this;
-    }
-
     public static function getI18nResourceClass(): string
     {
         return CustomerFamilyI18n::class;

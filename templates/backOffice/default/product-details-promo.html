@@ -1,12 +1,12 @@
 {$purchasePrice = $purchasePrice|default:''}
 {loop type='product' name='product_default_pse_promo_loop' id=$product_id visible='*' backend_context=1}
-    {loop type="product_purchase_price" name="product_purchase_price_loop" pse_id=$PRODUCT_SALE_ELEMENT currency_id=$edit_currency_id}
+    {loop type="product_purchase_price_loop" name="product_purchase_price_loop" pse_id=$PRODUCT_SALE_ELEMENT currency_id=$edit_currency_id}
         {assign var="purchasePrice" value=$PURCHASE_PRICE}
     {/loop}
 
     {if $purchasePrice !== ''}
-        {loop type='customer_family' name='customer_family_loop_promo_prices'}
-            {loop type='customer_family_pse_calculated_prices' name='calculated_promo_prices' pse_id=$PRODUCT_SALE_ELEMENT customer_family_id=$CUSTOMER_FAMILY_ID currency_id=$edit_currency_id}
+        {loop type='customer_family_loop' name='customer_family_loop_promo_prices'}
+            {loop type='customer_family_product_price_loop' name='calculated_promo_prices' pse_id=$PRODUCT_SALE_ELEMENT customer_family_id=$CUSTOMER_FAMILY_ID currency_id=$edit_currency_id}
                 <div class="form-group">
                     <!-- Family name -->
                     <label class="control-label">

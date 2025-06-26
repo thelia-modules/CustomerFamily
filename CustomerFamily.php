@@ -28,16 +28,16 @@ use CustomerFamily\Model\CustomerFamily as CustomerFamilyModel;
 class CustomerFamily extends BaseModule
 {
     /** @cont string */
-    const MODULE_DOMAIN = 'customerfamily';
+    public const MODULE_DOMAIN = 'customerfamily';
 
     /** @cont string */
-    const MESSAGE_DOMAIN = 'customerfamily';
+    public const MESSAGE_DOMAIN = 'customerfamily';
 
     /** @cont string */
-    const CUSTOMER_FAMILY_PARTICULAR = "particular";
+    public const CUSTOMER_FAMILY_PARTICULAR = "particular";
 
     /** @cont string */
-    const CUSTOMER_FAMILY_PROFESSIONAL = "professional";
+    public const CUSTOMER_FAMILY_PROFESSIONAL = "professional";
 
     /**
      * @param ConnectionInterface $con
@@ -49,7 +49,7 @@ class CustomerFamily extends BaseModule
             CustomerFamilyQuery::create()->findOne();
         } catch (\Exception $e) {
             $database = new Database($con);
-            $database->insertSql(null, [__DIR__ . "/Config/thelia.sql"]);
+            $database->insertSql(null, [__DIR__ . "/Config/TheliaMain.sql"]);
         }
 
         //Generate the 2 defaults customer_family
@@ -88,7 +88,7 @@ class CustomerFamily extends BaseModule
      *
      * @return Model\CustomerFamily
      */
-    public static function getCustomerFamilyByCode($code, $title = null, $locale = "fr_FR")
+    public static function getCustomerFamilyByCode($code, $title = null, $locale = "fr_FR"): CustomerFamilyModel
     {
         if ($title == null) {
             $title = $code;
@@ -133,8 +133,8 @@ class CustomerFamily extends BaseModule
     public static function configureServices(ServicesConfigurator $servicesConfigurator): void
     {
         $servicesConfigurator->load(self::getModuleCode().'\\', __DIR__)
-            ->exclude([THELIA_MODULE_DIR . ucfirst(self::getModuleCode()). "/I18n/*"])
-            ->autowire(true)
-            ->autoconfigure(true);
+            ->exclude([__DIR__.'/I18n/*'])
+            ->autowire()
+            ->autoconfigure();
     }
 }
