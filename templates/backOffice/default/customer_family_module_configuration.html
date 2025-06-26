@@ -98,7 +98,7 @@
                                         {/form}
 
                                         <!-- Families list -->
-                                        {loop type="customer_family" name="customer_family" lang=$edit_language_id  force_return="on"}
+                                        {loop type="customer_family_loop" name="customer_family" lang=$edit_language_id  force_return="on"}
                                             <tr>
                                                 <td>
                                                     {$CUSTOMER_FAMILY_ID}
@@ -261,7 +261,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {loop type='customer_family' name='customerfamily_loop'}
+                                    {loop type='customer_family_loop' name='customerfamily_loop'}
 
                                         {assign var='amount_added_before' value=0}
                                         {assign var='coefficient' value=1}
@@ -280,7 +280,7 @@
                                                         <input type="hidden" name="{$name}" value="0">
                                                     {/form_field}
 
-                                                    {loop type='customer_family_price' name='customer_family_price_loop' promo=0 customer_family_id=$CUSTOMER_FAMILY_ID}
+                                                    {loop type='customer_family_price_loop' name='customer_family_price_loop' promo=0 customer_family_id=$CUSTOMER_FAMILY_ID}
                                                         {assign var='amount_added_before' value=$AMOUNT_ADDED_BEFORE}
                                                         {assign var='coefficient' value=$COEFFICIENT}
                                                         {assign var='amount_added_after' value=$AMOUNT_ADDED_AFTER}
@@ -343,7 +343,7 @@
                                                         <input type="hidden" name="{$name}" value="1">
                                                     {/form_field}
 
-                                                    {loop type='customer_family_price' name='customer_family_price_promo_loop' promo=1 customer_family_id=$CUSTOMER_FAMILY_ID}
+                                                    {loop type='customer_family_price_loop' name='customer_family_price_promo_loop' promo=1 customer_family_id=$CUSTOMER_FAMILY_ID}
                                                         {assign var='amount_added_before' value=$AMOUNT_ADDED_BEFORE}
                                                         {assign var='coefficient' value=$COEFFICIENT}
                                                         {assign var='amount_added_after' value=$AMOUNT_ADDED_AFTER}
@@ -397,7 +397,7 @@
 
                 <div id="category_restrictions" class="tab-pane form-container">
                     <div class="row">
-                        {loop type='customer_family' name='customerfamily_loop'}
+                        {loop type='customer_family_loop' name='customerfamily_loop'}
                             <div class="col-md-12 general-block-decorator">
                                 <form method="post" action="{url path="/admin/module/CustomerFamily/category_restriction/%customerFamilyId" customerFamilyId=$CUSTOMER_FAMILY_ID}">
                                     <div class="title title-without-tabs">
@@ -423,7 +423,7 @@
                 </div>
                 <div id="brand_restrictions" class="tab-pane form-container">
                     <div class="row">
-                        {loop type='customer_family' name='customerfamily_loop'}
+                        {loop type='customer_family_loop' name='customerfamily_loop'}
                             <div class="col-md-12 general-block-decorator">
                                 <form method="post" action="{url path="/admin/module/CustomerFamily/brand_restriction/%customerFamilyId" customerFamilyId=$CUSTOMER_FAMILY_ID}">
                                     <div class="title title-without-tabs">

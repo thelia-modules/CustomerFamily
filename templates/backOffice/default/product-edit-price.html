@@ -1,5 +1,5 @@
 {$purchasePrice = $purchasePrice|default:''}
-{loop type="product_purchase_price" name="pse_purchase_price_loop" pse_id=$pseId currency_id=$edit_currency_id}
+{loop type="product_purchase_price_loop" name="pse_purchase_price_loop" pse_id=$pseId currency_id=$edit_currency_id}
     {assign var="purchasePrice" value=$PURCHASE_PRICE}
 {/loop}
 
@@ -19,8 +19,8 @@
 </tr>
 
 {if $purchasePrice !== ''}
-    {loop type='customer_family' name='customer_family_loop_prices'}
-        {loop type='customer_family_pse_calculated_prices' name='calculated_prices' pse_id=$pseId customer_family_id=$CUSTOMER_FAMILY_ID}
+    {loop type='customer_family_loop' name='customer_family_loop_prices'}
+        {loop type='customer_family_product_price_loop' name='calculated_prices' pse_id=$pseId customer_family_id=$CUSTOMER_FAMILY_ID}
             <tr></tr>
             <tr class="purchase-price">
                 <!-- Customer family title -->
