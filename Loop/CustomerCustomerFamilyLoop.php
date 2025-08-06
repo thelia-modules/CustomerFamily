@@ -17,6 +17,7 @@ use CustomerFamily\Model\Map\CustomerCustomerFamilyTableMap;
 use CustomerFamily\Model\Map\CustomerFamilyTableMap;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -35,7 +36,7 @@ class CustomerCustomerFamilyLoop extends BaseLoop implements PropelSearchLoopInt
      *
      * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
      */
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('customer_id'),
@@ -49,7 +50,7 @@ class CustomerCustomerFamilyLoop extends BaseLoop implements PropelSearchLoopInt
      *
      * @return \Propel\Runtime\ActiveQuery\ModelCriteria
      */
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
         $search = CustomerCustomerFamilyQuery::create();
 
@@ -80,7 +81,7 @@ class CustomerCustomerFamilyLoop extends BaseLoop implements PropelSearchLoopInt
      *
      * @return LoopResult
      */
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         foreach ($loopResult->getResultDataCollection() as $customerCustomerFamily) {
             /** @var \CustomerFamily\Model\CustomerCustomerFamily $customerCustomerFamily */

@@ -42,7 +42,7 @@ class ProductModuleHook extends BaseHook
         $event->add($content);
     }
 
-    public static function getSubscribedHooks()
+    public static function getSubscribedHooks(): array
     {
         return [
             "product.tab-content" => [

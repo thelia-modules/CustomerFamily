@@ -5,6 +5,7 @@ namespace CustomerFamily\Loop;
 use CustomerFamily\CustomerFamily;
 use CustomerFamily\Model\ProductPurchasePriceQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -28,7 +29,7 @@ class ProductPurchasePriceLoop extends BaseLoop implements PropelSearchLoopInter
      *
      * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
      */
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createIntTypeArgument('pse_id', null, true),
@@ -39,7 +40,7 @@ class ProductPurchasePriceLoop extends BaseLoop implements PropelSearchLoopInter
     /**
      * @return ProductPurchasePriceQuery|\Propel\Runtime\ActiveQuery\ModelCriteria|\Thelia\Model\ProductPrice
      */
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
 
         if(CustomerFamily::getConfigValue('customer_family_price_mode', null)){
@@ -58,7 +59,7 @@ class ProductPurchasePriceLoop extends BaseLoop implements PropelSearchLoopInter
      *
      * @return LoopResult
      */
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         /** @var \CustomerFamily\Model\ProductPurchasePrice $productPurchasePrice */
         foreach ($loopResult->getResultDataCollection() as $productPurchasePrice) {

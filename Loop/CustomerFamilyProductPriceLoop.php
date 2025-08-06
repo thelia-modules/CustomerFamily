@@ -23,7 +23,7 @@ class CustomerFamilyProductPriceLoop extends BaseLoop implements ArraySearchLoop
      *
      * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
      */
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createIntTypeArgument('pse_id', null, true),
@@ -37,7 +37,7 @@ class CustomerFamilyProductPriceLoop extends BaseLoop implements ArraySearchLoop
      *
      * @return array
      */
-    public function buildArray()
+    public function buildArray(): array
     {
         $items = [];
 
@@ -53,7 +53,7 @@ class CustomerFamilyProductPriceLoop extends BaseLoop implements ArraySearchLoop
      *
      * @return LoopResult
      */
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         $items = $loopResult->getResultDataCollection();
 

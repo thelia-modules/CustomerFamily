@@ -15,6 +15,7 @@ namespace CustomerFamily\Loop;
 use CustomerFamily\Model\Base\CustomerFamily;
 use CustomerFamily\Model\CustomerFamilyQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -35,7 +36,7 @@ class CustomerFamilyLoop extends BaseI18nLoop implements PropelSearchLoopInterfa
      *
      * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
      */
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
@@ -55,7 +56,7 @@ class CustomerFamilyLoop extends BaseI18nLoop implements PropelSearchLoopInterfa
      *
      * @return \Propel\Runtime\ActiveQuery\ModelCriteria
      */
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
         $search = CustomerFamilyQuery::create();
 
@@ -86,7 +87,7 @@ class CustomerFamilyLoop extends BaseI18nLoop implements PropelSearchLoopInterfa
      *`
      * @return LoopResult
      */
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         foreach ($loopResult->getResultDataCollection() as $customerFamily) {
             /** @var CustomerFamily $customerFamily */
