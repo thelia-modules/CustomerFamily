@@ -14,7 +14,7 @@ use Thelia\Form\BaseForm;
  */
 class CustomerFamilyPriceForm extends BaseForm
 {
-    public static function getName()
+    public static function getName(): string
     {
         return 'customer_family_price_update';
     }

@@ -21,7 +21,7 @@ class CustomerFamilyUpdateForm extends CustomerFamilyCreateForm
     /**
      * @return string the name of you form. This name must be unique
      */
-    public static function getName()
+    public static function getName(): string
     {
         return 'customer_family_update_form';
     }

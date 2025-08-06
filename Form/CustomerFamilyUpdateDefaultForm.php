@@ -11,7 +11,7 @@ use Thelia\Form\BaseForm;
  */
 class CustomerFamilyUpdateDefaultForm extends BaseForm
 {
-    public static function getName()
+    public static function getName(): string
     {
         return 'customer_family_update_default_form';
     }
