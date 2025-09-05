@@ -18,14 +18,14 @@ use Thelia\Core\Event\Loop\LoopExtendsBuildModelCriteriaEvent;
 use Thelia\Core\Event\Loop\LoopExtendsParseResultsEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\SecurityContext;
-use Thelia\Exception\TaxEngineException;
+use Thelia\Domain\Taxation\TaxEngine\Exception\TaxEngineException;
+use Thelia\Domain\Taxation\TaxEngine\TaxEngine;
 use Thelia\Model\Currency;
 use Thelia\Model\Map\ProductPriceTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Product;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\ProductSaleElements;
-use Thelia\TaxEngine\TaxEngine;
 
 class CustomerFamilyPriceListener implements EventSubscriberInterface
 {
