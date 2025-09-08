@@ -11,12 +11,12 @@ use CustomerFamily\Model\Map\CustomerCustomerFamilyTableMap;
 use CustomerFamily\Model\Map\CustomerFamilyTableMap;
 use CustomerFamily\Model\ProductPurchasePriceQuery;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Domain\Taxation\TaxEngine\TaxEngine;
 use Thelia\Exception\TaxEngineException;
 use Thelia\Model\CartItem;
 use Thelia\Model\Currency;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductSaleElements;
-use Thelia\TaxEngine\TaxEngine;
 
 /**
  * Class CustomerFamilyService
