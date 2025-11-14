@@ -138,6 +138,7 @@
 		<!-- Admin product edit purchase price -->
 		<hook id="customer.family.product.price.edit" class="CustomerFamily\Hook\CustomerFamilyProductPriceHook">
 			<tag name="hook.event_listener" event="product.combinations-row" type="back" method="onPsePriceEdit" />
+			<tag name="hook.event_listener" event="product.edit-js" type="back" method="js:assets/js/product-edit-price.js" />
 			<tag name="hook.event_listener" event="product.details-pricing-form" type="back" templates="render:product-details-pricing.html" />
 			<tag name="hook.event_listener" event="product.details-promotion-form" type="back" templates="render:product-details-promo.html" />
 		</hook>

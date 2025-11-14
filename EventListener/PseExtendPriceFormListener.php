@@ -2,6 +2,7 @@
 
 namespace CustomerFamily\EventListener;
 
+use CustomerFamily\CustomerFamily;
 use CustomerFamily\Model\ProductPurchasePrice;
 use CustomerFamily\Model\ProductPurchasePriceQuery;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -69,6 +70,10 @@ class PseExtendPriceFormListener implements EventSubscriberInterface
     public function handleExtendedData(FormEvent $formEvent)
     {
         if (!$formEvent->getForm()->isValid()) {
+            return;
+        }
+
+        if (true === (bool) CustomerFamily::getConfigValue('customer_family_price_mode', false)) {
             return;
         }
 

@@ -7,8 +7,13 @@ use CustomerFamily\Form\CustomerFamilyPriceForm;
 use CustomerFamily\Form\CustomerFamilyPriceModeForm;
 use CustomerFamily\Model\CustomerFamilyPrice;
 use CustomerFamily\Model\CustomerFamilyPriceQuery;
+use CustomerFamily\Model\CustomerFamilyProductPrice;
+use CustomerFamily\Model\CustomerFamilyProductPriceQuery;
+use CustomerFamily\Service\CustomerFamilyService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Thelia\Controller\Admin\BaseAdminController;
+use Thelia\Core\HttpFoundation\JsonResponse;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Translation\Translator;
@@ -99,5 +104,41 @@ class CustomerFamilyPriceController extends BaseAdminController
         CustomerFamily::setConfigValue('customer_family_price_mode', $mode);
 
         return new RedirectResponse(URL::getInstance()->absoluteUrl("/admin/module/CustomerFamily"));
+    }
+
+    /**
+     * @Route("/CustomerFamily/ajax/save-price", name="_updatepse__price", methods="GET")
+     */
+    public function ajaxSavePriceAction(Request $request, CustomerFamilyService $customerFamilyService): JsonResponse
+    {
+        try {
+            $customerFamilyId = (int)$request->query->get('customer_family_id');
+            $pseId = (int)$request->query->get('pse_id');
+            $priceType = $request->query->get('price_type');
+            $priceValue = $request->query->get('price_value') ? (float)$request->query->get('price_value'): null;
+
+            $customerFamilyPrice = CustomerFamilyProductPriceQuery::create()
+                ->filterByCustomerFamilyId($customerFamilyId)
+                ->filterByProductSaleElementsId($pseId)
+                ->findOneOrCreate();
+
+            if (null === $priceValue) {
+                $customerFamilyPrice->delete();
+                return new JsonResponse(['success' => true]);
+            }
+
+            if ($priceType === 'promo_price') {
+                $customerFamilyPrice->setPromoPrice($priceValue);
+            } else {
+                $customerFamilyPrice->setPrice($priceValue);
+            }
+
+            $customerFamilyPrice->save();
+
+            return new JsonResponse(['success' => true]);
+
+        } catch (\Exception $ex) {
+            return new JsonResponse(null, 500);
+        }
     }
 }

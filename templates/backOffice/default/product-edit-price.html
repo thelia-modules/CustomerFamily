@@ -1,4 +1,5 @@
-{$purchasePrice = $purchasePrice|default:''}
+
+{$purchasePrice = $purchasePrice|default:null}
 {loop type="product_purchase_price_loop" name="pse_purchase_price_loop" pse_id=$pseId currency_id=$edit_currency_id}
     {assign var="purchasePrice" value=$PURCHASE_PRICE}
 {/loop}
@@ -18,37 +19,52 @@
     {/form_field}
 </tr>
 
-{if $purchasePrice !== ''}
-    {loop type='customer_family_loop' name='customer_family_loop_prices'}
-        {loop type='customer_family_product_price_loop' name='calculated_prices' pse_id=$pseId customer_family_id=$CUSTOMER_FAMILY_ID}
-            <tr></tr>
-            <tr class="purchase-price">
-                <!-- Customer family title -->
-                <td>
-                    {intl l='Price for:' d='customerfamily.bo.default'} <a href="{url path="/admin/module/CustomerFamily"}">{$TITLE_CUSTOMER_FAMILY}</a>
-                </td>
-                <!-- Calculated standard price -->
-                <td colspan="2" class="text-right">
-                    <span class="glyphicon glyphicon-arrow-right pull-left" aria-hidden="true"></span>
-                    <b>{intl l='Calculated price' d='customerfamily.bo.default'}</b>
-                </td>
-                <td>
-                    <input class="input-sm text-right form-control" type="text" value="{$CALCULATED_PRICE}" disabled />
-                </td>
-                <td>
-                    <input class="input-sm text-right form-control" type="text" value="{$CALCULATED_TAXED_PRICE}" disabled />
-                </td>
-                <!-- Calculated promo price -->
-                <td colspan="4" class="text-right">
-                    <b>{intl l='Calculated promo price' d='customerfamily.bo.default'}</b>
-                </td>
-                <td>
-                    <input class="input-sm text-right form-control" type="text" value="{$CALCULATED_PROMO_PRICE}" disabled />
-                </td>
-                <td>
-                    <input class="input-sm text-right form-control" type="text" value="{$CALCULATED_TAXED_PROMO_PRICE}" disabled />
-                </td>
-            </tr>
-        {/loop}
-    {/loop}
-{/if}
+{loop type='customer_family_product_price_loop' name='calculated_prices' pse_id=$pseId}
+    <tr></tr>
+    <tr class="purchase-price customer-family-price-row" data-customer-family-id="{$CUSTOMER_FAMILY_ID}" data-pse-id="{$pseId}">
+        <!-- Customer family title -->
+        <td>
+            {intl l='Price for:' d='customerfamily.bo.default'} <a href="{url path="/admin/module/CustomerFamily"}">{$CUSTOMER_FAMILY_TITLE}</a>
+        </td>
+        <!-- Calculated standard price -->
+        <td colspan="2" class="text-right">
+            <span class="glyphicon glyphicon-arrow-right pull-left" aria-hidden="true"></span>
+            {if !$WITH_FORMULA}
+                <b>{intl l='Price' d='customerfamily.bo.default'}</b>
+            {else}
+                <b>{intl l='Calculated price' d='customerfamily.bo.default'}</b>
+            {/if}
+        </td>
+
+        <td>
+            <input id="price_without_tax_{$CUSTOMER_FAMILY_ID}_{$pseId}" data-product-id="{$product_id}" data-price-type="price-without-tax" data-rel-price="price_with_tax_{$CUSTOMER_FAMILY_ID}_{$pseId}" class="input-sm text-right form-control price_field automatic_price_field_family standard-price-input" type="text" value="{$PRICE}" {if $WITH_FORMULA}disabled{/if} />
+        </td>
+        <td>
+            <input id="price_with_tax_{$CUSTOMER_FAMILY_ID}_{$pseId}" data-product-id="{$product_id}" data-price-type="price-with-tax" data-rel-price="price_without_tax_{$CUSTOMER_FAMILY_ID}_{$pseId}" class="input-sm text-right form-control price_field automatic_price_field_family standard-taxed-price-input" type="text" value="{$TAXED_PRICE}" readonly />
+        </td>
+        <td>
+            <button class="btn btn-default btn-xs save-price" type="button">
+                <span class="glyphicon glyphicon-save"></span>
+            </button>
+        </td>
+        <!-- Calculated promo price -->
+        <td colspan="4" class="text-right">
+            {if !$WITH_FORMULA_PROMO}
+                <b>{intl l='Promo price' d='customerfamily.bo.default'}</b>
+            {else}
+                <b>{intl l='Calculated promo price' d='customerfamily.bo.default'}</b>
+            {/if}
+        </td>
+        <td>
+            <input id="promo_price_without_tax_{$CUSTOMER_FAMILY_ID}_{$pseId}" data-product-id="{$product_id}" data-price-type="promo-price-without-tax" data-rel-price="promo_price_with_tax_{$CUSTOMER_FAMILY_ID}_{$pseId}" class="input-sm text-right form-control price_field automatic_price_field promo-price-input" type="text" value="{$PROMO_PRICE}" {if $WITH_FORMULA_PROMO}disabled{/if} />
+        </td>
+        <td>
+            <input id="promo_price_with_tax_{$CUSTOMER_FAMILY_ID}_{$pseId}" data-product-id="{$product_id}" data-price-type="promo-price-with-tax" data-rel-price="promo_price_without_tax_{$CUSTOMER_FAMILY_ID}_{$pseId}" class="input-sm text-right form-control price_field automatic_price_field promo-taxed-price-input" type="text" value="{$TAXED_PROMO_PRICE}" readonly />
+        </td>
+        <td>
+            <button class="btn btn-default btn-xs save-promo-price" type="button">
+                <span class="glyphicon glyphicon-save"></span>
+            </button>
+        </td>
+    </tr>
+{/loop}

@@ -2,50 +2,70 @@
 
 namespace CustomerFamily\Loop;
 
-use Thelia\Core\Template\Element\ArraySearchLoopInterface;
+use CustomerFamily\Model\CustomerFamily;
+use CustomerFamily\Model\CustomerFamilyQuery;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\Currency;
 use Thelia\Model\ProductSaleElementsQuery;
 
-/**
- * Class CustomerFamilyProductPriceLoop
- * @package CustomerFamily\Loop
- * @author Etienne Perriere <eperriere@openstudio.fr>
- */
-class CustomerFamilyProductPriceLoop extends BaseLoop implements ArraySearchLoopInterface
+class CustomerFamilyProductPriceLoop extends BaseLoop implements PropelSearchLoopInterface
 {
-    /**
-     * Definition of loop arguments
-     *
-     * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
-     */
     protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createIntTypeArgument('pse_id', null, true),
             Argument::createIntTypeArgument('currency_id', Currency::getDefaultCurrency()->getId()),
-            Argument::createIntTypeArgument('customer_family_id', null, true)
+            Argument::createIntTypeArgument('locale', null),
+            Argument::createIntTypeArgument('customer_family_id')
         );
     }
 
-    /**
-     * this method returns an array
-     *
-     * @return array
-     */
-    public function buildArray(): array
+    public function buildModelCriteria(): ModelCriteria
     {
-        $items = [];
+        /** @var Session $session */
+        $session = $this->getCurrentRequest()->getSession();
 
-        $items['pse_id'] = $this->getPseId();
-        $items['currency_id'] = $this->getCurrencyId();
-        $items['customerFamilyId'] = $this->getCustomerFamilyId();
+        $pseId = $this->getPseId();
 
-        return $items;
+        if (!$locale = $this->getLocale()) {
+            $locale = $session->getAdminEditionLang()->getLocale();
+        }
+
+        $query = CustomerFamilyQuery::create('cf');
+
+        if ($customerFamilyId = $this->getCustomerFamilyId()) {
+            $query->filterById($customerFamilyId);
+        }
+
+        $query
+            ->leftJoinCustomerFamilyPrice('cfpp')
+            ->addJoinCondition('cfpp', 'cfpp.promo = 0')
+
+            ->leftJoinCustomerFamilyPrice('cfpp_promo')
+            ->addJoinCondition('cfpp_promo', 'cfpp_promo.promo = 1')
+
+            ->leftJoinCustomerFamilyI18n('cfi')
+            ->addJoinCondition('cfi', 'cfi.locale = ?', $locale)
+
+            ->leftJoinCustomerFamilyProductPrice('pp')
+            ->addJoinCondition('pp', 'pp.product_sale_elements_id = ?', $pseId, \PDO::PARAM_INT)
+
+            ->leftJoinWith('pp.ProductSaleElements pse')
+            ->addJoinCondition('pse', 'pse.id = ?', $pseId, \PDO::PARAM_INT)
+
+            ->withColumn('cfi.title', 'Title')
+            ->withColumn('cfpp.use_equation', 'UseEquation')
+            ->withColumn('cfpp_promo.use_equation', 'UsePromoEquation')
+            ->withColumn('pse.id', 'PseId');
+
+        return $query;
     }
 
     /**
@@ -55,23 +75,53 @@ class CustomerFamilyProductPriceLoop extends BaseLoop implements ArraySearchLoop
      */
     public function parseResults(LoopResult $loopResult): LoopResult
     {
-        $items = $loopResult->getResultDataCollection();
 
         /** @var \CustomerFamily\Service\CustomerFamilyService $customerFamilyService */
         $customerFamilyService = $this->container->get('customer.family.service');
+        $pse = ProductSaleElementsQuery::create()->findOneById($this->getPseId());
 
-        $pse = ProductSaleElementsQuery::create()->findOneById($items['pse_id']);
+        /** @var CustomerFamily $customerFamily */
+        foreach ($loopResult->getResultDataCollection() as $customerFamily) {
 
-        $prices = $customerFamilyService->calculateCustomerFamilyPsePrice($pse, $items['customerFamilyId'], $items['currency_id']);
+            $loopResultRow = new LoopResultRow($customerFamily);
 
-        $loopResultRow = new LoopResultRow();
-        
-        $loopResultRow->set("CALCULATED_PRICE", $prices['price'] ?? null);
-        $loopResultRow->set("CALCULATED_TAXED_PRICE", $prices['taxedPrice'] ?? null);
-        $loopResultRow->set("CALCULATED_PROMO_PRICE", $prices['promoPrice'] ?? null);
-        $loopResultRow->set("CALCULATED_TAXED_PROMO_PRICE", $prices['taxedPromoPrice'] ?? null);
+            $loopResultRow->set("CUSTOMER_FAMILY_TITLE", $customerFamily->getVirtualColumn('Title'));
+            $loopResultRow->set("CUSTOMER_FAMILY_ID", $customerFamily->getId());
 
-        $loopResult->addRow($loopResultRow);
+            $loopResultRow->set("WITH_FORMULA", false);
+            $loopResultRow->set("WITH_FORMULA_PROMO", false);
+
+            if ($customerFamily->getVirtualColumn('UseEquation')) {
+                $loopResultRow->set("WITH_FORMULA", true);
+            }
+
+            if ($customerFamily->getVirtualColumn('UsePromoEquation')) {
+                $loopResultRow->set("WITH_FORMULA_PROMO", true);
+            }
+
+            $loopResultRow->set("PRICE", null);
+            $loopResultRow->set("TAXED_PRICE", null);
+            $loopResultRow->set("PROMO_PRICE", null);
+            $loopResultRow->set("TAXED_PROMO_PRICE", null);
+
+            if ($pse->getId() !== $customerFamily->getVirtualColumn('PseId')) {
+                $loopResult->addRow($loopResultRow);
+                continue;
+            }
+
+            $prices = $customerFamilyService->calculateCustomerFamilyPsePrice(
+                $pse,
+                $customerFamily->getId(),
+                $this->getCurrencyId()
+            );
+
+            $loopResultRow->set("PRICE", $prices['price'] ?? null);
+            $loopResultRow->set("TAXED_PRICE", $prices['taxedPrice'] ?? null);
+            $loopResultRow->set("PROMO_PRICE", $prices['promoPrice'] ?? null);
+            $loopResultRow->set("TAXED_PROMO_PRICE", $prices['taxedPromoPrice'] ?? null);
+
+            $loopResult->addRow($loopResultRow);
+        }
 
         return $loopResult;
     }
