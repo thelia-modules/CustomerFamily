@@ -49,7 +49,7 @@ class CustomerFamily extends BaseModule
             CustomerFamilyQuery::create()->findOne();
         } catch (\Exception $e) {
             $database = new Database($con);
-            $database->insertSql(null, [__DIR__ . "/Config/thelia.sql"]);
+            $database->insertSql(null, [__DIR__ . "/Config/TheliaMain.sql"]);
         }
 
         //Generate the 2 defaults customer_family
