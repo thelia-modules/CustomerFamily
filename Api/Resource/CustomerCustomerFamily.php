@@ -8,7 +8,6 @@ use CustomerFamily\Model\Map\CustomerCustomerFamilyTableMap;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
-use Symfony\Component\Serializer\Annotation\Ignore;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Thelia\Api\Resource\Customer as CustomerRessource;
 use Thelia\Api\Resource\Order as OrderRessource;
@@ -25,12 +24,12 @@ class CustomerCustomerFamily implements ResourceAddonInterface
     #[Groups([CustomerRessource::GROUP_ADMIN_READ, CustomerRessource::GROUP_ADMIN_WRITE, CustomerRessource::GROUP_FRONT_READ_SINGLE, OrderRessource::GROUP_ADMIN_READ])]
     public ?string $code = null;
 
-    #[Ignore] public static function getResourceParent(): string
+    public static function getResourceParent(): string
     {
         return \Thelia\Api\Resource\Customer::class;
     }
 
-    #[Ignore] public static function getPropelRelatedTableMap(): ?TableMap
+    public static function getPropelRelatedTableMap(): ?TableMap
     {
         return new CustomerCustomerFamilyTableMap();
     }
