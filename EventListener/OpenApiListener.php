@@ -52,7 +52,12 @@ class OpenApiListener implements EventSubscriberInterface
 
     public function saveCustomerFamily(CustomerEvent $customerEvent)
     {
-        $data = json_decode($this->requestStack->getCurrentRequest()->getContent(), true);
+        $request = $this->requestStack->getCurrentRequest();
+        if (null === $request) {
+            return;
+        }
+
+        $data = json_decode($request->getContent(), true);
 
         if (!isset($data['customer']['customerFamily'])) {
             return;
