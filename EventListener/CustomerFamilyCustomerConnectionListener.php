@@ -42,7 +42,7 @@ class CustomerFamilyCustomerConnectionListener implements EventSubscriberInterfa
      *
      * @return array The event names to listen to
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::CUSTOMER_LOGOUT => ['refreshCartItemPrices', -230],

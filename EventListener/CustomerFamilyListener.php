@@ -67,7 +67,7 @@ class CustomerFamilyListener implements EventSubscriberInterface
      *
      * @api
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return array(
             TheliaEvents::CUSTOMER_CREATEACCOUNT => array(

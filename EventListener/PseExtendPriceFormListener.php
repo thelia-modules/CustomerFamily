@@ -26,7 +26,7 @@ class PseExtendPriceFormListener implements EventSubscriberInterface
      *
      * @return array The event names to listen to
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [TheliaEvents::FORM_AFTER_BUILD . '.thelia_product_sale_element_update_form' => ['extendPsePriceForm', 128]];
     }

@@ -12,7 +12,7 @@ use Thelia\Model\Map\CategoryTableMap;
 
 class CategoryLoopExtend extends BaseCustomerFamilyLoopExtend implements EventSubscriberInterface
 {
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::getLoopExtendsEvent(TheliaEvents::LOOP_EXTENDS_BUILD_MODEL_CRITERIA, 'category') => ['buildModelCriteria', 128],

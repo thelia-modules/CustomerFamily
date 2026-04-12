@@ -24,7 +24,7 @@ use Thelia\Model\ProductSaleElementsQuery;
 
 readonly class CustomerFamilyPricePersistProcessor implements ProcessorInterface
 {
-    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
         if ($operation instanceof Post) {
             return $this->create($data, $operation, $uriVariables, $context);

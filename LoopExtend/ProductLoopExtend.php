@@ -16,7 +16,7 @@ use Thelia\Model\Map\ProductTableMap;
 
 class ProductLoopExtend extends BaseCustomerFamilyLoopExtend implements EventSubscriberInterface
 {
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::getLoopExtendsEvent(TheliaEvents::LOOP_EXTENDS_BUILD_MODEL_CRITERIA, 'product') => ['buildModelCriteria', 128],
