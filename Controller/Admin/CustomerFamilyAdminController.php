@@ -43,18 +43,12 @@ use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerQuery;
 use Thelia\Tools\URL;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
-/**
- * @Route("/admin/module/CustomerFamily", name="customer_family")
- * Class CustomerFamilyAdminController
- * @package CustomerFamily\Controller\Admin
- */
+#[Route("/admin/module/CustomerFamily", name: "customer_family")]
 class CustomerFamilyAdminController extends BaseAdminController
 {
-    /**
-     * @Route("", name="_view", methods="GET")
-     */
+    #[Route("", name: "_view", methods: ["GET"])]
     public function viewAction($params = [])
     {
         $categoryRestrictions = [];
@@ -106,8 +100,8 @@ class CustomerFamilyAdminController extends BaseAdminController
     /**
      * @param Request $request
      * @return mixed|\Thelia\Core\HttpFoundation\Response
-     * @Route("/create", name="_create", methods="POST")
      */
+    #[Route("/create", name: "_create", methods: ["POST"])]
     public function createAction(EventDispatcherInterface $eventDispatcher, RequestStack $requestStack, ParserContext $parserContext)
     {
         if (null !== $response = $this->checkAuth(array(AdminResources::MODULE), array('CustomerFamily'), AccessManager::CREATE)) {
@@ -142,8 +136,8 @@ class CustomerFamilyAdminController extends BaseAdminController
      * @param Request $request
      * @param $id
      * @return mixed|\Thelia\Core\HttpFoundation\Response
-     * @Route("/update/{id}", name="_update", methods="POST")
      */
+    #[Route("/update/{id}", name: "_update", methods: ["POST"])]
     public function updateAction($id, EventDispatcherInterface $eventDispatcher, RequestStack $requestStack, ParserContext $parserContext)
     {
         if (null !== $response = $this->checkAuth(array(AdminResources::MODULE), array('CustomerFamily'), AccessManager::UPDATE)) {
@@ -185,8 +179,8 @@ class CustomerFamilyAdminController extends BaseAdminController
      * There must be at least one default family
      *
      * @return mixed|\Symfony\Component\HttpFoundation\Response|static
-     * @Route("/update-default", name="_update-default", methods="POST")
      */
+    #[Route("/update-default", name: "_update-default", methods: ["POST"])]
     public function updateDefaultAction(Translator $translator)
     {
         if (null !== $response = $this->checkAuth([AdminResources::MODULE], ['CustomerFamily'], AccessManager::UPDATE)) {
@@ -247,8 +241,8 @@ class CustomerFamilyAdminController extends BaseAdminController
      * @param Request $request
      * @param $id
      * @return mixed|\Thelia\Core\HttpFoundation\Response
-     * @Route("/delete/{id}", name="_delete", methods="POST")
      */
+    #[Route("/delete/{id}", name: "_delete", methods: ["POST"])]
     public function deleteAction($id, EventDispatcherInterface $eventDispatcher, RequestStack $requestStack, ParserContext $parserContext)
     {
         if (null !== $response = $this->checkAuth(array(AdminResources::MODULE), array('CustomerFamily'), AccessManager::DELETE)) {
@@ -317,8 +311,8 @@ class CustomerFamilyAdminController extends BaseAdminController
     /**
      * @param Request $request
      * @return mixed|\Thelia\Core\HttpFoundation\Response
-     * @Route("/customer/update", name="_customer_update", methods="POST")
      */
+    #[Route("/customer/update", name: "_customer_update", methods: ["POST"])]
     public function customerUpdateAction(RequestStack $requestStack, ParserContext $parserContext, EventDispatcherInterface $eventDispatcher)
     {
         if (null !== $response = $this->checkAuth(array(AdminResources::MODULE), array('CustomerFamily'), AccessManager::UPDATE)) {
@@ -366,9 +360,7 @@ class CustomerFamilyAdminController extends BaseAdminController
             ));
     }
 
-    /**
-     * @Route("/category_restriction/{customerFamilyId}", name="_category_restriction", methods="POST")
-     */
+    #[Route("/category_restriction/{customerFamilyId}", name: "_category_restriction", methods: ["POST"])]
     public function saveCustomerFamilyCategoryRestriction($customerFamilyId, ParserContext $parserContext, RequestStack $requestStack)
     {
         $customerFamily = CustomerFamilyQuery::create()
@@ -400,9 +392,7 @@ class CustomerFamilyAdminController extends BaseAdminController
         return $this->renderAdminConfig(null, "", "", $parserContext, $request->getSession());
     }
 
-    /**
-     * @Route("/brand_restriction/{customerFamilyId}", name="_brand_restriction", methods="POST")
-     */
+    #[Route("/brand_restriction/{customerFamilyId}", name: "_brand_restriction", methods: ["POST"])]
     public function saveCustomerFamilyBrandRestriction($customerFamilyId, ParserContext $parserContext, RequestStack $requestStack)
     {
         $customerFamily = CustomerFamilyQuery::create()

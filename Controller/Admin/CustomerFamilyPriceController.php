@@ -19,22 +19,22 @@ use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Tools\URL;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
- * @Route("/admin", name="customer_family")
  * Class CustomerFamilyPriceController
  * @package CustomerFamily\Controller
  * @author Etienne Perriere <eperriere@openstudio.fr>
  */
+#[Route("/admin", name: "customer_family")]
 class CustomerFamilyPriceController extends BaseAdminController
 {
     /**
      * Add or update amounts and factor to calculate prices for customer families
      *
      * @return mixed|\Symfony\Component\HttpFoundation\Response|\Thelia\Core\HttpFoundation\Response|static
-     * @Route("/module/CustomerFamily/update-price-calculation", name="_update_price_calculation", methods="POST")
      */
+    #[Route("/module/CustomerFamily/update-price-calculation", name: "_update_price_calculation", methods: ["POST"])]
     public function updateAction(Translator $translator)
     {
         // Check rights
@@ -91,9 +91,7 @@ class CustomerFamilyPriceController extends BaseAdminController
         return new RedirectResponse(URL::getInstance()->absoluteUrl("/admin/module/CustomerFamily"));
     }
 
-    /**
-     * @Route("/CustomerFamily/selectPriceMode", name="_update_price", methods="POST")
-     */
+    #[Route("/CustomerFamily/selectPriceMode", name: "_update_price", methods: ["POST"])]
     public function updatePriceModeAction()
     {
         $form = $this->createForm(CustomerFamilyPriceModeForm::getName());
@@ -106,9 +104,7 @@ class CustomerFamilyPriceController extends BaseAdminController
         return new RedirectResponse(URL::getInstance()->absoluteUrl("/admin/module/CustomerFamily"));
     }
 
-    /**
-     * @Route("/CustomerFamily/ajax/save-price", name="_updatepse__price", methods="GET")
-     */
+    #[Route("/CustomerFamily/ajax/save-price", name: "_updatepse__price", methods: ["GET"])]
     public function ajaxSavePriceAction(Request $request, CustomerFamilyService $customerFamilyService): JsonResponse
     {
         try {
