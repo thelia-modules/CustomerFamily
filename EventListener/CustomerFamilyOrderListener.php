@@ -85,15 +85,22 @@ class CustomerFamilyOrderListener implements EventSubscriberInterface
     }
 
     /**
-     * @param PropelOrderEvents $orderEvent
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function saveOrderFamilyAndEquation(PropelOrderEvents $orderEvent)
+    public function saveOrderFamilyAndEquation(PropelOrderEvents $orderEvent): void
     {
-        $customerFamily = CustomerFamilyQuery::create()
-            ->findOneById(
-                $this->customerFamilyService->getCustomerCustomerFamilyId($orderEvent->getModel()->getCustomerId())
-            );
+        $customerFamilyId = $this->customerFamilyService
+            ->getCustomerCustomerFamilyId($orderEvent->getModel()->getCustomerId());
+
+        if (null === $customerFamilyId) {
+            return;
+        }
+
+        $customerFamily = CustomerFamilyQuery::create()->findOneById($customerFamilyId);
+
+        if (null === $customerFamily) {
+            return;
+        }
 
         (new CustomerFamilyOrder())
             ->setOrderId($orderEvent->getModel()->getId())
