@@ -1,0 +1,17 @@
+<script>
+(function () {
+    var select = document.getElementById('customer_family_code_select');
+    if (!select) {
+        return;
+    }
+    function toggleProFields() {
+        var option = select.options[select.selectedIndex];
+        var code = option ? option.getAttribute('data-code') : 'none';
+        var extra = document.getElementById('customer-family-extra-fields');
+        if (extra) {
+            extra.style.display = (code === 'particular' || code === 'none') ? 'none' : 'block';
+        }
+    }
+    select.addEventListener('change', toggleProFields);
+})();
+</script>

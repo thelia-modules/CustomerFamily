@@ -12,8 +12,17 @@ use Thelia\Core\Hook\BaseHook;
  */
 class CustomerFamilyHook extends BaseHook
 {
-    public function onAddCss(HookRenderEvent $event)
+    public static function getSubscribedHooks(): array
     {
-        $event->add($this->addCSS('assets/css/style.css'));
+        return [
+            'main.head-css' => [
+                ['type' => 'back', 'method' => 'onAddCss'],
+            ],
+        ];
+    }
+
+    public function onAddCss(HookRenderEvent $event): void
+    {
+        $event->add($this->render('customer-family-css.html.twig'));
     }
 }

@@ -54,8 +54,62 @@ class CustomerFamilyAdminController extends BaseAdminController
         $categoryRestrictions = [];
         $brandRestrictions = [];
 
+        $editLocale = $this->getCurrentEditionLocale();
+
         $customerFamilies = CustomerFamilyQuery::create()
             ->find();
+
+        // Data for the Twig back-office (no {loop} helper available there).
+        $families = [];
+        $priceRows = [];
+        foreach ($customerFamilies as $family) {
+            $family->setLocale($editLocale);
+            $families[] = [
+                'id' => $family->getId(),
+                'code' => $family->getCode(),
+                'title' => $family->getTitle(),
+                'is_default' => (bool) $family->getIsDefault(),
+                'category_restriction_enabled' => (bool) $family->getCategoryRestrictionEnabled(),
+                'brand_restriction_enabled' => (bool) $family->getBrandRestrictionEnabled(),
+            ];
+
+            foreach ([0, 1] as $promo) {
+                $price = \CustomerFamily\Model\CustomerFamilyPriceQuery::create()
+                    ->filterByCustomerFamilyId($family->getId())
+                    ->filterByPromo($promo)
+                    ->findOne();
+
+                $priceRows[] = [
+                    'customer_family_id' => $family->getId(),
+                    'title' => $family->getTitle(),
+                    'promo' => $promo,
+                    'use_equation' => null !== $price ? (bool) $price->getUseEquation() : false,
+                    'amount_added_before' => null !== $price ? $price->getAmountAddedBefore() : 0,
+                    'coefficient' => null !== $price ? $price->getMultiplicationCoefficient() : 1,
+                    'amount_added_after' => null !== $price ? $price->getAmountAddedAfter() : 0,
+                    'is_taxed' => null !== $price ? (bool) $price->getIsTaxed() : true,
+                ];
+            }
+        }
+
+        $langs = [];
+        foreach (\Thelia\Model\LangQuery::create()->orderByPosition()->find() as $lang) {
+            $langs[] = [
+                'id' => $lang->getId(),
+                'title' => $lang->getTitle(),
+                'code' => $lang->getCode(),
+                'locale' => $lang->getLocale(),
+            ];
+        }
+
+        $editLang = \Thelia\Model\LangQuery::create()->findOneByLocale($editLocale);
+
+        $createForm = $this->createForm(CustomerFamilyCreateForm::getName())->getForm()->createView();
+        $updateForm = $this->createForm(CustomerFamilyUpdateForm::getName())->getForm()->createView();
+        $deleteForm = $this->createForm(CustomerFamilyDeleteForm::getName())->getForm()->createView();
+        $updateDefaultForm = $this->createForm(CustomerFamilyUpdateDefaultForm::getName())->getForm()->createView();
+        $priceForm = $this->createForm(\CustomerFamily\Form\CustomerFamilyPriceForm::getName())->getForm()->createView();
+        $priceModeForm = $this->createForm(\CustomerFamily\Form\CustomerFamilyPriceModeForm::getName())->getForm()->createView();
 
         $con = Propel::getConnection();
 
@@ -94,7 +148,22 @@ class CustomerFamilyAdminController extends BaseAdminController
             $brandRestrictions[$customerFamily->getId()] = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         }
 
-        return $this->render("customer_family_module_configuration", compact('categoryRestrictions', 'brandRestrictions'));
+        return $this->render("customer_family_module_configuration", [
+            'categoryRestrictions' => $categoryRestrictions,
+            'brandRestrictions' => $brandRestrictions,
+            'families' => $families,
+            'priceRows' => $priceRows,
+            'langs' => $langs,
+            'edit_language_id' => null !== $editLang ? $editLang->getId() : null,
+            'edit_language_locale' => $editLocale,
+            'price_mode' => (bool) CustomerFamily::getConfigValue('customer_family_price_mode', 0),
+            'createForm' => $createForm,
+            'updateForm' => $updateForm,
+            'deleteForm' => $deleteForm,
+            'updateDefaultForm' => $updateDefaultForm,
+            'priceForm' => $priceForm,
+            'priceModeForm' => $priceModeForm,
+        ]);
     }
 
     /**

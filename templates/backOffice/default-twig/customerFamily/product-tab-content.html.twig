@@ -1,0 +1,32 @@
+<br>
+<div class="card">
+    <div class="card-header">
+        {{ 'Customer family prices'|trans({}, 'customer_family.bo.default') }}
+    </div>
+    <div class="card-body">
+        <table class="table table-striped table-bordered">
+            <tr>
+                <th></th>
+                {% for family, psePrices in prices %}
+                    <th>{{ family }}</th>
+                {% endfor %}
+            </tr>
+            {% for pseRef in pseRefs %}
+                <tr>
+                    <td>{{ pseRef }}</td>
+                    {% for family, psePrices in prices %}
+                        <td>
+                            {% if psePrices[pseRef] is defined %}
+                                {{ 'Is promo'|trans({}, 'customer_family.bo.default') }}: {{ psePrices[pseRef].promo }}<br>
+                                {{ 'Price'|trans({}, 'customer_family.bo.default') }}: {{ psePrices[pseRef].price }}<br>
+                                {{ 'Promo price'|trans({}, 'customer_family.bo.default') }}: {{ psePrices[pseRef].promoPrice }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>

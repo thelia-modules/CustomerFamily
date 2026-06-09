@@ -1,0 +1,10 @@
+<div class="row">
+    <div class="col-sm-6">
+        <label for="purchase_price" class="form-label">{{ 'Purchase price'|trans }} ({{ currencyName }}) :</label>
+        <div class="input-group">
+            <input type="text" id="purchase_price" name="purchase_price" class="form-control" title="{{ 'Purchase price'|trans }}" placeholder="{{ 'Purchase price'|trans }}">
+            <span class="input-group-text">{{ currencySymbol }}</span>
+        </div>
+        <div class="form-text">{{ 'Enter here the product purchase price in %title'|trans({'%title': currencyName}) }}</div>
+    </div>
+</div>

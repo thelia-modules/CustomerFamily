@@ -1,0 +1,53 @@
+<tr></tr>
+<tr class="purchase-price">
+    <td></td>
+    <td colspan="2" class="text-end">
+        <label for="purchase_price">{{ 'Purchase price (w/o taxes)'|trans({}, 'customerfamily.bo.default') }}</label>
+    </td>
+    <td colspan="1">
+        <input class="form-control-sm text-end form-control" type="text" name="purchase_price[{{ idx }}]" value="{{ purchasePrice }}">
+    </td>
+    <td colspan="7"></td>
+</tr>
+
+{% for price in calculatedPrices %}
+    <tr></tr>
+    <tr class="purchase-price customer-family-price-row" data-customer-family-id="{{ price.CUSTOMER_FAMILY_ID }}" data-pse-id="{{ pseId }}">
+        <td>
+            {{ 'Price for:'|trans({}, 'customerfamily.bo.default') }} <a href="{{ path('customer_family_view') }}">{{ price.CUSTOMER_FAMILY_TITLE }}</a>
+        </td>
+        <td colspan="2" class="text-end">
+            <i class="bi bi-arrow-right float-start"></i>
+            {% if not price.WITH_FORMULA %}
+                <b>{{ 'Price'|trans({}, 'customerfamily.bo.default') }}</b>
+            {% else %}
+                <b>{{ 'Calculated price'|trans({}, 'customerfamily.bo.default') }}</b>
+            {% endif %}
+        </td>
+        <td>
+            <input id="price_without_tax_{{ price.CUSTOMER_FAMILY_ID }}_{{ pseId }}" data-product-id="{{ product_id }}" data-price-type="price-without-tax" data-rel-price="price_with_tax_{{ price.CUSTOMER_FAMILY_ID }}_{{ pseId }}" class="form-control-sm text-end form-control price_field automatic_price_field_family standard-price-input" type="text" value="{{ price.PRICE }}" {{ price.WITH_FORMULA ? 'disabled' : '' }}>
+        </td>
+        <td>
+            <input id="price_with_tax_{{ price.CUSTOMER_FAMILY_ID }}_{{ pseId }}" data-product-id="{{ product_id }}" data-price-type="price-with-tax" data-rel-price="price_without_tax_{{ price.CUSTOMER_FAMILY_ID }}_{{ pseId }}" class="form-control-sm text-end form-control price_field automatic_price_field_family standard-taxed-price-input" type="text" value="{{ price.TAXED_PRICE }}" readonly>
+        </td>
+        <td>
+            <button class="btn btn-secondary btn-sm save-price" type="button"><i class="bi bi-save"></i></button>
+        </td>
+        <td colspan="4" class="text-end">
+            {% if not price.WITH_FORMULA_PROMO %}
+                <b>{{ 'Promo price'|trans({}, 'customerfamily.bo.default') }}</b>
+            {% else %}
+                <b>{{ 'Calculated promo price'|trans({}, 'customerfamily.bo.default') }}</b>
+            {% endif %}
+        </td>
+        <td>
+            <input id="promo_price_without_tax_{{ price.CUSTOMER_FAMILY_ID }}_{{ pseId }}" data-product-id="{{ product_id }}" data-price-type="promo-price-without-tax" data-rel-price="promo_price_with_tax_{{ price.CUSTOMER_FAMILY_ID }}_{{ pseId }}" class="form-control-sm text-end form-control price_field automatic_price_field promo-price-input" type="text" value="{{ price.PROMO_PRICE }}" {{ price.WITH_FORMULA_PROMO ? 'disabled' : '' }}>
+        </td>
+        <td>
+            <input id="promo_price_with_tax_{{ price.CUSTOMER_FAMILY_ID }}_{{ pseId }}" data-product-id="{{ product_id }}" data-price-type="promo-price-with-tax" data-rel-price="promo_price_without_tax_{{ price.CUSTOMER_FAMILY_ID }}_{{ pseId }}" class="form-control-sm text-end form-control price_field automatic_price_field promo-taxed-price-input" type="text" value="{{ price.TAXED_PROMO_PRICE }}" readonly>
+        </td>
+        <td>
+            <button class="btn btn-secondary btn-sm save-promo-price" type="button"><i class="bi bi-save"></i></button>
+        </td>
+    </tr>
+{% endfor %}

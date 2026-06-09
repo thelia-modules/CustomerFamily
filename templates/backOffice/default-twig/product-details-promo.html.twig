@@ -1,0 +1,22 @@
+{% for price in calculatedPrices %}
+    <div class="mb-3">
+        <label class="form-label">
+            {{ 'Calculated prices for:'|trans({}, 'customerfamily.bo.default') }}
+            <a href="{{ path('customer_family_view') }}">{{ price.CUSTOMER_FAMILY_TITLE }}</a>
+        </label>
+        <div class="row mb-2">
+            <label class="col-md-3 col-form-label">{{ 'Untaxed'|trans({}, 'customerfamily.bo.default') }}</label>
+            <div class="col-md-8 input-group">
+                <input type="text" class="form-control" value="{{ price.CALCULATED_PROMO_PRICE }}" disabled>
+                <span class="input-group-text">{{ currencySymbol }}</span>
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-md-3 col-form-label">{{ 'Taxed'|trans({}, 'customerfamily.bo.default') }}</label>
+            <div class="col-md-8 input-group">
+                <input type="text" class="form-control" value="{{ price.CALCULATED_TAXED_PROMO_PRICE }}" disabled>
+                <span class="input-group-text">{{ currencySymbol }}</span>
+            </div>
+        </div>
+    </div>
+{% endfor %}

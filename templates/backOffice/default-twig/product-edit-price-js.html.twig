@@ -1,0 +1,113 @@
+<script>
+(function () {
+    function getJson(url, params) {
+        var qs = new URLSearchParams(params).toString();
+        return fetch(url + '?' + qs, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(function (r) { return r.json(); });
+    }
+
+    function updatePrice(price, priceType, destFieldId, productId) {
+        var taxRuleField = document.getElementById('tax_rule_field');
+        var taxRuleId = taxRuleField ? taxRuleField.value : '';
+        if (taxRuleId === '') {
+            return;
+        }
+        var operation = '';
+        if (priceType.indexOf('with-tax') !== -1) operation = 'from_tax';
+        else if (priceType.indexOf('without-tax') !== -1) operation = 'to_tax';
+
+        getJson('/admin/product/calculate-price', { price: price, action: operation, product_id: productId })
+            .then(function (json) {
+                var dest = document.getElementById(destFieldId);
+                if (dest) { dest.value = json.result; }
+            })
+            .catch(function () { /* ignore */ });
+    }
+
+    function savePrice(button, customerFamilyId, pseId, priceType, priceValue, taxedInput) {
+        var originalHtml = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<i class="bi bi-arrow-repeat"></i>';
+
+        getJson('/admin/CustomerFamily/ajax/save-price', {
+            customer_family_id: customerFamilyId,
+            pse_id: pseId,
+            price_type: priceType,
+            price_value: priceValue
+        })
+            .then(function (response) {
+                if (response && response.success) {
+                    button.classList.remove('btn-secondary');
+                    button.classList.add('btn-success');
+                    button.innerHTML = '<i class="bi bi-check-lg"></i>';
+                    if (response.taxed_price && taxedInput) { taxedInput.value = response.taxed_price; }
+                    setTimeout(function () {
+                        button.classList.remove('btn-success');
+                        button.classList.add('btn-secondary');
+                        button.innerHTML = originalHtml;
+                        button.disabled = false;
+                    }, 2000);
+                } else {
+                    button.classList.remove('btn-secondary');
+                    button.classList.add('btn-danger');
+                    button.innerHTML = '<i class="bi bi-exclamation-circle"></i>';
+                    setTimeout(function () {
+                        button.classList.remove('btn-danger');
+                        button.classList.add('btn-secondary');
+                        button.innerHTML = originalHtml;
+                        button.disabled = false;
+                    }, 3000);
+                }
+            })
+            .catch(function () {
+                button.classList.add('btn-danger');
+                button.innerHTML = '<i class="bi bi-exclamation-circle"></i>';
+                setTimeout(function () {
+                    button.classList.remove('btn-danger');
+                    button.classList.add('btn-secondary');
+                    button.innerHTML = originalHtml;
+                    button.disabled = false;
+                }, 3000);
+            });
+    }
+
+    function rowData(el) {
+        var row = el.closest('.customer-family-price-row');
+        return {
+            row: row,
+            customerFamilyId: row ? row.dataset.customerFamilyId : null,
+            pseId: row ? row.dataset.pseId : null
+        };
+    }
+
+    document.addEventListener('click', function (e) {
+        var saveBtn = e.target.closest('.save-price');
+        if (saveBtn) {
+            e.preventDefault();
+            var d = rowData(saveBtn);
+            if (!d.customerFamilyId || !d.pseId) return;
+            var price = d.row.querySelector('.standard-price-input').value;
+            savePrice(saveBtn, d.customerFamilyId, d.pseId, 'price', price, d.row.querySelector('.standard-taxed-price-input'));
+            return;
+        }
+        var savePromoBtn = e.target.closest('.save-promo-price');
+        if (savePromoBtn) {
+            e.preventDefault();
+            var dp = rowData(savePromoBtn);
+            if (!dp.customerFamilyId || !dp.pseId) return;
+            var promoPrice = dp.row.querySelector('.promo-price-input').value;
+            savePrice(savePromoBtn, dp.customerFamilyId, dp.pseId, 'promo_price', promoPrice, dp.row.querySelector('.promo-taxed-price-input'));
+        }
+    });
+
+    var debounce;
+    document.addEventListener('input', function (e) {
+        var field = e.target.closest('.automatic_price_field_family');
+        if (!field) return;
+        clearTimeout(debounce);
+        debounce = setTimeout(function () {
+            updatePrice(field.value, field.dataset.priceType, field.dataset.relPrice, field.dataset.productId);
+        }, 300);
+    });
+})();
+</script>

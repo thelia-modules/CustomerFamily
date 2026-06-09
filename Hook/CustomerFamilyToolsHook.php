@@ -15,6 +15,15 @@ use Thelia\Tools\URL;
 
 class CustomerFamilyToolsHook extends BaseHook
 {
+    public static function getSubscribedHooks(): array
+    {
+        return [
+            'main.top-menu-tools' => [
+                ['type' => 'back', 'method' => 'onMainTopMenuTools'],
+            ],
+        ];
+    }
+
     public function onMainTopMenuTools(HookRenderBlockEvent $event)
     {
         $event->add(
