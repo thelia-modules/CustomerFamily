@@ -32,7 +32,7 @@ class ProductModuleHook extends BaseHook
         );
 
         $content = $this->render(
-            'customerFamily/product-tab-content.html',
+            'customerFamily/product-tab-content.html.twig',
             [
                 'prices' => $prices,
                 'pseRefs' => array_unique($pseRefs)
