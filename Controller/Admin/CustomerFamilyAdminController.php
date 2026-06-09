@@ -49,7 +49,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class CustomerFamilyAdminController extends BaseAdminController
 {
     #[Route("", name: "_view", methods: ["GET"])]
-    public function viewAction($params = [])
+    public function viewAction(\Twig\Environment $twig)
     {
         $categoryRestrictions = [];
         $brandRestrictions = [];
@@ -148,22 +148,25 @@ class CustomerFamilyAdminController extends BaseAdminController
             $brandRestrictions[$customerFamily->getId()] = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         }
 
-        return $this->render("customer_family_module_configuration", [
-            'categoryRestrictions' => $categoryRestrictions,
-            'brandRestrictions' => $brandRestrictions,
-            'families' => $families,
-            'priceRows' => $priceRows,
-            'langs' => $langs,
-            'edit_language_id' => null !== $editLang ? $editLang->getId() : null,
-            'edit_language_locale' => $editLocale,
-            'price_mode' => (bool) CustomerFamily::getConfigValue('customer_family_price_mode', 0),
-            'createForm' => $createForm,
-            'updateForm' => $updateForm,
-            'deleteForm' => $deleteForm,
-            'updateDefaultForm' => $updateDefaultForm,
-            'priceForm' => $priceForm,
-            'priceModeForm' => $priceModeForm,
-        ]);
+        return new \Thelia\Core\HttpFoundation\Response($twig->render(
+            '@CustomerFamilyModule/backOffice/default-twig/customer_family_module_configuration.html.twig',
+            [
+                'categoryRestrictions' => $categoryRestrictions,
+                'brandRestrictions' => $brandRestrictions,
+                'families' => $families,
+                'priceRows' => $priceRows,
+                'langs' => $langs,
+                'edit_language_id' => null !== $editLang ? $editLang->getId() : null,
+                'edit_language_locale' => $editLocale,
+                'price_mode' => (bool) CustomerFamily::getConfigValue('customer_family_price_mode', 0),
+                'createForm' => $createForm,
+                'updateForm' => $updateForm,
+                'deleteForm' => $deleteForm,
+                'updateDefaultForm' => $updateDefaultForm,
+                'priceForm' => $priceForm,
+                'priceModeForm' => $priceModeForm,
+            ]
+        ));
     }
 
     /**
