@@ -148,7 +148,7 @@ class CustomerFamilyAdminController extends BaseAdminController
             $brandRestrictions[$customerFamily->getId()] = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         }
 
-        return new \Thelia\Core\HttpFoundation\Response($twig->render(
+        return new \Symfony\Component\HttpFoundation\Response($twig->render(
             '@CustomerFamilyModule/backOffice/default-twig/customer_family_module_configuration.html.twig',
             [
                 'categoryRestrictions' => $categoryRestrictions,
