@@ -148,7 +148,7 @@ class CustomerFamilyAdminController extends BaseAdminController
             $brandRestrictions[$customerFamily->getId()] = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         }
 
-        return $this->render("customer_family_module_configuration", [
+        return $this->render("customer_family_module_configuration.html.twig", [
             'categoryRestrictions' => $categoryRestrictions,
             'brandRestrictions' => $brandRestrictions,
             'families' => $families,
