@@ -420,14 +420,14 @@ class CustomerFamilyAdminController extends BaseAdminController
             ->setGeneralError($error);
 
         //Don't forget to fill the Customer form
-        $customerId = $requestStack->getCurrentRequest()->get('customer_customer_family_form')['customer_id'];
+        $customerId = $requestStack->getCurrentRequest()->request->all('customer_customer_family_form')['customer_id'];
         if (null != $customer = CustomerQuery::create()->findPk($customerId)) {
             $customerForm = $this->hydrateCustomerForm($customer);
             $parserContext->addForm($customerForm);
         }
 
         return $this->render('customer-edit', array(
-                'customer_id' => $requestStack->getCurrentRequest()->get('customer_customer_family_form')['customer_id'],
+                'customer_id' => $requestStack->getCurrentRequest()->request->all('customer_customer_family_form')['customer_id'],
                 "order_creation_error" => Translator::getInstance()->trans($error, array(), CustomerFamily::MESSAGE_DOMAIN)
             ));
     }
@@ -439,7 +439,7 @@ class CustomerFamilyAdminController extends BaseAdminController
             ->findOneById($customerFamilyId);
 
         $request = $requestStack->getCurrentRequest();
-        $restrictionEnabled = $request->get('restriction_enabled') === "on";
+        $restrictionEnabled = $request->request->get('restriction_enabled') === "on";
         $customerFamily->setCategoryRestrictionEnabled($restrictionEnabled);
         $customerFamily->save();
 
@@ -449,11 +449,9 @@ class CustomerFamilyAdminController extends BaseAdminController
         $stmt->bindValue('customerFamilyId', $customerFamilyId);
         $stmt->execute();
 
-        $brands = $request->get('available_categories');
-        if (is_array($brands)) {
-            foreach ($request->get('available_categories') as $availableCategoryId) {
-                var_dump($customerFamilyId);
-                var_dump($availableCategoryId);
+        $brands = $request->request->all('available_categories');
+        if ($brands !== []) {
+            foreach ($brands as $availableCategoryId) {
                 $customerFamilyAvailableCategory = new CustomerFamilyAvailableCategory();
                 $customerFamilyAvailableCategory->setCustomerFamilyId($customerFamilyId)
                     ->setCategoryId($availableCategoryId)
@@ -471,7 +469,7 @@ class CustomerFamilyAdminController extends BaseAdminController
             ->findOneById($customerFamilyId);
 
         $request = $requestStack->getCurrentRequest();
-        $restrictionEnabled = $request->get('restriction_enabled') === "on";
+        $restrictionEnabled = $request->request->get('restriction_enabled') === "on";
         $customerFamily->setBrandRestrictionEnabled($restrictionEnabled);
         $customerFamily->save();
 
@@ -481,11 +479,9 @@ class CustomerFamilyAdminController extends BaseAdminController
         $stmt->bindValue('customerFamilyId', $customerFamilyId);
         $stmt->execute();
 
-        $categories = $request->get('available_categories');
-        if (is_array($categories)) {
-            foreach ($request->get('available_categories') as $availableBrandId) {
-                var_dump($customerFamilyId);
-                var_dump($availableBrandId);
+        $categories = $request->request->all('available_categories');
+        if ($categories !== []) {
+            foreach ($categories as $availableBrandId) {
                 $customerFamilyAvailableBrand = new CustomerFamilyAvailableBrand();
                 $customerFamilyAvailableBrand->setCustomerFamilyId($customerFamilyId)
                     ->setBrandId($availableBrandId)
