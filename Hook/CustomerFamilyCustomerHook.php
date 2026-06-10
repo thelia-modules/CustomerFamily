@@ -2,16 +2,28 @@
 
 namespace CustomerFamily\Hook;
 
+use CustomerFamily\Form\CustomerCustomerFamilyForm;
 use CustomerFamily\Model\CustomerCustomerFamilyQuery;
 use CustomerFamily\Model\CustomerFamilyQuery;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Hook\HookRenderEvent;
+use Thelia\Core\Form\TheliaFormFactory;
 use Thelia\Core\Hook\BaseHook;
+use Thelia\Core\Template\Parser\ParserResolver;
 
 /**
  * Hooks injecting CustomerFamily widgets into the core customer admin screens.
  */
 class CustomerFamilyCustomerHook extends BaseHook
 {
+    public function __construct(
+        private readonly TheliaFormFactory $formFactory,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?ParserResolver $parserResolver = null,
+    ) {
+        parent::__construct($dispatcher, $parserResolver);
+    }
+
     public static function getSubscribedHooks(): array
     {
         return [
@@ -57,6 +69,7 @@ class CustomerFamilyCustomerHook extends BaseHook
             'customer_id' => $customerId,
             'current_family_id' => $currentFamilyId,
             'families' => $this->listFamilies(),
+            'customer_family_form' => $this->formFactory->createForm(CustomerCustomerFamilyForm::getName())->getForm()->createView(),
         ]));
     }
 

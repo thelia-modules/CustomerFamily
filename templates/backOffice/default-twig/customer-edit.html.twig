@@ -4,11 +4,11 @@
             <div class="card-header">{{ 'Family of this customer'|trans({}, 'customerfamily') }}</div>
             <div class="card-body">
                 <form class="row g-2 align-items-end" action="{{ path('customer_family_customer_update') }}" method="post">
-                    <input type="hidden" name="_token" value="{{ assignToken() }}">
-                    <input type="hidden" name="customer_id" value="{{ customer_id }}">
+                    <input type="hidden" name="{{ customer_family_form.vars.full_name }}[_token]" value="{{ customer_family_form._token.vars.value }}">
+                    <input type="hidden" name="{{ customer_family_form.vars.full_name }}[customer_id]" value="{{ customer_id }}">
                     <div class="col-md-8">
                         <label class="form-label" for="customer_customer_family_id">{{ 'Customer family'|trans({}, 'customerfamily') }} *</label>
-                        <select name="customer_family_id" id="customer_customer_family_id" class="form-control">
+                        <select name="{{ customer_family_form.vars.full_name }}[customer_family_id]" id="customer_customer_family_id" class="form-control">
                             {% for family in families %}
                                 <option data-code="{{ family.code }}" value="{{ family.id }}" {{ current_family_id == family.id ? 'selected' : '' }}>{{ family.title }}</option>
                             {% endfor %}

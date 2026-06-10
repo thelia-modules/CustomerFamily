@@ -56,8 +56,8 @@
                             <tbody>
                                 {% if families is not empty %}
                                     <form action="{{ path('customer_family_update-default') }}" method="post" id="update-default-family-form" data-cf-config-target="defaultForm">
-                                        <input type="hidden" name="customer_family_id" id="default_family_id">
-                                        <input type="hidden" name="_token" value="{{ assignToken() }}">
+                                        <input type="hidden" name="{{ updateDefaultForm.vars.full_name }}[customer_family_id]" id="default_family_id">
+                                        <input type="hidden" name="{{ updateDefaultForm.vars.full_name }}[_token]" value="{{ updateDefaultForm._token.vars.value }}">
                                     </form>
                                     {% for family in families %}
                                         <tr>
@@ -81,13 +81,13 @@
                                 <tr>
                                     <td colspan="5">
                                         <form action="{{ path('customer_family_create') }}" method="POST" class="row row-cols-lg-auto g-2 align-items-center justify-content-center">
-                                            <input type="hidden" name="_token" value="{{ assignToken() }}">
-                                            <input type="hidden" name="locale" value="{{ edit_language_locale }}">
+                                            <input type="hidden" name="{{ createForm.vars.full_name }}[_token]" value="{{ createForm._token.vars.value }}">
+                                            <input type="hidden" name="{{ createForm.vars.full_name }}[locale]" value="{{ edit_language_locale }}">
                                             <div class="col">
-                                                <input class="form-control" type="text" required placeholder="{{ 'Code'|trans({}, 'customerfamily') }}" name="code">
+                                                <input class="form-control" type="text" required placeholder="{{ 'Code'|trans({}, 'customerfamily') }}" name="{{ createForm.vars.full_name }}[code]">
                                             </div>
                                             <div class="col">
-                                                <input class="form-control" type="text" required placeholder="{{ 'Title'|trans }}" name="title">
+                                                <input class="form-control" type="text" required placeholder="{{ 'Title'|trans }}" name="{{ createForm.vars.full_name }}[title]">
                                             </div>
                                             <div class="col">
                                                 <button type="submit" class="btn btn-primary">{{ 'Add'|trans }}</button>
@@ -104,7 +104,7 @@
                 <div class="modal js-modal-delete" tabindex="-1" data-cf-config-target="deleteModal" aria-hidden="true">
                     <div class="modal-dialog">
                         <form action="" method="POST" data-cf-config-target="deleteFormEl">
-                            <input type="hidden" name="_token" value="{{ assignToken() }}">
+                            <input type="hidden" name="{{ deleteForm.vars.full_name }}[_token]" value="{{ deleteForm._token.vars.value }}">
                             <div class="modal-content">
                                 <div class="modal-body">{{ 'Do you really want to delete this customer family ?'|trans({}, 'customerfamily.bo.default') }}</div>
                                 <div class="modal-footer">
@@ -120,17 +120,17 @@
                 <div class="modal js-modal-update" tabindex="-1" data-cf-config-target="updateModal" aria-hidden="true">
                     <div class="modal-dialog">
                         <form action="" method="POST" data-cf-config-target="updateFormEl">
-                            <input type="hidden" name="_token" value="{{ assignToken() }}">
-                            <input type="hidden" name="locale" value="{{ edit_language_locale }}">
+                            <input type="hidden" name="{{ updateForm.vars.full_name }}[_token]" value="{{ updateForm._token.vars.value }}">
+                            <input type="hidden" name="{{ updateForm.vars.full_name }}[locale]" value="{{ edit_language_locale }}">
                             <div class="modal-content">
                                 <div class="modal-body">
                                     <div class="mb-3">
                                         <label class="form-label">{{ 'Code'|trans({}, 'customerfamily') }}</label>
-                                        <input class="form-control js-field-code" type="text" required name="code" data-cf-config-target="updateCode">
+                                        <input class="form-control js-field-code" type="text" required name="{{ updateForm.vars.full_name }}[code]" data-cf-config-target="updateCode">
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label">{{ 'Title'|trans }}</label>
-                                        <input class="form-control js-field-title" type="text" required name="title" data-cf-config-target="updateTitle">
+                                        <input class="form-control js-field-title" type="text" required name="{{ updateForm.vars.full_name }}[title]" data-cf-config-target="updateTitle">
                                     </div>
                                 </div>
                                 <div class="modal-footer">
@@ -144,9 +144,9 @@
 
                 <div class="mt-3">
                     <form action="{{ path('customer_family_update_price') }}" method="post">
-                        <input type="hidden" name="_token" value="{{ assignToken() }}">
+                        <input type="hidden" name="{{ priceModeForm.vars.full_name }}[_token]" value="{{ priceModeForm._token.vars.value }}">
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="price_mode" id="customer_family_price_mode_price_mode" value="1" {{ price_mode ? 'checked' : '' }} onchange="this.form.submit()">
+                            <input class="form-check-input" type="checkbox" name="{{ priceModeForm.vars.full_name }}[price_mode]" id="customer_family_price_mode_price_mode" value="1" {{ price_mode ? 'checked' : '' }} onchange="this.form.submit()">
                             <label class="form-check-label" for="customer_family_price_mode_price_mode">{{ 'Use the product price'|trans({}, 'customerfamily') }}</label>
                         </div>
                         <div class="form-text">{{ 'By checking this check box this module will use the product price of Thelia instead of the the purchase price of CustomerFamily'|trans({}, 'customerfamily') }}</div>
@@ -178,16 +178,16 @@
                             <tr>
                                 <td>
                                     <form action="{{ path('customer_family_update_price_calculation') }}" method="post" class="row g-2 align-items-center">
-                                        <input type="hidden" name="_token" value="{{ assignToken() }}">
-                                        <input type="hidden" name="promo" value="{{ row.promo }}">
-                                        <input type="hidden" name="customer_family_id" value="{{ row.customer_family_id }}">
+                                        <input type="hidden" name="{{ priceForm.vars.full_name }}[_token]" value="{{ priceForm._token.vars.value }}">
+                                        <input type="hidden" name="{{ priceForm.vars.full_name }}[promo]" value="{{ row.promo }}">
+                                        <input type="hidden" name="{{ priceForm.vars.full_name }}[customer_family_id]" value="{{ row.customer_family_id }}">
                                         <div class="col-auto">{{ row.title }}{% if row.promo %} - {{ 'Promo'|trans({}, 'customerfamily.bo.default') }}{% endif %}</div>
                                 </td>
-                                <td><input type="checkbox" class="form-check-input" name="use_equation" {{ row.use_equation ? 'checked' : '' }}></td>
-                                <td><input type="number" class="form-control" name="amount_added_before" step="any" value="{{ row.amount_added_before }}"></td>
-                                <td><input type="number" class="form-control" name="coefficient" step="any" value="{{ row.coefficient }}"></td>
-                                <td><input type="number" class="form-control" name="amount_added_after" step="any" value="{{ row.amount_added_after }}"></td>
-                                <td><input type="checkbox" class="form-check-input" name="is_taxed" {{ row.is_taxed ? 'checked' : '' }}></td>
+                                <td><input type="checkbox" class="form-check-input" name="{{ priceForm.vars.full_name }}[use_equation]" {{ row.use_equation ? 'checked' : '' }}></td>
+                                <td><input type="number" class="form-control" name="{{ priceForm.vars.full_name }}[amount_added_before]" step="any" value="{{ row.amount_added_before }}"></td>
+                                <td><input type="number" class="form-control" name="{{ priceForm.vars.full_name }}[coefficient]" step="any" value="{{ row.coefficient }}"></td>
+                                <td><input type="number" class="form-control" name="{{ priceForm.vars.full_name }}[amount_added_after]" step="any" value="{{ row.amount_added_after }}"></td>
+                                <td><input type="checkbox" class="form-check-input" name="{{ priceForm.vars.full_name }}[is_taxed]" {{ row.is_taxed ? 'checked' : '' }}></td>
                                 <td><button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i></button></form></td>
                             </tr>
                         {% endfor %}
