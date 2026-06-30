@@ -29,13 +29,14 @@ class CustomerFamilyProductPriceLoop extends BaseLoop implements PropelSearchLoo
 
     public function buildModelCriteria(): ModelCriteria
     {
-        /** @var Session $session */
-        $session = $this->getCurrentRequest()->getSession();
+        $request = $this->getCurrentRequest();
 
         $pseId = $this->getPseId();
 
         if (!$locale = $this->getLocale()) {
-            $locale = $session->getAdminEditionLang()->getLocale();
+            $locale = (null !== $request && $request->hasSession())
+                ? $request->getSession()->getAdminEditionLang()->getLocale()
+                : (\Thelia\Model\LangQuery::create()->findOneByByDefault(true)?->getLocale() ?? 'en_US');
         }
 
         $query = CustomerFamilyQuery::create('cf');

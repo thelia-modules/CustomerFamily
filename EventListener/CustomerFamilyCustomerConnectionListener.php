@@ -59,7 +59,12 @@ class CustomerFamilyCustomerConnectionListener implements EventSubscriberInterfa
             return;
         }
 
-        $cart = $this->requestStack->getCurrentRequest()->getSession()->getSessionCart($this->dispatcher);
+        $request = $this->requestStack->getCurrentRequest();
+        if (null === $request || !$request->hasSession()) {
+            return;
+        }
+
+        $cart = $request->getSession()->getSessionCart($this->dispatcher);
 
         foreach ($cart->getCartItems() as $cartItem) {
             $this->customerFamilyService->setCustomerFamilyPriceToCartItem(

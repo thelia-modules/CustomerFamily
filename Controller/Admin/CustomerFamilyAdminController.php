@@ -201,7 +201,7 @@ class CustomerFamilyAdminController extends BaseAdminController
             CustomerFamily::MODULE_DOMAIN
         );
 
-        return $this->renderAdminConfig($form, $message, $error, $parserContext, $requestStack->getCurrentRequest()->getSession());
+        return $this->renderAdminConfig($form, $message, $error, $parserContext, $requestStack->getCurrentRequest()?->hasSession() ? $requestStack->getCurrentRequest()->getSession() : null);
     }
 
     /**
@@ -243,7 +243,7 @@ class CustomerFamilyAdminController extends BaseAdminController
             CustomerFamily::MODULE_DOMAIN
         );
 
-        return $this->renderAdminConfig($form, $message, $error, $parserContext, $requestStack->getCurrentRequest()->getSession());
+        return $this->renderAdminConfig($form, $message, $error, $parserContext, $requestStack->getCurrentRequest()?->hasSession() ? $requestStack->getCurrentRequest()->getSession() : null);
     }
 
     /**
@@ -347,7 +347,7 @@ class CustomerFamilyAdminController extends BaseAdminController
             CustomerFamily::MODULE_DOMAIN
         );
 
-        return $this->renderAdminConfig($form, $message, $error, $parserContext, $requestStack->getCurrentRequest()->getSession());
+        return $this->renderAdminConfig($form, $message, $error, $parserContext, $requestStack->getCurrentRequest()?->hasSession() ? $requestStack->getCurrentRequest()->getSession() : null);
     }
 
     /**
@@ -356,7 +356,7 @@ class CustomerFamilyAdminController extends BaseAdminController
      * @param string $errorMessage
      * @return \Symfony\Component\HttpFoundation\Response|static
      */
-    protected function renderAdminConfig($form, $successMessage, $errorMessage, ParserContext $parserContext, SessionInterface $session)
+    protected function renderAdminConfig($form, $successMessage, $errorMessage, ParserContext $parserContext, ?SessionInterface $session = null)
     {
         if (!empty($errorMessage)) {
             $form->setErrorMessage($errorMessage);
@@ -367,7 +367,7 @@ class CustomerFamilyAdminController extends BaseAdminController
         }
 
         //for compatibility 2.0
-        if (method_exists($session, "getFlashBag")) {
+        if (null !== $session && method_exists($session, "getFlashBag")) {
             if (empty($errorMessage)) {
                 $session->getFlashBag()->add("success", $successMessage);
             } else {
@@ -459,7 +459,7 @@ class CustomerFamilyAdminController extends BaseAdminController
             }
         }
 
-        return $this->renderAdminConfig(null, "", "", $parserContext, $request->getSession());
+        return $this->renderAdminConfig(null, "", "", $parserContext, (null !== $request && $request->hasSession()) ? $request->getSession() : null);
     }
 
     #[Route("/brand_restriction/{customerFamilyId}", name: "_brand_restriction", methods: ["POST"])]
@@ -489,7 +489,7 @@ class CustomerFamilyAdminController extends BaseAdminController
             }
         }
 
-        return $this->renderAdminConfig(null, "", "", $parserContext, $request->getSession());
+        return $this->renderAdminConfig(null, "", "", $parserContext, (null !== $request && $request->hasSession()) ? $request->getSession() : null);
     }
 
     /**

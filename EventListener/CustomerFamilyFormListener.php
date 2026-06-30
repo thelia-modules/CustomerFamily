@@ -104,7 +104,13 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
     public function addCustomerFamilyFieldsForUpdate(TheliaFormEvent $event)
     {
         // Adding new fields
-        $customer = $this->requestStack->getCurrentRequest()->getSession()->getCustomerUser();
+        $request = $this->requestStack->getCurrentRequest();
+        if (null === $request || !$request->hasSession()) {
+            // No session => no connected customer => stop here
+            return;
+        }
+
+        $customer = $request->getSession()->getCustomerUser();
 
         if (is_null($customer)) {
             // No customer => no account update => stop here
