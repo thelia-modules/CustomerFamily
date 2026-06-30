@@ -94,6 +94,10 @@ class CustomerFamilyPriceController extends BaseAdminController
     #[Route("/CustomerFamily/selectPriceMode", name: "_update_price", methods: ["POST"])]
     public function updatePriceModeAction()
     {
+        if (null !== $response = $this->checkAuth([AdminResources::MODULE], ['CustomerFamily'], AccessManager::UPDATE)) {
+            return $response;
+        }
+
         $form = $this->createForm(CustomerFamilyPriceModeForm::getName());
         $vForm = $this->validateForm($form);
 
