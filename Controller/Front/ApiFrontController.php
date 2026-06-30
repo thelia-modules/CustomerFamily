@@ -34,7 +34,11 @@ final class ApiFrontController extends BaseFrontController
     #[Route('', name: '_get', methods: ['GET'])]
     public function getCustomerFamilies(Request $request): JsonResponse
     {
-        $locale = $request->get('locale', $request->getSession()->getLang()->getLocale());
+        $defaultLocale = $request->hasSession()
+            ? $request->getSession()->getLang()->getLocale()
+            : (\Thelia\Model\LangQuery::create()->findOneByByDefault(true)?->getLocale() ?? 'en_US');
+
+        $locale = $request->query->get('locale', $defaultLocale);
 
         $customerFamilies = CustomerFamilyQuery::create()->find();
 
