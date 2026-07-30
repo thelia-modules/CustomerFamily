@@ -2,6 +2,7 @@
 
 namespace CustomerFamily\Hook;
 
+use CustomerFamily\EventListener\ProductCreationFormListener;
 use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\Hook\BaseHook;
 use Thelia\Model\Currency;
@@ -27,6 +28,8 @@ class CustomerFamilyProductHook extends BaseHook
         $event->add($this->render('product-create-form.html.twig', [
             'currencySymbol' => $currency->getSymbol(),
             'currencyName' => $currency->getName(),
+            'form_name' => ProductCreationFormListener::THELIA_PRODUCT_CREATION_FORM_NAME,
+            'field_name' => ProductCreationFormListener::PURCHASE_PRICE_FIELD_NAME,
         ]));
     }
 }

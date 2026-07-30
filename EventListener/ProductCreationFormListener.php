@@ -21,6 +21,11 @@ use Thelia\Core\Translation\Translator;
  */
 class ProductCreationFormListener implements EventSubscriberInterface
 {
+    /** 'thelia_product_creation' is the name of the form used to create products (Thelia\Form\ProductCreationForm). */
+    const THELIA_PRODUCT_CREATION_FORM_NAME = 'thelia_product_creation';
+
+    const PURCHASE_PRICE_FIELD_NAME = 'purchase_price';
+
     /** @var RequestStack */
     protected $requestStack;
 
@@ -40,7 +45,7 @@ class ProductCreationFormListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            TheliaEvents::FORM_AFTER_BUILD.'.thelia_product_creation'  => ['addPurchasePriceOnProductCreation', 128],
+            TheliaEvents::FORM_AFTER_BUILD.'.'.self::THELIA_PRODUCT_CREATION_FORM_NAME  => ['addPurchasePriceOnProductCreation', 128],
             TheliaEvents::PRODUCT_CREATE => ['createProductPurchasePrice', 96]
         ];
     }
@@ -54,14 +59,14 @@ class ProductCreationFormListener implements EventSubscriberInterface
     {
         $event->getForm()->getFormBuilder()
             ->add(
-                'purchase_price',
+                self::PURCHASE_PRICE_FIELD_NAME,
                 NumberType::class,
                 [
                     'constraints' => [
                         new Constraints\GreaterThanOrEqual(['value' => 0])
                     ],
                     'label' => self::trans('Purchase price'),
-                    'label_attr' => ['for' => 'purchase_price']
+                    'label_attr' => ['for' => self::PURCHASE_PRICE_FIELD_NAME]
                 ]
             )
         ;

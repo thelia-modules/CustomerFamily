@@ -2,6 +2,7 @@
 
 namespace CustomerFamily\Hook;
 
+use CustomerFamily\EventListener\CustomerFamilyFormListener;
 use CustomerFamily\Form\CustomerCustomerFamilyForm;
 use CustomerFamily\Model\CustomerCustomerFamilyQuery;
 use CustomerFamily\Model\CustomerFamilyQuery;
@@ -43,6 +44,8 @@ class CustomerFamilyCustomerHook extends BaseHook
     {
         $event->add($this->render('customer-create.html.twig', [
             'families' => $this->listFamilies(),
+            'form_name' => CustomerFamilyFormListener::THELIA_CUSTOMER_CREATE_FORM_NAME,
+            'field_name' => CustomerFamilyFormListener::CUSTOMER_FAMILY_CODE_FIELD_NAME,
         ]));
     }
 
