@@ -7,8 +7,8 @@ use CustomerFamily\Event\CustomerFamilyPriceChangeEvent;
 use CustomerFamily\Service\CustomerFamilyService;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Thelia\Core\Event\ProductSaleElement\PseByProductEvent;
 use Thelia\Core\Security\SecurityContext;
-use TheliaSmarty\Events\PseByProductEvent;
 
 class PseByProductListener implements EventSubscriberInterface
 {
