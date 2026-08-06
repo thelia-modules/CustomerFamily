@@ -16,7 +16,7 @@ use CustomerFamily\Model\CustomerFamilyQuery;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurator;
 use Symfony\Component\Finder\Finder;
-use Thelia\Install\Database;
+use Thelia\Core\Install\Database;
 use Thelia\Module\BaseModule;
 use CustomerFamily\Model\CustomerFamily as CustomerFamilyModel;
 
@@ -42,7 +42,7 @@ class CustomerFamily extends BaseModule
     /**
      * @param ConnectionInterface $con
      */
-    public function postActivation(ConnectionInterface $con = null): void
+    public function postActivation(?ConnectionInterface $con = null): void
     {
 
         try {
@@ -63,7 +63,7 @@ class CustomerFamily extends BaseModule
         self::getCustomerFamilyByCode(self::CUSTOMER_FAMILY_PROFESSIONAL, "Professional", "en_US");
     }
 
-    public function update($currentVersion, $newVersion, ConnectionInterface $con = null): void
+    public function update($currentVersion, $newVersion, ?ConnectionInterface $con = null): void
     {
         $finder = Finder::create()
             ->name('*.sql')

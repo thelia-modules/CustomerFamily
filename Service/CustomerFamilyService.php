@@ -37,7 +37,7 @@ class CustomerFamilyService
         $this->taxEngine = $taxEngine;
     }
 
-    public function getCustomerCustomerFamilyId(int $customerId = null): ?int
+    public function getCustomerCustomerFamilyId(?int $customerId = null): ?int
     {
         $customerFamily = null;
 
