@@ -25,7 +25,7 @@ class CustomerFamilyEvent extends ActionEvent
     /** @var CustomerFamily */
     private $customerFamily;
 
-    public function __construct(CustomerFamily $customerFamily = null)
+    public function __construct(?CustomerFamily $customerFamily = null)
     {
         if ($customerFamily !== null) {
             $this->customerFamily = $customerFamily;
