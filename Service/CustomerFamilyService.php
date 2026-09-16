@@ -132,6 +132,13 @@ class CustomerFamilyService
 
         $prices = $this->calculateCustomerFamilyPsePrice($productSaleElements, $customerFamilyId, $currencyId);
 
+        // No customer family price applies to this sale element. The line keeps
+        // whatever the core has just worked out for it — a reserved sale price,
+        // for instance — instead of being reset to the catalog.
+        if (null === ($prices['price'] ?? null) && null === ($prices['promoPrice'] ?? null)) {
+            return $cartItem;
+        }
+
         if (isset($prices['promo'])) {
             $cartItem->setPromo($prices['promo']);
         }
