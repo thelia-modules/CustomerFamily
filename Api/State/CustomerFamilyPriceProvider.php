@@ -12,18 +12,12 @@
 
 namespace CustomerFamily\Api\State;
 
-use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
-use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
 use CustomerFamily\Api\Resource\CustomerFamilyProductPrice;
 use CustomerFamily\Model\CustomerFamilyProductPriceQuery;
 use CustomerFamily\Model\CustomerFamilyQuery;
 use Thelia\Api\Bridge\Propel\Service\ApiResourcePropelTransformerService;
-use Thelia\Model\ProductSaleElementsQuery;
-use TntSearch\Index\Customer;
 
 class CustomerFamilyPriceProvider implements ProviderInterface
 {
