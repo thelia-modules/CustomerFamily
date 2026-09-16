@@ -81,9 +81,13 @@ use Thelia\Api\Resource\PropelResourceTrait;
         ),
         new Put(
             uriTemplate: '/admin/customer_family_product_prices/{productSaleElementsId}/family/{customerFamilyCode}',
+            uriVariables: ['productSaleElementsId', 'customerFamilyCode'],
+            provider: CustomerFamilyPriceProvider::class,
         ),
         new Delete(
             uriTemplate: '/admin/customer_family_product_prices/{productSaleElementsId}/family/{customerFamilyCode}',
+            uriVariables: ['productSaleElementsId', 'customerFamilyCode'],
+            provider: CustomerFamilyPriceProvider::class,
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_ADMIN_READ]],
