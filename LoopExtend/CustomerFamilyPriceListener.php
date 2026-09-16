@@ -68,7 +68,16 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
             return;
         }
 
-        $this->addCustomerFamilyProductPriceColumns($event->getModelCriteria(), $customerFamilyId);
+        $search = $event->getModelCriteria();
+        $pseAlias = $this->productSaleElementsAlias($search);
+
+        // A product query with no sale elements join has nothing to hang a per-sale-element
+        // price on, and referring to a table it does not select would break the whole loop.
+        if ($search instanceof ProductQuery && null === $pseAlias) {
+            return;
+        }
+
+        $this->addCustomerFamilyProductPriceColumns($search, $customerFamilyId, $pseAlias);
 
         // Get associated prices
         $customerFamilyPrice = $this->customerFamilyService->getCustomerFamilyPrice($customerFamilyId, 0, 1);
@@ -81,8 +90,6 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
 
         // Get currency & search
         $currencyId = Currency::getDefaultCurrency()->getId();
-        $search = $event->getModelCriteria();
-        $searchType = $search instanceof ProductQuery ? 'pse' : null;
 
         $tableName = $useProductPrice ?  ProductPriceTableMap::TABLE_NAME : ProductPurchasePriceTableMap::TABLE_NAME;
         $colCurrencyId = $useProductPrice ? ProductPriceTableMap::COL_CURRENCY_ID : ProductPurchasePriceTableMap::COL_CURRENCY_ID;
@@ -93,7 +100,7 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
         $productPurchasePriceJoin->addExplicitCondition(
             ProductSaleElementsTableMap::TABLE_NAME,
             'ID',
-            $searchType,
+            $pseAlias,
             $tableName,
             'PRODUCT_SALE_ELEMENTS_ID'
         );
@@ -181,10 +188,31 @@ class CustomerFamilyPriceListener implements EventSubscriberInterface
         }
     }
 
-    private function addCustomerFamilyProductPriceColumns(ModelCriteria $query, int $customerFamilyId)
+    /**
+     * The alias the loop gave to the product_sale_elements table it joined. The product
+     * loop names it `pse` when it joins prices itself, and `global` when it runs in
+     * complex mode, so the alias is read from the query rather than assumed.
+     *
+     * Null when the query already selects sale elements, and null as well when a product
+     * query joined none at all — the caller tells the two apart.
+     */
+    private function productSaleElementsAlias(ModelCriteria $query): ?string
     {
-        $pseAlias = $query instanceof ProductQuery ? 'pse' : null;
+        if (!$query instanceof ProductQuery) {
+            return null;
+        }
 
+        foreach ($query->getJoins() as $join) {
+            if (ProductSaleElementsTableMap::TABLE_NAME === $join->getRightTableName()) {
+                return $join->getRightTableAliasOrName();
+            }
+        }
+
+        return null;
+    }
+
+    private function addCustomerFamilyProductPriceColumns(ModelCriteria $query, int $customerFamilyId, ?string $pseAlias)
+    {
         $customerFamilyProductPriceJoin = new Join(null, null, Criteria::LEFT_JOIN);
         $customerFamilyProductPriceJoin->addExplicitCondition(
             ProductSaleElementsTableMap::TABLE_NAME,
