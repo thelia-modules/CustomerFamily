@@ -13,6 +13,7 @@
 namespace CustomerFamily;
 
 use CustomerFamily\Model\CustomerFamilyQuery;
+use CustomerFamily\Service\InstallSql;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurator;
 use Symfony\Component\Finder\Finder;
@@ -45,11 +46,24 @@ class CustomerFamily extends BaseModule
     public function postActivation(?ConnectionInterface $con = null): void
     {
 
-        try {
-            CustomerFamilyQuery::create()->findOne();
-        } catch (\Exception $e) {
-            $database = new Database($con);
-            $database->insertSql(null, [__DIR__ . "/Config/TheliaMain.sql"]);
+        $database = new Database($con);
+        $installSql = InstallSql::keepingExistingTables((string) file_get_contents(__DIR__ . "/Config/TheliaMain.sql"));
+
+        // A table creation commits the transaction of the activation: run the script only when a table is missing.
+        if (self::hasMissingTable($database, InstallSql::createdTables($installSql))) {
+            $installScript = tempnam(sys_get_temp_dir(), 'customerfamily');
+
+            if (false === $installScript) {
+                throw new \RuntimeException('Unable to write the CustomerFamily install script to the temporary directory');
+            }
+
+            file_put_contents($installScript, $installSql);
+
+            try {
+                $database->insertSql(null, [$installScript]);
+            } finally {
+                unlink($installScript);
+            }
         }
 
         //Generate the 2 defaults customer_family
@@ -61,6 +75,26 @@ class CustomerFamily extends BaseModule
         //Professional
         self::getCustomerFamilyByCode(self::CUSTOMER_FAMILY_PROFESSIONAL, "Professionnel", "fr_FR");
         self::getCustomerFamilyByCode(self::CUSTOMER_FAMILY_PROFESSIONAL, "Professional", "en_US");
+    }
+
+    /**
+     * @param list<string> $tables
+     */
+    private static function hasMissingTable(Database $database, array $tables): bool
+    {
+        if ([] === $tables) {
+            return false;
+        }
+
+        $existing = (int) $database->execute(
+            sprintf(
+                'SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name IN (%s)',
+                implode(', ', array_fill(0, \count($tables), '?'))
+            ),
+            $tables
+        )->fetchColumn();
+
+        return $existing < \count($tables);
     }
 
     public function update($currentVersion, $newVersion, ?ConnectionInterface $con = null): void
@@ -133,7 +167,8 @@ class CustomerFamily extends BaseModule
     public static function configureServices(ServicesConfigurator $servicesConfigurator): void
     {
         $servicesConfigurator->load(self::getModuleCode().'\\', __DIR__)
-            ->exclude([__DIR__.'/I18n/*'])
+            // The tests are no services of the shop, and PHPUnit is not installed with it.
+            ->exclude([__DIR__.'/I18n/*', __DIR__.'/Tests/*'])
             ->autowire()
             ->autoconfigure();
     }
