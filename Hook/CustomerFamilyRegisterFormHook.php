@@ -24,6 +24,10 @@ class CustomerFamilyRegisterFormHook extends BaseHook
      */
     public function onRegisterFormBottom(HookRenderEvent $event)
     {
+        if (!CustomerFamily::customerCanChooseFamily()) {
+            return;
+        }
+
         $event->add($this->render(
             'register.html',
             array(
@@ -39,6 +43,10 @@ class CustomerFamilyRegisterFormHook extends BaseHook
      */
     public function onRegisterAfterJSInclude(HookRenderEvent $event)
     {
+        if (!CustomerFamily::customerCanChooseFamily()) {
+            return;
+        }
+
         $event->add($this->addJS('assets/js/register.js'));
     }
 }

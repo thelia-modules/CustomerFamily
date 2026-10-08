@@ -152,6 +152,17 @@
                         <div class="form-text">{{ 'By checking this check box this module will use the product price of Thelia instead of the the purchase price of CustomerFamily'|trans({}, 'customerfamily') }}</div>
                     </form>
                 </div>
+
+                <div class="mt-3">
+                    <form action="{{ path('customer_family_customer_choice') }}" method="post">
+                        <input type="hidden" name="{{ customerChoiceForm.vars.full_name }}[_token]" value="{{ customerChoiceForm._token.vars.value }}">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="{{ customerChoiceForm.vars.full_name }}[customer_can_choose_family]" id="customer_family_customer_choice_customer_can_choose_family" value="1" {{ customer_can_choose_family ? 'checked' : '' }} onchange="this.form.submit()">
+                            <label class="form-check-label" for="customer_family_customer_choice_customer_can_choose_family">{{ 'Let customers choose their family'|trans({}, 'customerfamily') }}</label>
+                        </div>
+                        <div class="form-text">{{ 'When checked, customers pick their family on the register and account forms. Otherwise only an administrator sets it.'|trans({}, 'customerfamily') }}</div>
+                    </form>
+                </div>
             </div>
 
             {# ---------------- Prices definition tab ---------------- #}
@@ -201,6 +212,7 @@
                     <div class="card mb-3">
                         <div class="card-body">
                             <form method="post" action="{{ path('customer_family_category_restriction', {customerFamilyId: family.id}) }}">
+                                <input type="hidden" name="_token" value="{{ assignToken() }}">
                                 <h5 class="card-title">{{ family.title }}</h5>
                                 <div class="form-check mb-2">
                                     <input name="restriction_enabled" class="form-check-input restriction_toggler" id="category_restriction_{{ family.id }}" type="checkbox" data-action="cf-config#toggleRestriction" data-target-id="toggled_by_category_restriction_{{ family.id }}" {{ family.category_restriction_enabled ? 'checked' : '' }}>
@@ -227,6 +239,7 @@
                     <div class="card mb-3">
                         <div class="card-body">
                             <form method="post" action="{{ path('customer_family_brand_restriction', {customerFamilyId: family.id}) }}">
+                                <input type="hidden" name="_token" value="{{ assignToken() }}">
                                 <h5 class="card-title">{{ family.title }}</h5>
                                 <div class="form-check mb-2">
                                     <input name="restriction_enabled" class="form-check-input restriction_toggler" id="brand_restriction_{{ family.id }}" type="checkbox" data-action="cf-config#toggleRestriction" data-target-id="toggled_by_brand_restriction_{{ family.id }}" {{ family.brand_restriction_enabled ? 'checked' : '' }}>

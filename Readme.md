@@ -30,6 +30,8 @@ This module is visible in the BackOffice Customer Edit.
 
 Use the first tab to create, edit or remove families. You can also define default family, use to show specific price to unlogged customers.
 
+By default only an administrator sets the family of a customer. Tick "Let customers choose their family" in the first tab to let customers pick it on the register and account forms.
+
 The second tab allows you to define how prices are calculated for each family, depending on the products purchase price.
 
 Product's prices are automatically changed in the 'product' loop, you don't need to use 'customer_family_pse_calculated_prices' loop (see below) to get product's prices.

@@ -10,35 +10,30 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace CustomerFamily\Hook;
+namespace CustomerFamily\Form;
 
 use CustomerFamily\CustomerFamily;
-use Thelia\Core\Event\Hook\HookRenderEvent;
-use Thelia\Core\Hook\BaseHook;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Thelia\Form\BaseForm;
 
-class CustomerFamilyUpdateFormHook extends BaseHook
+class CustomerFamilyCustomerChoiceForm extends BaseForm
 {
-    public function onAccountUpdateFormBottom(HookRenderEvent $event)
+    public static function getName(): string
     {
-        if (!CustomerFamily::customerCanChooseFamily()) {
-            return;
-        }
-
-        $event->add($this->render(
-            'account-update.html',
-            array(
-                'form' => $event->getArgument('form'),
-                'messageDomain' => CustomerFamily::MESSAGE_DOMAIN,
-            )
-        ));
+        return 'customer_family_customer_choice';
     }
 
-    public function onAccountUpdateAfterJSInclude(HookRenderEvent $event)
+    protected function buildForm()
     {
-        if (!CustomerFamily::customerCanChooseFamily()) {
-            return;
-        }
-
-        $event->add($this->addJS('assets/js/update.js'));
+        $this->formBuilder
+            ->add(
+                'customer_can_choose_family',
+                CheckboxType::class,
+                [
+                    'label' => $this->translator->trans('Let customers choose their family', [], CustomerFamily::MESSAGE_DOMAIN),
+                    'data' => CustomerFamily::customerCanChooseFamily(),
+                    'required' => false,
+                ]
+            );
     }
 }

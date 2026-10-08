@@ -69,6 +69,10 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
 
     public function addCustomerFamilyFieldsForRegister(TheliaFormEvent $event)
     {
+        if (!CustomerFamily::customerCanChooseFamily()) {
+            return;
+        }
+
         // Retrieving CustomerFamily choices
         $customerFamilyChoices = array();
 
@@ -103,6 +107,10 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
 
     public function addCustomerFamilyFieldsForUpdate(TheliaFormEvent $event)
     {
+        if (!CustomerFamily::customerCanChooseFamily()) {
+            return;
+        }
+
         // Adding new fields
         $request = $this->requestStack->getCurrentRequest();
         if (null === $request || !$request->hasSession()) {

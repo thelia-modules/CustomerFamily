@@ -40,6 +40,9 @@ class CustomerFamily extends BaseModule
     /** @cont string */
     public const CUSTOMER_FAMILY_PROFESSIONAL = "professional";
 
+    /** Module configuration key: when set, customers pick their own family on the register and account forms. */
+    public const CUSTOMER_CAN_CHOOSE_FAMILY = 'customer_can_choose_family';
+
     /**
      * @param ConnectionInterface $con
      */
@@ -113,6 +116,11 @@ class CustomerFamily extends BaseModule
                 $database->insertSql(null, [$file->getPathname()]);
             }
         }
+    }
+
+    public static function customerCanChooseFamily(): bool
+    {
+        return (bool) self::getConfigValue(self::CUSTOMER_CAN_CHOOSE_FAMILY, false);
     }
 
     /**

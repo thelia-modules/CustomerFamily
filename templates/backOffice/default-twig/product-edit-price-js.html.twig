@@ -24,12 +24,21 @@
             .catch(function () { /* ignore */ });
     }
 
+    function postJson(url, params) {
+        return fetch(url, {
+            method: 'POST',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            body: new URLSearchParams(params)
+        }).then(function (r) { return r.json(); });
+    }
+
     function savePrice(button, customerFamilyId, pseId, priceType, priceValue, taxedInput) {
         var originalHtml = button.innerHTML;
         button.disabled = true;
         button.innerHTML = '<i class="bi bi-arrow-repeat"></i>';
 
-        getJson('/admin/CustomerFamily/ajax/save-price', {
+        postJson('{{ path('customer_family_updatepse__price') }}', {
+            _token: '{{ assignToken() }}',
             customer_family_id: customerFamilyId,
             pse_id: pseId,
             price_type: priceType,
