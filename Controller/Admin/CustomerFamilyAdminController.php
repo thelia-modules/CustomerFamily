@@ -17,6 +17,7 @@ use CustomerFamily\Event\CustomerCustomerFamilyEvent;
 use CustomerFamily\Event\CustomerFamilyEvent;
 use CustomerFamily\Event\CustomerFamilyEvents;
 use CustomerFamily\Form\CustomerCustomerFamilyForm;
+use CustomerFamily\Form\CustomerFamilyCustomerChoiceForm;
 use CustomerFamily\Form\CustomerFamilyCreateForm;
 use CustomerFamily\Form\CustomerFamilyDeleteForm;
 use CustomerFamily\Form\CustomerFamilyUpdateDefaultForm;
@@ -28,6 +29,7 @@ use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Thelia\Controller\Admin\BaseAdminController;
@@ -42,6 +44,7 @@ use Thelia\Form\CustomerUpdateForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerQuery;
+use Thelia\Tools\TokenProvider;
 use Thelia\Tools\URL;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -110,6 +113,7 @@ class CustomerFamilyAdminController extends BaseAdminController
         $updateDefaultForm = $this->createForm(CustomerFamilyUpdateDefaultForm::getName())->getForm()->createView();
         $priceForm = $this->createForm(\CustomerFamily\Form\CustomerFamilyPriceForm::getName())->getForm()->createView();
         $priceModeForm = $this->createForm(\CustomerFamily\Form\CustomerFamilyPriceModeForm::getName())->getForm()->createView();
+        $customerChoiceForm = $this->createForm(CustomerFamilyCustomerChoiceForm::getName())->getForm()->createView();
 
         $con = Propel::getConnection();
 
@@ -165,6 +169,8 @@ class CustomerFamilyAdminController extends BaseAdminController
                 'updateDefaultForm' => $updateDefaultForm,
                 'priceForm' => $priceForm,
                 'priceModeForm' => $priceModeForm,
+                'customerChoiceForm' => $customerChoiceForm,
+                'customer_can_choose_family' => CustomerFamily::customerCanChooseFamily(),
             ]
         ));
     }
@@ -202,6 +208,23 @@ class CustomerFamilyAdminController extends BaseAdminController
         );
 
         return $this->renderAdminConfig($form, $message, $error, $parserContext, $requestStack->getCurrentRequest()?->hasSession() ? $requestStack->getCurrentRequest()->getSession() : null);
+    }
+
+    #[Route("/customer-choice", name: "_customer_choice", methods: ["POST"])]
+    public function updateCustomerChoiceAction(): Response
+    {
+        if (null !== $response = $this->checkAuth(AdminResources::MODULE, 'CustomerFamily', AccessManager::UPDATE)) {
+            return $response;
+        }
+
+        $validatedForm = $this->validateForm($this->createForm(CustomerFamilyCustomerChoiceForm::getName()));
+
+        CustomerFamily::setConfigValue(
+            CustomerFamily::CUSTOMER_CAN_CHOOSE_FAMILY,
+            $validatedForm->get('customer_can_choose_family')->getData() ? 1 : 0
+        );
+
+        return new RedirectResponse(URL::getInstance()->absoluteUrl("/admin/module/CustomerFamily"));
     }
 
     /**
@@ -433,8 +456,14 @@ class CustomerFamilyAdminController extends BaseAdminController
     }
 
     #[Route("/category_restriction/{customerFamilyId}", name: "_category_restriction", methods: ["POST"])]
-    public function saveCustomerFamilyCategoryRestriction($customerFamilyId, ParserContext $parserContext, RequestStack $requestStack)
+    public function saveCustomerFamilyCategoryRestriction($customerFamilyId, ParserContext $parserContext, RequestStack $requestStack, TokenProvider $tokenProvider)
     {
+        if (null !== $response = $this->checkAuth(AdminResources::MODULE, 'CustomerFamily', AccessManager::UPDATE)) {
+            return $response;
+        }
+
+        $tokenProvider->checkToken((string) $requestStack->getCurrentRequest()->request->get('_token'));
+
         $customerFamily = CustomerFamilyQuery::create()
             ->findOneById($customerFamilyId);
 
@@ -463,8 +492,14 @@ class CustomerFamilyAdminController extends BaseAdminController
     }
 
     #[Route("/brand_restriction/{customerFamilyId}", name: "_brand_restriction", methods: ["POST"])]
-    public function saveCustomerFamilyBrandRestriction($customerFamilyId, ParserContext $parserContext, RequestStack $requestStack)
+    public function saveCustomerFamilyBrandRestriction($customerFamilyId, ParserContext $parserContext, RequestStack $requestStack, TokenProvider $tokenProvider)
     {
+        if (null !== $response = $this->checkAuth(AdminResources::MODULE, 'CustomerFamily', AccessManager::UPDATE)) {
+            return $response;
+        }
+
+        $tokenProvider->checkToken((string) $requestStack->getCurrentRequest()->request->get('_token'));
+
         $customerFamily = CustomerFamilyQuery::create()
             ->findOneById($customerFamilyId);
 

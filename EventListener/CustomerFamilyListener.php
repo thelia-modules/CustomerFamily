@@ -27,6 +27,9 @@ use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Mailer\MailerFactory;
 
@@ -38,6 +41,12 @@ class CustomerFamilyListener implements EventSubscriberInterface
 {
     const THELIA_CUSTOMER_CREATE_FORM_NAME = 'thelia_customer_create';
     const THELIA_CUSTOMER_UPDATE_FORM_NAME = 'thelia_customer_profile_update';
+
+    /**
+     * The back office customer creation form refuses extra fields: the family select the module adds
+     * to it is posted under this name, outside the core form.
+     */
+    const ADMIN_CUSTOMER_CREATE_FIELDS = 'customer_family_customer_create';
 
     /** @var RequestStack */
     protected $requestStack;
@@ -53,7 +62,7 @@ class CustomerFamilyListener implements EventSubscriberInterface
      * @param ParserInterface $parser
      * @param MailerFactory $mailer
      */
-    public function __construct(RequestStack $requestStack, ParserInterface $parser, MailerFactory $mailer)
+    public function __construct(RequestStack $requestStack, ParserInterface $parser, MailerFactory $mailer, private readonly SecurityContext $securityContext)
     {
         $this->requestStack = $requestStack;
         $this->parser = $parser;
@@ -141,25 +150,23 @@ class CustomerFamilyListener implements EventSubscriberInterface
      */
     public function afterCreateCustomer(CustomerEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        $form = $this->requestStack->getCurrentRequest()->request->all()[self::THELIA_CUSTOMER_CREATE_FORM_NAME];
+        $customerFamily = null;
 
-        if (is_null($form) or !array_key_exists(CustomerFamilyFormListener::CUSTOMER_FAMILY_CODE_FIELD_NAME, $form)) {
-            // Nothing to create the new CustomerCustomerFamily => stop here !
-            return;
+        if ($this->securityContext->isGranted(['ADMIN'], [AdminResources::CUSTOMER], [], [AccessManager::CREATE])) {
+            $customerFamily = $this->findSubmittedCustomerFamily(self::ADMIN_CUSTOMER_CREATE_FIELDS);
         }
 
-        $customerFamily = CustomerFamilyQuery::create()->findOneByCode($form[CustomerFamilyFormListener::CUSTOMER_FAMILY_CODE_FIELD_NAME]);
-
-        if (is_null($customerFamily)) {
-            // No family => no CustomerCustomerFamily to update.
-            return;
+        if (null === $customerFamily && CustomerFamily::customerCanChooseFamily()) {
+            $customerFamily = $this->findSubmittedCustomerFamily(self::THELIA_CUSTOMER_CREATE_FORM_NAME);
         }
 
-        $customerFamilyId = $customerFamily->getId();
+        if (null === $customerFamily) {
+            return;
+        }
 
         $updateEvent = new CustomerCustomerFamilyEvent($event->getCustomer()->getId());
         $updateEvent
-            ->setCustomerFamilyId($customerFamilyId)
+            ->setCustomerFamilyId($customerFamily->getId())
         ;
 
         $dispatcher->dispatch($updateEvent, CustomerFamilyEvents::CUSTOMER_CUSTOMER_FAMILY_UPDATE);
@@ -172,28 +179,35 @@ class CustomerFamilyListener implements EventSubscriberInterface
      */
     public function customerUpdateProfile(CustomerCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
-        $requestAll = $this->requestStack->getCurrentRequest()->request->all();
-
-        if (!isset($requestAll[self::THELIA_CUSTOMER_UPDATE_FORM_NAME])) {
+        // The account form of the shop only carries the family when customers may choose it;
+        // the back office sets it through its own form (customer_customer_family_form).
+        if (!CustomerFamily::customerCanChooseFamily()) {
             return;
         }
 
-        $form = $requestAll[self::THELIA_CUSTOMER_UPDATE_FORM_NAME];
+        $customerFamily = $this->findSubmittedCustomerFamily(self::THELIA_CUSTOMER_UPDATE_FORM_NAME);
 
-        if (is_null($form) or !array_key_exists(CustomerFamilyFormListener::CUSTOMER_FAMILY_CODE_FIELD_NAME, $form)) {
-            // Nothing to update => stop here !
+        if (null === $customerFamily) {
             return;
         }
-
-
-        $newCustomerFamily = CustomerFamilyQuery::create()->findOneByCode($form[CustomerFamilyFormListener::CUSTOMER_FAMILY_CODE_FIELD_NAME]);
-
 
         $updateEvent = new CustomerCustomerFamilyEvent($event->getCustomer()->getId());
         $updateEvent
-            ->setCustomerFamilyId($newCustomerFamily->getId());
+            ->setCustomerFamilyId($customerFamily->getId());
 
         $dispatcher->dispatch($updateEvent, CustomerFamilyEvents::CUSTOMER_CUSTOMER_FAMILY_UPDATE);
+    }
+
+    private function findSubmittedCustomerFamily(string $formName): ?\CustomerFamily\Model\CustomerFamily
+    {
+        $form = $this->requestStack->getCurrentRequest()?->request->all()[$formName] ?? null;
+        $code = \is_array($form) ? ($form[CustomerFamilyFormListener::CUSTOMER_FAMILY_CODE_FIELD_NAME] ?? null) : null;
+
+        if (!\is_string($code) || '' === $code) {
+            return null;
+        }
+
+        return CustomerFamilyQuery::create()->findOneByCode($code);
     }
 
     /**

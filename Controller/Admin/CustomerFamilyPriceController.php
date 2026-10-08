@@ -11,6 +11,7 @@ use CustomerFamily\Model\CustomerFamilyProductPrice;
 use CustomerFamily\Model\CustomerFamilyProductPriceQuery;
 use CustomerFamily\Service\CustomerFamilyService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Core\HttpFoundation\JsonResponse;
 use Thelia\Core\HttpFoundation\Request;
@@ -18,6 +19,7 @@ use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\Exception\FormValidationException;
+use Thelia\Tools\TokenProvider;
 use Thelia\Tools\URL;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -108,14 +110,20 @@ class CustomerFamilyPriceController extends BaseAdminController
         return new RedirectResponse(URL::getInstance()->absoluteUrl("/admin/module/CustomerFamily"));
     }
 
-    #[Route("/CustomerFamily/ajax/save-price", name: "_updatepse__price", methods: ["GET"])]
-    public function ajaxSavePriceAction(Request $request, CustomerFamilyService $customerFamilyService): JsonResponse
+    #[Route("/CustomerFamily/ajax/save-price", name: "_updatepse__price", methods: ["POST"])]
+    public function ajaxSavePriceAction(Request $request, CustomerFamilyService $customerFamilyService, TokenProvider $tokenProvider): Response
     {
+        if (null !== $response = $this->checkAuth(AdminResources::MODULE, 'CustomerFamily', AccessManager::UPDATE)) {
+            return $response;
+        }
+
+        $tokenProvider->checkToken((string) $request->request->get('_token'));
+
         try {
-            $customerFamilyId = (int)$request->query->get('customer_family_id');
-            $pseId = (int)$request->query->get('pse_id');
-            $priceType = $request->query->get('price_type');
-            $priceValue = $request->query->get('price_value') ? (float)$request->query->get('price_value'): null;
+            $customerFamilyId = (int)$request->request->get('customer_family_id');
+            $pseId = (int)$request->request->get('pse_id');
+            $priceType = $request->request->get('price_type');
+            $priceValue = $request->request->get('price_value') ? (float)$request->request->get('price_value'): null;
 
             $customerFamilyPrice = CustomerFamilyProductPriceQuery::create()
                 ->filterByCustomerFamilyId($customerFamilyId)
