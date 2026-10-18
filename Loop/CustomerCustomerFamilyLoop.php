@@ -64,13 +64,13 @@ class CustomerCustomerFamilyLoop extends BaseLoop implements PropelSearchLoopInt
 
         if (null !== $customerFamilyCode = $this->getCustomerFamilyCode()) {
             $join =  new Join(
-                CustomerCustomerFamilyTableMap::CUSTOMER_FAMILY_ID,
-                CustomerFamilyTableMap::ID,
+                CustomerCustomerFamilyTableMap::COL_CUSTOMER_FAMILY_ID,
+                CustomerFamilyTableMap::COL_ID,
                 Criteria::INNER_JOIN
             );
 
             $search->addJoinObject($join, "customer_family_join")
-                ->addJoinCondition("customer_family_join", CustomerFamilyTableMap::CODE." = '$customerFamilyCode'");
+                ->addJoinCondition('customer_family_join', CustomerFamilyTableMap::COL_CODE.' = ?', $customerFamilyCode, null, \PDO::PARAM_STR);
         }
 
         return $search;

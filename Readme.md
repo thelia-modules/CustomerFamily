@@ -34,11 +34,11 @@ By default only an administrator sets the family of a customer. Tick "Let custom
 
 The second tab allows you to define how prices are calculated for each family, depending on the products purchase price.
 
-Product's prices are automatically changed in the 'product' loop, you don't need to use 'customer_family_pse_calculated_prices' loop (see below) to get product's prices.
+Product's prices are automatically changed in the 'product' loop.
 
 ## Loops
 
-Use provided loops to display for example taxed or untaxed price depending on the customer's family.
+Use provided loops to read the customer families.
 
 ### customer_family
 
@@ -91,67 +91,6 @@ This loop returns customer family for specific customer or inverse
 ```
 {loop type="customer_customer_family" name="customer_customer_family_loop" customer_id="4"}
 
-{/loop}
-```
-
-### customer_family_price
-
-This loop returns the customer family's equation data
-
-#### Input arguments
-
-|Argument |Description |
-|---      |---         |
-|**customer_family_id** | family id |
-|**promo** | equation for the promo price or not |
-|**use_equation** | is the equation used to calculate price |
-
-#### Output values
-
-|Argument |Description |
-|---      |---         |
-|**CUSTOMER_FAMILY_ID** | customer family id |
-|**PROMO** | equation for the promo price or not |
-|**USE_EQUATION** | is the equation used to calculate price |
-|**AMOUNT_ADDED_BEFORE** | amount directly added to the purchase price | 
-|**AMOUNT_ADDED_AFTER** | amount added to the purchase price after the multiplication |
-|**COEFFICIENT** | coefficient the purchase price added to AMOUNT_ADDED_BEFORE is multiplied by |
-|**IS_TAXED** | are taxes applied on the final calculated price |
-
-#### Example
-```
-{loop type="customer_family_price" name="customer_family_price_loop" customer_family_id=1 promo=0}
-    {$AMOUNT_ADDED_BEFORE}
-    ...
-{/loop}
-```
-
-### customer_family_pse_calculated_prices
-
-This loop returns the PSE's calculated price based on the given customer family & currency
-
-#### Input arguments
-
-|Argument |Description |
-|---      |---         |
-|**pse_id** | *mandatory*, PSE id |
-|**currency_id** | currency id *(if not given, use default currency)* |
-|**customer_family_id** | *mandatory*, customer family id |
-
-#### Output values
-
-|Argument |Description |
-|---      |---         |
-|**CALCULATED_PRICE** | customer family id |
-|**CALCULATED_TAXED_PRICE** | equation for the promo price or not |
-|**CALCULATED_PROMO_PRICE** | is the equation used to calculate price |
-|**CALCULATED_TAXED_PROMO_PRICE** | amount directly added to the purchase price |
-
-#### Example
-```
-{loop type="customer_family_pse_calculated_prices" name="customer_family_pse_calculated_prices_loop" pse_id=22 customer_family_id=1}
-    {$CALCULATED_TAXED_PRICE}
-    ...
 {/loop}
 ```
 
