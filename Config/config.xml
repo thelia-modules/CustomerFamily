@@ -7,9 +7,6 @@
 	<loops>
 		<loop name="customer_family" class="CustomerFamily\Loop\CustomerFamilyLoop" />
 		<loop name="customer_customer_family" class="CustomerFamily\Loop\CustomerCustomerFamilyLoop" />
-		<loop name="customer_family_price" class="CustomerFamily\Loop\CustomerFamilyPriceLoop" />
-		<loop name="product_purchase_price" class="CustomerFamily\Loop\ProductPurchasePriceLoop" />
-		<loop name="customer_family_pse_calculated_prices" class="CustomerFamily\Loop\CustomerFamilyProductPriceLoop" />
 	</loops>
 
     <services>
