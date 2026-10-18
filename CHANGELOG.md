@@ -1,3 +1,13 @@
+# 4.4.0
+
+- Customers pick their family on the Flexy sign-up and account forms when the shop lets them ("Let customers choose
+  their family"). The module adds its select to `flexybundle_form_customer_register_form` and
+  `flexybundle_form_customer_update_form` when they are built, and saves the choice on `CREATE_CUSTOMER_MINIMAL` and
+  `CUSTOMER_UPDATEPROFILE`. The sign-up form needs a Flexy release that renders the fields a module adds to it; the
+  account form already does.
+- The Smarty `register.html` and `account-update.html` templates, their jQuery scripts and the two hook classes that
+  rendered them are removed (the hooks were no longer registered).
+
 # 4.3.0
 
 - The customer's family is shown on the Flexy account page through a theme hook (`account.bottom`), in place of the
