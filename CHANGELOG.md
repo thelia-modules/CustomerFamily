@@ -1,3 +1,9 @@
+# 4.3.0
+
+- The customer's family is shown on the Flexy account page through a theme hook (`account.bottom`), in place of the
+  Smarty `account-additional.html` template and its unsubscribed hook class. The register and account update templates
+  are untouched.
+
 # 4.2.0
 
 - Smarty is gone: the Smarty back-office templates (the Twig ones stay) and the `customer_family_price`,
