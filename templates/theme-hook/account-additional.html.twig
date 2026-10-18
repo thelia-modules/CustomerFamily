@@ -1,0 +1,13 @@
+{% for customerCustomerFamily in loop('customer_customer_family', 'customer_customer_family', {customer_id: customerId}) %}
+    <div id="customer-customer-family-{{ customerCustomerFamily.CUSTOMER_ID }}-{{ customerCustomerFamily.CUSTOMER_FAMILY_ID }}" class="container-l pb-15 lg:pb-30">
+        <div class="max-w-4xl mx-auto">
+            {% for family in loop('customer_family', 'customer_family', {id: customerCustomerFamily.CUSTOMER_FAMILY_ID}) %}
+                <h2 class="h4 text-black">{{ 'My customer family'|trans({}, 'customerfamily') }}</h2>
+                <dl class="mt-4">
+                    <dt class="sr-only">{{ 'Customer family'|trans({}, 'customerfamily') }}</dt>
+                    <dd>{{ family.TITLE_CUSTOMER_FAMILY }}</dd>
+                </dl>
+            {% endfor %}
+        </div>
+    </div>
+{% endfor %}
