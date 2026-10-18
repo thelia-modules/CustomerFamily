@@ -39,6 +39,10 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
      */
     const THELIA_ACCOUNT_UPDATE_FORM_NAME = 'thelia_customer_profile_update';
 
+    /** The sign-up and account forms of the Flexy front-office theme. */
+    const FLEXY_REGISTER_FORM_NAME = 'flexybundle_form_customer_register_form';
+    const FLEXY_ACCOUNT_UPDATE_FORM_NAME = 'flexybundle_form_customer_update_form';
+
     const CUSTOMER_FAMILY_CODE_FIELD_NAME = 'customer_family_code';
 
     /** @var RequestStack */
@@ -64,6 +68,8 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
         return array(
             TheliaEvents::FORM_AFTER_BUILD.'.'.self::THELIA_CUSTOMER_CREATE_FORM_NAME => array('addCustomerFamilyFieldsForRegister', 128),
             TheliaEvents::FORM_AFTER_BUILD.'.'.self::THELIA_ACCOUNT_UPDATE_FORM_NAME  => array('addCustomerFamilyFieldsForUpdate', 128),
+            TheliaEvents::FORM_AFTER_BUILD.'.'.self::FLEXY_REGISTER_FORM_NAME => array('addCustomerFamilyFieldsForRegister', 128),
+            TheliaEvents::FORM_AFTER_BUILD.'.'.self::FLEXY_ACCOUNT_UPDATE_FORM_NAME => array('addCustomerFamilyFieldsForUpdate', 128),
         );
     }
 
@@ -95,6 +101,8 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
                         )
                     ),
                     'choices' => $customerFamilyChoices,
+                    'required' => false,
+                    'placeholder' => self::trans('Select customer family'),
                     'label' => self::trans('Customer family'),
                     'label_attr' => array(
                         'for' => 'customer_family_id',
@@ -152,6 +160,8 @@ class CustomerFamilyFormListener extends BaseAction implements EventSubscriberIn
                         )
                     ),
                     'choices' => $customerFamilyChoices,
+                    'required' => false,
+                    'placeholder' => self::trans('Select customer family'),
                     'label' => self::trans('Customer family'),
                     'label_attr' => array(
                         'for' => 'customer_family_id',
