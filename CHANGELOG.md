@@ -1,3 +1,11 @@
+# 4.2.0
+
+- Smarty is gone: the Smarty back-office templates (the Twig ones stay) and the `customer_family_price`,
+  `product_purchase_price` and `customer_family_pse_calculated_prices` loops are removed. The front-office register and
+  account templates, and the two loops they call, are untouched.
+- The `customer_customer_family` loop binds the family code instead of inlining it in the SQL, and uses the Propel
+  `COL_*` constants.
+
 # 4.1.0
 
 - Customers no longer change their own family unless the shop allows it. A new option, "Let customers choose their
