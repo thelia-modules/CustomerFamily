@@ -24,6 +24,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
+use Thelia\Core\Event\Customer\CustomerCreateOrUpdateMinimalEvent;
 use Thelia\Core\Event\Customer\CustomerEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
@@ -81,6 +82,11 @@ class CustomerFamilyListener implements EventSubscriberInterface
         return array(
             TheliaEvents::CUSTOMER_CREATEACCOUNT => array(
                 'afterCreateCustomer', 100
+            ),
+            // The Flexy sign-up form creates the account through this event, after the
+            // core listener (priority 128) has saved the customer.
+            TheliaEvents::CREATE_CUSTOMER_MINIMAL => array(
+                'afterRegisterCustomer', 100
             ),
             TheliaEvents::CUSTOMER_UPDATEPROFILE => array(
                 'customerUpdateProfile', 100
@@ -177,6 +183,26 @@ class CustomerFamilyListener implements EventSubscriberInterface
      * @param $eventName
      * @param EventDispatcherInterface $dispatcher
      */
+    public function afterRegisterCustomer(CustomerCreateOrUpdateMinimalEvent $event, $eventName, EventDispatcherInterface $dispatcher)
+    {
+        $customer = $event->getCustomer();
+
+        if (null === $customer || !CustomerFamily::customerCanChooseFamily()) {
+            return;
+        }
+
+        $customerFamily = $this->findSubmittedCustomerFamily(CustomerFamilyFormListener::FLEXY_REGISTER_FORM_NAME);
+
+        if (null === $customerFamily) {
+            return;
+        }
+
+        $updateEvent = new CustomerCustomerFamilyEvent($customer->getId());
+        $updateEvent->setCustomerFamilyId($customerFamily->getId());
+
+        $dispatcher->dispatch($updateEvent, CustomerFamilyEvents::CUSTOMER_CUSTOMER_FAMILY_UPDATE);
+    }
+
     public function customerUpdateProfile(CustomerCreateOrUpdateEvent $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         // The account form of the shop only carries the family when customers may choose it;
@@ -185,7 +211,8 @@ class CustomerFamilyListener implements EventSubscriberInterface
             return;
         }
 
-        $customerFamily = $this->findSubmittedCustomerFamily(self::THELIA_CUSTOMER_UPDATE_FORM_NAME);
+        $customerFamily = $this->findSubmittedCustomerFamily(self::THELIA_CUSTOMER_UPDATE_FORM_NAME)
+            ?? $this->findSubmittedCustomerFamily(CustomerFamilyFormListener::FLEXY_ACCOUNT_UPDATE_FORM_NAME);
 
         if (null === $customerFamily) {
             return;
